@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F7A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="帰りの会メモ">
+<title>帰りの会メモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#F6F7F3; --surface:#FFFFFF; --surface-2:#EFF1EB;
+  --ink:#1B211D; --ink-2:#5C665F; --ink-3:#8A938C;
+  --line:#DCE1DA; --line-strong:#C3CBC1;
+  --accent:#1F7A5C; --accent-ink:#FFFFFF; --accent-soft:#E2EFE8;
+  --amber:#9A6510; --amber-soft:#F6EBD6;
+  --rule:#CBDCE6;
+  --shadow:0 1px 2px rgba(27,33,29,.06), 0 10px 28px rgba(27,33,29,.06);
+  --sans:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#111412; --surface:#191D1A; --surface-2:#222724;
+    --ink:#E7EDE8; --ink-2:#A2ABA4; --ink-3:#7B847D;
+    --line:#2A302C; --line-strong:#3C443E;
+    --accent:#4FC79A; --accent-ink:#0C1310; --accent-soft:#1B2E27;
+    --amber:#E2AC55; --amber-soft:#2C2517;
+    --rule:#27343A;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#111412; --surface:#191D1A; --surface-2:#222724;
+  --ink:#E7EDE8; --ink-2:#A2ABA4; --ink-3:#7B847D;
+  --line:#2A302C; --line-strong:#3C443E;
+  --accent:#4FC79A; --accent-ink:#0C1310; --accent-soft:#1B2E27;
+  --amber:#E2AC55; --amber-soft:#2C2517;
+  --rule:#27343A;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+ul,ol,dl{margin:0; padding:0; list-style:none}
+dd{margin:0}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:none; padding:0}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px; padding:18px 0 14px;
+}
+.brand{font-size:15px; font-weight:900; letter-spacing:.04em; margin:0}
+.brand span{color:var(--accent)}
+.clock{font-family:var(--mono); font-size:12px; color:var(--ink-3); letter-spacing:.06em; font-variant-numeric:tabular-nums}
+
+/* ---------- shared ---------- */
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 8px;
+}
+.card{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:14px; box-shadow:var(--shadow); padding:16px;
+}
+.stack{display:flex; flex-direction:column; gap:14px}
+.row{display:flex; align-items:center; gap:10px}
+.spread{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.muted{color:var(--ink-2); font-size:14px}
+.tiny{font-size:12.5px; color:var(--ink-3); line-height:1.7}
+h2.sec{font-size:17px; font-weight:900; margin:0 0 10px; letter-spacing:.01em}
+hr.hair{border:none; border-top:1px solid var(--line); margin:18px 0}
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  border:1px solid var(--line-strong); background:var(--surface);
+  border-radius:10px; padding:11px 14px; font-size:14px; font-weight:700;
+  transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.small{padding:7px 11px; font-size:13px; border-radius:8px}
+.btn.ghost{border-color:transparent; color:var(--ink-2)}
+.btn.danger{color:#B3452F; border-color:var(--line-strong)}
+:root[data-theme="dark"] .btn.danger, :root:not([data-theme="light"]) .btn.danger{}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.danger{color:#F08A6E} }
+:root[data-theme="dark"] .btn.danger{color:#F08A6E}
+
+input[type=text],input[type=time],input[type=date],textarea,select{
+  width:100%; background:var(--surface); border:1px solid var(--line-strong);
+  border-radius:10px; padding:11px 12px; font-size:15px;
+}
+textarea{resize:vertical; min-height:96px; line-height:1.8}
+
+/* ---------- tab bar ---------- */
+.tabbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  background:var(--surface);
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+}
+.tab{
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  color:var(--ink-3); font-size:11px; font-weight:700; letter-spacing:.03em;
+  padding:4px 0;
+}
+.tab svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.tab[aria-current="page"]{color:var(--accent)}
+
+.view{display:none}
+.view.on{display:block}
+
+/* ---------- home ---------- */
+.daypick{display:flex; gap:6px; background:var(--surface-2); padding:4px; border-radius:11px; margin-bottom:14px}
+.daypick button{
+  flex:1; padding:9px 0; border-radius:8px; font-size:14px; font-weight:700; color:var(--ink-2);
+}
+.daypick button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+
+.dayhead{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:4px}
+.bigdate{font-size:30px; font-weight:900; line-height:1.1; letter-spacing:-.01em}
+.bigdate .dow{font-size:17px; color:var(--accent); margin-left:6px}
+.patname{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.08em; color:var(--ink-2);
+  border:1px solid var(--line-strong); border-radius:999px; padding:3px 10px; white-space:nowrap;
+}
+
+/* items — the thing you forget */
+.items-panel{background:var(--amber-soft); border:1px solid var(--amber); border-color:color-mix(in srgb, var(--amber) 30%, transparent); border-radius:14px; padding:14px 16px}
+.items-panel .eyebrow{color:var(--amber)}
+.itemlist{display:flex; flex-wrap:wrap; gap:8px}
+.itemlist li{
+  background:var(--surface); border:1px solid var(--line-strong);
+  border-color:color-mix(in srgb, var(--amber) 38%, transparent);
+  color:var(--ink); border-radius:9px; padding:7px 12px; font-size:15px; font-weight:700;
+}
+
+/* timetable rows */
+.tt{border-top:1px solid var(--line)}
+.tt li{display:flex; align-items:center; gap:14px; padding:11px 4px 11px 0; border-bottom:1px solid var(--line); position:relative}
+.tt li.chg::before{content:""; position:absolute; left:-16px; top:6px; bottom:6px; width:3px; border-radius:2px; background:var(--accent)}
+.pno{
+  font-family:var(--mono); font-size:12px; font-weight:600; color:var(--ink-3);
+  min-width:30px; font-variant-numeric:tabular-nums;
+}
+.psub{font-size:18px; font-weight:700; flex:1; text-align:left}
+.psub.empty{color:var(--ink-3); font-weight:400}
+.chgtag{font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-soft); border-radius:5px; padding:2px 6px; letter-spacing:.04em}
+
+.kv{display:flex; align-items:baseline; gap:10px}
+.kv dt{font-family:var(--mono); font-size:11px; letter-spacing:.12em; color:var(--ink-3); text-transform:uppercase; min-width:74px}
+.kv dd{margin:0; font-size:16px; font-weight:700; font-variant-numeric:tabular-nums}
+
+/* notebook-ruled memo */
+.memo{
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 27px, var(--rule) 27px 28px);
+  background-position:0 6px;
+  padding:6px 2px 2px; line-height:28px; font-size:15px; white-space:pre-wrap; word-break:break-word;
+  min-height:28px;
+}
+.shots{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px}
+.shots img{height:132px; border-radius:10px; border:1px solid var(--line); cursor:zoom-in}
+
+.notice{
+  background:var(--accent-soft); border:1px solid var(--line-strong);
+  border-color:color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius:12px; padding:12px 14px; font-size:13.5px; line-height:1.7;
+}
+.notice b{display:block; margin-bottom:2px}
+
+/* ---------- input view ---------- */
+.editrow{
+  display:flex; align-items:center; gap:12px; width:100%;
+  padding:10px 8px 10px 0; border-bottom:1px solid var(--line); position:relative; text-align:left;
+}
+.editrow.chg::before{content:""; position:absolute; left:-16px; top:5px; bottom:5px; width:3px; border-radius:2px; background:var(--accent)}
+.editrow .val{flex:1; font-size:17px; font-weight:700}
+.editrow .val.empty{color:var(--ink-3); font-weight:400}
+.editrow .caret{color:var(--ink-3); font-size:13px}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  border:1px solid var(--line-strong); border-radius:9px; padding:8px 12px;
+  font-size:14.5px; font-weight:500; background:var(--surface); transition:.12s;
+}
+.chip[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:transparent; font-weight:700}
+.chip.add{border-style:dashed; color:var(--ink-2)}
+
+.saved{
+  font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--accent);
+  opacity:0; transition:opacity .25s;
+}
+.saved.on{opacity:1}
+
+/* ---------- calendar ---------- */
+.calhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+.calhead .m{font-size:20px; font-weight:900; font-variant-numeric:tabular-nums}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:3px}
+.cal .dowh{font-family:var(--mono); font-size:10.5px; text-align:center; color:var(--ink-3); padding:4px 0; letter-spacing:.06em}
+.cal .cell{
+  aspect-ratio:1/1.18; border:1px solid var(--line); border-radius:9px; background:var(--surface);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  padding:5px 2px 3px; gap:3px; font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums;
+}
+.cal .cell.blank{border-color:transparent; background:none}
+.cal .cell.today{border-color:var(--accent); border-width:2px}
+.cal .cell.sat{color:#3F6EA8} .cal .cell.sun{color:#B3452F}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cal .cell.sat{color:#7FA9DC} :root:not([data-theme="light"]) .cal .cell.sun{color:#EE8E76} }
+:root[data-theme="dark"] .cal .cell.sat{color:#7FA9DC} :root[data-theme="dark"] .cal .cell.sun{color:#EE8E76}
+.dots{display:flex; gap:2px; height:5px}
+.dot{display:inline-block; width:5px; height:5px; border-radius:50%; flex:0 0 auto}
+.dot.d-chg{background:var(--accent)} .dot.d-item{background:var(--amber)} .dot.d-ev{background:#8A6BC4}
+.cal .cell .ev{font-family:var(--sans); font-size:9px; line-height:1.15; text-align:center; color:var(--ink-2); overflow:hidden; max-height:22px; word-break:break-all}
+
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; font-size:12px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:5px}
+
+/* ---------- settings ---------- */
+.acc{border:1px solid var(--line); border-radius:12px; background:var(--surface); overflow:hidden}
+.acc + .acc{margin-top:10px}
+.acc > summary{padding:14px 16px; font-weight:700; font-size:15px; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center}
+.acc > summary::-webkit-details-marker{display:none}
+.acc > summary::after{content:"＋"; color:var(--ink-3); font-family:var(--mono)}
+.acc[open] > summary::after{content:"−"}
+.acc .body{padding:0 16px 16px; border-top:1px solid var(--line); padding-top:14px}
+.wk{display:flex; gap:5px; margin-bottom:12px; overflow-x:auto}
+.wk button{border:1px solid var(--line-strong); border-radius:9px; padding:8px 13px; font-weight:700; font-size:14px; white-space:nowrap}
+.wk button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:transparent}
+
+/* ---------- sheet ---------- */
+.sheet-bg{
+  position:fixed; inset:0; background:rgba(10,14,12,.5); z-index:60;
+  display:none; align-items:flex-end; justify-content:center;
+}
+.sheet-bg.on{display:flex}
+.sheet{
+  background:var(--surface); width:100%; max-width:560px;
+  border-radius:18px 18px 0 0; padding:18px 16px calc(20px + env(safe-area-inset-bottom));
+  max-height:82vh; overflow-y:auto; border:1px solid var(--line); border-bottom:none;
+}
+.sheet h3{margin:0 0 14px; font-size:16px; font-weight:900}
+.grid-pick{display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:7px}
+.grid-pick button{border:1px solid var(--line-strong); border-radius:10px; padding:13px 6px; font-weight:700; font-size:14.5px}
+.grid-pick button:hover{background:var(--surface-2)}
+
+.toast{
+  position:fixed; left:50%; transform:translateX(-50%); bottom:calc(92px + env(safe-area-inset-bottom));
+  background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:999px;
+  font-size:13.5px; font-weight:700; z-index:70; opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1 class="brand">帰りの会<span>メモ</span></h1>
+    <div class="clock" id="clock"></div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section class="view on" id="v-home">
+    <div class="daypick" id="daypick">
+      <button data-off="0" aria-pressed="false">今日</button>
+      <button data-off="1" aria-pressed="true">明日</button>
+      <button data-off="2" aria-pressed="false">あさって</button>
+    </div>
+
+    <div class="stack">
+      <div id="demoNote" class="notice" style="display:none">
+        <b>いまは見本の時間割です</b>
+        下の「設定」→「基本の時間割」を自分のものに直すと、帰りの会は変わったコマをタップするだけになります。
+        <div style="margin-top:10px"><button class="btn small" id="goSetup">設定をひらく</button></div>
+      </div>
+
+      <div class="card">
+        <div class="dayhead">
+          <div class="bigdate" id="hDate">—</div>
+          <div class="patname" id="hPat">—</div>
+        </div>
+        <ul class="tt" id="hTT"></ul>
+        <dl class="kv" style="margin:14px 0 0"><dt>下校</dt><dd id="hDis">—</dd></dl>
+      </div>
+
+      <div class="items-panel">
+        <p class="eyebrow">持ち物</p>
+        <ul class="itemlist" id="hItems"></ul>
+      </div>
+
+      <div class="card" id="hEvWrap" style="display:none">
+        <p class="eyebrow">行事・予定</p>
+        <div id="hEv" style="font-weight:700"></div>
+      </div>
+
+      <div class="card" id="hMemoWrap" style="display:none">
+        <p class="eyebrow">連絡・メモ</p>
+        <div class="memo" id="hMemo"></div>
+        <div class="shots" id="hShots" style="margin-top:12px"></div>
+      </div>
+
+      <div class="row" style="gap:8px">
+        <button class="btn primary" style="flex:1" id="hEdit">この日を書きこむ</button>
+        <button class="btn" id="hGcal">カレンダーに入れる</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INPUT ============ -->
+  <section class="view" id="v-in">
+    <div class="spread" style="margin-bottom:12px">
+      <p class="eyebrow" style="margin:0">書きこむ日</p>
+      <span class="saved" id="savedMark">保存済み</span>
+    </div>
+    <input type="date" id="inDate" style="margin-bottom:14px">
+
+    <div class="stack">
+      <div class="card">
+        <div class="spread" style="margin-bottom:10px">
+          <h2 class="sec" style="margin:0">日課</h2>
+          <button class="btn small" id="inPat">パターンを選ぶ</button>
+        </div>
+        <p class="tiny" style="margin:0 0 8px" id="inPatNow">—</p>
+        <div id="inTT"></div>
+        <div class="row" style="margin-top:12px; gap:8px">
+          <button class="btn small ghost" id="inReset">基本にもどす</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="sec">持ち物</h2>
+        <div class="chips" id="inItems"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="sec">下校時刻</h2>
+        <input type="time" id="inDis">
+      </div>
+
+      <div class="card">
+        <h2 class="sec">行事・予定</h2>
+        <input type="text" id="inEv" placeholder="例：合唱コンクール練習、6限カット">
+      </div>
+
+      <div class="card">
+        <div class="spread" style="margin-bottom:10px">
+          <h2 class="sec" style="margin:0">連絡・メモ</h2>
+          <div class="row" style="gap:6px">
+            <button class="btn small" id="inMic" title="話して入力">🎙 音声</button>
+            <label class="btn small" for="inCam">📷 写真</label>
+            <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
+          </div>
+        </div>
+        <textarea id="inMemo" placeholder="連絡帳に書くことをそのまま。あとで直せます。"></textarea>
+        <p class="tiny" id="micNote" style="margin:8px 0 0"></p>
+        <div class="shots" id="inShots" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CALENDAR ============ -->
+  <section class="view" id="v-cal">
+    <div class="calhead">
+      <button class="btn small" id="calPrev">◀</button>
+      <div class="m" id="calM">—</div>
+      <button class="btn small" id="calNext">▶</button>
+    </div>
+    <div class="cal" id="calGrid"></div>
+    <div class="legend">
+      <span><i class="dot d-chg"></i>時間割を変更</span>
+      <span><i class="dot d-item"></i>持ち物あり</span>
+      <span><i class="dot d-ev"></i>行事</span>
+    </div>
+    <p class="tiny" style="margin-top:14px">日付をタップすると、その日の書きこみ画面がひらきます。</p>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="view" id="v-set">
+    <details class="acc" open>
+      <summary>基本の時間割</summary>
+      <div class="body">
+        <p class="tiny" style="margin:0 0 12px">ここを一度うめておくと、帰りの会では変わったコマをタップするだけで済みます。</p>
+        <div class="wk" id="setWk"></div>
+        <div id="setTT"></div>
+        <div class="row" style="margin-top:14px">
+          <span class="muted" style="flex:1">下校時刻</span>
+          <input type="time" id="setDis" style="width:130px">
+        </div>
+        <div class="row" style="margin-top:10px">
+          <span class="muted" style="flex:1">1日のコマ数</span>
+          <select id="setPeriods" style="width:130px">
+            <option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>特別日課のパターン</summary>
+      <div class="body">
+        <p class="tiny" style="margin:0 0 12px">短縮授業や行事日課など、まるごと入れ替わる日を登録しておけます。帰りの会では選ぶだけ。</p>
+        <div id="patList" class="stack" style="gap:8px"></div>
+        <button class="btn small" id="patAdd" style="margin-top:12px">＋ パターンを追加</button>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>教科のボタン</summary>
+      <div class="body">
+        <div class="chips" id="setSubs"></div>
+        <div class="row" style="margin-top:12px">
+          <input type="text" id="subNew" placeholder="教科を追加">
+          <button class="btn small" id="subAdd">追加</button>
+        </div>
+        <p class="tiny" style="margin-top:8px">タップで削除できます。</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>持ち物のボタン</summary>
+      <div class="body">
+        <div class="chips" id="setItems"></div>
+        <div class="row" style="margin-top:12px">
+          <input type="text" id="itemNew" placeholder="持ち物を追加">
+          <button class="btn small" id="itemAdd">追加</button>
+        </div>
+        <p class="tiny" style="margin-top:8px">タップで削除できます。よく使うものは自動で上に並びます。</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>通知</summary>
+      <div class="body">
+        <div class="row" style="margin-bottom:12px">
+          <span class="muted" style="flex:1">夜のお知らせ</span>
+          <input type="time" id="setNight" style="width:130px">
+        </div>
+        <div class="row" style="margin-bottom:14px">
+          <span class="muted" style="flex:1">朝のお知らせ</span>
+          <input type="time" id="setMorning" style="width:130px">
+        </div>
+        <button class="btn" id="notifAsk">通知を許可する</button>
+        <p class="tiny" id="notifState" style="margin-top:10px"></p>
+        <div class="notice" style="margin-top:14px">
+          <b>ここは正直に書いておきます</b>
+          ウェブアプリは、閉じているあいだに決まった時刻で通知を出すことができません（とくにiPhone）。この通知は<b>アプリを開いているとき</b>だけ出ます。<br><br>
+          確実に気づきたいなら、上の「今日/明日」画面の<b>「カレンダーに入れる」</b>を使ってください。スマホのカレンダーの通知に乗せられます。あわせて、スマホのアラームを夜の時刻にセットしておくのが一番確実です。
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>データ</summary>
+      <div class="body">
+        <p class="tiny" style="margin:0 0 12px">この記録はこのスマホ（ブラウザ）の中だけに入っています。ブラウザのデータを消すと消えるので、ときどき書き出しておくと安心です。</p>
+        <div class="row" style="gap:8px; flex-wrap:wrap">
+          <button class="btn small" id="dExport">バックアップを書き出す</button>
+          <button class="btn small" id="dCopy">コピーする</button>
+          <label class="btn small" for="dImportFile">ファイルから読みこむ</label>
+          <input type="file" id="dImportFile" accept=".json,application/json" hidden>
+          <button class="btn small" id="dPaste">貼り付けて読みこむ</button>
+        </div>
+        <hr class="hair">
+        <button class="btn small danger" id="dWipe">ぜんぶ消してはじめから</button>
+        <p class="tiny" style="margin-top:8px" id="storeInfo"></p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>見た目</summary>
+      <div class="body">
+        <div class="wk" id="themePick">
+          <button data-t="auto" aria-pressed="true">端末に合わせる</button>
+          <button data-t="light" aria-pressed="false">明るい</button>
+          <button data-t="dark" aria-pressed="false">暗い</button>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <nav class="tabbar" aria-label="画面">
+    <button class="tab" data-v="home" aria-current="page">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M7.5 9.5h9M7.5 13h6.5M7.5 16.5h4"/></svg>今日/明日
+    </button>
+    <button class="tab" data-v="in">
+      <svg viewBox="0 0 24 24"><path d="M4 20l1-4.5L15.8 4.7a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L8.5 19 4 20z"/><path d="M14.5 6.5l3 3"/></svg>書きこむ
+    </button>
+    <button class="tab" data-v="cal">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>カレンダー
+    </button>
+    <button class="tab" data-v="set">
+      <svg viewBox="0 0 24 24"><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2.2"/><circle cx="9" cy="16" r="2.2"/></svg>設定
+    </button>
+  </nav>
+</div>
+
+<div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= storage ================= */
+var KEY = "kaerinokai_v1";
+var DOW = ["日","月","火","水","木","金","土"];
+var WKID = ["sun","mon","tue","wed","thu","fri","sat"];
+
+function defaults(){
+  var d = {
+    v: 1,
+    demo: true,
+    periods: 6,
+    subjects: ["国語","算数","数学","英語","理科","社会","体育","音楽","図工","美術","技術","家庭","書写","道徳","総合","学活","委員会","自習","移動教室"],
+    items: [
+      {n:"体操着",c:0},{n:"上履き",c:0},{n:"給食セット",c:0},{n:"絵の具セット",c:0},
+      {n:"習字道具",c:0},{n:"リコーダー",c:0},{n:"鍵盤ハーモニカ",c:0},{n:"裁縫セット",c:0},
+      {n:"彫刻刀",c:0},{n:"エプロン",c:0},{n:"水着",c:0},{n:"雑巾",c:0},
+      {n:"定規",c:0},{n:"コンパス",c:0},{n:"分度器",c:0},{n:"漢字ドリル",c:0},
+      {n:"計算ドリル",c:0},{n:"図書の本",c:0},{n:"水筒",c:0},{n:"折りたたみ傘",c:0}
+    ],
+    base: {},
+    patterns: [
+      {id:"p_tanshuku", name:"短縮5時間", periods:["","","","","",""], dis:"14:20"},
+      {id:"p_gyoji",    name:"行事日課",   periods:["","","","","",""], dis:"15:00"}
+    ],
+    days: {},
+    notif: {night:"21:00", morning:"07:00", last:""},
+    theme: "auto"
+  };
+  var demo = {
+    mon:["国語","算数","理科","体育","社会","音楽"],
+    tue:["算数","国語","社会","図工","図工","学活"],
+    wed:["理科","算数","国語","体育","家庭","家庭"],
+    thu:["国語","社会","算数","音楽","理科","委員会"],
+    fri:["算数","国語","体育","書写","総合","学活"],
+    sat:["","","","","",""], sun:["","","","","",""]
+  };
+  for (var k in demo) d.base[k] = {periods: demo[k].slice(), dis: (k==="fri"?"15:10":"15:30")};
+  return d;
+}
+
+var S = null;
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ S = JSON.parse(raw); }
+  }catch(e){}
+  if(!S || !S.base){ S = defaults(); }
+  if(!S.notif) S.notif = {night:"21:00", morning:"07:00", last:""};
+  if(!S.patterns) S.patterns = [];
+  if(!S.theme) S.theme = "auto";
+  return S;
+}
+var saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    try{ localStorage.setItem(KEY, JSON.stringify(S)); flashSaved(); }
+    catch(e){ toast("保存できません。写真が多すぎるかもしれません"); }
+  }, 120);
+}
+function flashSaved(){
+  var m = $("#savedMark"); if(!m) return;
+  m.classList.add("on"); setTimeout(function(){ m.classList.remove("on"); }, 1100);
+}
+
+/* ================= helpers ================= */
+function $(s,r){ return (r||document).querySelector(s); }
+function $$(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function el(tag, cls, txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function pad(n){ return n<10 ? "0"+n : ""+n; }
+function keyOf(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function parseKey(k){ var p=k.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function addDays(d,n){ var x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
+
+var toastT = null;
+function toast(msg){
+  var t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove("on"); }, 2200);
+}
+
+/* ================= day model ================= */
+function baseFor(k){
+  var wk = WKID[parseKey(k).getDay()];
+  var b = S.base[wk] || {periods:[], dis:""};
+  return { periods: (b.periods||[]).slice(0, S.periods), dis: b.dis||"" };
+}
+function patternById(id){
+  for(var i=0;i<S.patterns.length;i++) if(S.patterns[i].id===id) return S.patterns[i];
+  return null;
+}
+/** resolved view of a date */
+function dayOf(k){
+  var rec = S.days[k] || {};
+  var src = rec.pat ? patternById(rec.pat) : null;
+  var base = src ? {periods:(src.periods||[]).slice(0,S.periods), dis:src.dis||""} : baseFor(k);
+  var per = [];
+  for(var i=0;i<S.periods;i++){
+    per.push( (rec.periods && rec.periods[i] != null && rec.periods[i] !== " ") ? rec.periods[i] : (base.periods[i] || "") );
+  }
+  return {
+    key: k,
+    periods: per,
+    basePeriods: base.periods,
+    patName: src ? src.name : (DOW[parseKey(k).getDay()] + "曜の基本"),
+    patId: rec.pat || "",
+    items: (rec.items || []).slice(),
+    dis: rec.dis || base.dis || "",
+    ev: rec.ev || "",
+    memo: rec.memo || "",
+    shots: (rec.shots || []).slice()
+  };
+}
+function rec(k){ if(!S.days[k]) S.days[k] = {}; return S.days[k]; }
+function isChanged(d,i){ return (d.periods[i]||"") !== (d.basePeriods[i]||""); }
+function hasAnything(k){
+  var r = S.days[k]; if(!r) return false;
+  return !!(r.pat || (r.periods&&r.periods.some(function(x){return x!=null;})) || (r.items&&r.items.length) || r.ev || r.memo || (r.shots&&r.shots.length) || r.dis);
+}
+
+/* ================= views ================= */
+var view = "home";
+function go(v){
+  view = v;
+  $$(".view").forEach(function(s){ s.classList.toggle("on", s.id === "v-"+v); });
+  $$(".tab").forEach(function(b){
+    if(b.dataset.v===v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+  });
+  window.scrollTo(0,0);
+  if(v==="home") renderHome();
+  if(v==="in") renderIn();
+  if(v==="cal") renderCal();
+  if(v==="set") renderSet();
+}
+$$(".tab").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.v); }); });
+
+/* ---------- HOME ---------- */
+var homeOff = (new Date()).getHours() >= 12 ? 1 : 0;
+function renderHome(){
+  $$("#daypick button").forEach(function(b){ b.setAttribute("aria-pressed", (+b.dataset.off===homeOff)?"true":"false"); });
+  var k = keyOf(addDays(new Date(), homeOff));
+  var d = dayOf(k);
+  var dt = parseKey(k);
+
+  $("#demoNote").style.display = S.demo ? "" : "none";
+  $("#hDate").innerHTML = (dt.getMonth()+1)+"月"+dt.getDate()+"日<span class='dow'>("+DOW[dt.getDay()]+")</span>";
+  $("#hPat").textContent = d.patName;
+
+  var tt = $("#hTT"); tt.innerHTML = "";
+  for(var i=0;i<S.periods;i++){
+    var li = el("li"); if(isChanged(d,i)) li.className="chg";
+    li.appendChild(el("span","pno",(i+1)+"限"));
+    var sp = el("span","psub"+(d.periods[i]?"":" empty"), d.periods[i] || "—");
+    li.appendChild(sp);
+    if(isChanged(d,i)) li.appendChild(el("span","chgtag","変更"));
+    tt.appendChild(li);
+  }
+  $("#hDis").textContent = d.dis || "—";
+
+  var ul = $("#hItems"); ul.innerHTML = "";
+  if(d.items.length===0){ var li0 = el("li","", "とくになし"); li0.style.fontWeight="400"; li0.style.color="var(--ink-3)"; ul.appendChild(li0); }
+  else d.items.forEach(function(n){ ul.appendChild(el("li","",n)); });
+
+  $("#hEvWrap").style.display = d.ev ? "" : "none";
+  $("#hEv").textContent = d.ev;
+
+  var showMemo = !!(d.memo || d.shots.length);
+  $("#hMemoWrap").style.display = showMemo ? "" : "none";
+  $("#hMemo").textContent = d.memo;
+  var sh = $("#hShots"); sh.innerHTML = "";
+  d.shots.forEach(function(src){
+    var im = new Image(); im.src = src; im.alt="黒板の写真";
+    im.addEventListener("click", function(){ openShot(src); });
+    sh.appendChild(im);
+  });
+}
+$("#daypick").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  homeOff = +b.dataset.off; renderHome();
+});
+$("#goSetup").addEventListener("click", function(){ go("set"); });
+$("#hEdit").addEventListener("click", function(){
+  inKey = keyOf(addDays(new Date(), homeOff)); go("in");
+});
+
+function openShot(src){
+  openSheet("写真", function(box){
+    var im = new Image(); im.src=src; im.style.width="100%"; im.style.borderRadius="12px";
+    box.appendChild(im);
+  });
+}
+
+/* ---------- INPUT ---------- */
+var inKey = keyOf(addDays(new Date(), (new Date()).getHours()>=12 ? 1 : 0));
+function renderIn(){
+  $("#inDate").value = inKey;
+  var d = dayOf(inKey);
+  $("#inPatNow").textContent = "いま：" + d.patName;
+
+  var box = $("#inTT"); box.innerHTML = "";
+  for(var i=0;i<S.periods;i++){
+    (function(idx){
+      var b = el("button","editrow"+(isChanged(d,idx)?" chg":""));
+      b.type="button";
+      b.appendChild(el("span","pno",(idx+1)+"限"));
+      b.appendChild(el("span","val"+(d.periods[idx]?"":" empty"), d.periods[idx] || "えらぶ"));
+      b.appendChild(el("span","caret","›"));
+      b.addEventListener("click", function(){ pickSubject(idx); });
+      box.appendChild(b);
+    })(i);
+  }
+
+  var ic = $("#inItems"); ic.innerHTML = "";
+  var sorted = S.items.slice().sort(function(a,b){ return (b.c||0)-(a.c||0); });
+  sorted.forEach(function(it){
+    var on = d.items.indexOf(it.n) >= 0;
+    var c = el("button","chip",it.n);
+    c.type="button"; c.setAttribute("aria-pressed", on?"true":"false");
+    c.addEventListener("click", function(){ toggleItem(it); });
+    ic.appendChild(c);
+  });
+  var add = el("button","chip add","＋ その他");
+  add.type="button";
+  add.addEventListener("click", function(){
+    askText("持ち物を追加", "例：リコーダー", function(n){
+      if(!S.items.some(function(x){return x.n===n;})) S.items.push({n:n,c:1});
+      var r = rec(inKey); r.items = (r.items||[]); if(r.items.indexOf(n)<0) r.items.push(n);
+      save(); renderIn();
+    });
+  });
+  ic.appendChild(add);
+
+  $("#inDis").value = d.dis || "";
+  $("#inEv").value = d.ev || "";
+  $("#inMemo").value = d.memo || "";
+  drawShots();
+}
+function toggleItem(it){
+  var r = rec(inKey); r.items = r.items || [];
+  var i = r.items.indexOf(it.n);
+  if(i>=0){ r.items.splice(i,1); }
+  else { r.items.push(it.n); it.c = (it.c||0)+1; }
+  save(); renderIn();
+}
+function drawShots(){
+  var d = dayOf(inKey); var sh = $("#inShots"); sh.innerHTML = "";
+  d.shots.forEach(function(src, i){
+    var wrap = el("div"); wrap.style.position="relative"; wrap.style.flex="0 0 auto";
+    var im = new Image(); im.src=src; im.style.height="132px"; im.style.borderRadius="10px"; im.style.border="1px solid var(--line)";
+    var x = el("button","btn small","✕");
+    x.type="button";
+    x.style.cssText="position:absolute; top:5px; right:5px; padding:3px 8px; border-radius:999px; background:var(--surface)";
+    x.addEventListener("click", function(){ var r=rec(inKey); r.shots.splice(i,1); save(); drawShots(); });
+    wrap.appendChild(im); wrap.appendChild(x); sh.appendChild(wrap);
+  });
+}
+$("#inDate").addEventListener("change", function(){ if(this.value){ inKey=this.value; renderIn(); } });
+$("#inDis").addEventListener("change", function(){ rec(inKey).dis = this.value; save(); });
+$("#inEv").addEventListener("input", function(){ rec(inKey).ev = this.value; save(); });
+$("#inMemo").addEventListener("input", function(){ rec(inKey).memo = this.value; save(); });
+$("#inReset").addEventListener("click", function(){
+  var r = rec(inKey); delete r.periods; delete r.pat; delete r.dis;
+  save(); renderIn(); toast("基本にもどしました");
+});
+$("#inPat").addEventListener("click", function(){
+  openSheet("日課パターン", function(box){
+    var g = el("div","grid-pick");
+    var bBase = el("button",null,"基本（"+DOW[parseKey(inKey).getDay()]+"曜）");
+    bBase.addEventListener("click", function(){ delete rec(inKey).pat; save(); closeSheet(); renderIn(); });
+    g.appendChild(bBase);
+    S.patterns.forEach(function(p){
+      var b = el("button",null,p.name);
+      b.addEventListener("click", function(){ rec(inKey).pat = p.id; delete rec(inKey).periods; save(); closeSheet(); renderIn(); });
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+    var note = el("p","tiny","パターンは「設定 → 特別日課のパターン」で追加・編集できます。");
+    note.style.marginTop = "14px"; box.appendChild(note);
+  });
+});
+function pickSubject(idx){
+  openSheet((idx+1)+"限", function(box){
+    var g = el("div","grid-pick");
+    S.subjects.forEach(function(s){
+      var b = el("button",null,s);
+      b.addEventListener("click", function(){ setPeriod(idx, s); });
+      g.appendChild(b);
+    });
+    var bn = el("button",null,"なし"); bn.style.color="var(--ink-3)";
+    bn.addEventListener("click", function(){ setPeriod(idx, ""); });
+    g.appendChild(bn);
+    var bo = el("button",null,"その他…");
+    bo.addEventListener("click", function(){
+      askText("教科を入力", "例：情報", function(v){
+        if(S.subjects.indexOf(v)<0) S.subjects.push(v);
+        setPeriod(idx, v);
+      });
+    });
+    g.appendChild(bo);
+    box.appendChild(g);
+  });
+}
+function setPeriod(idx, val){
+  var r = rec(inKey);
+  if(!r.periods){ r.periods = []; for(var i=0;i<S.periods;i++) r.periods.push(null); }
+  while(r.periods.length < S.periods) r.periods.push(null);
+  r.periods[idx] = val;
+  save(); closeSheet(); renderIn();
+}
+
+/* voice */
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var recog = null, listening = false;
+if(!SR){
+  $("#inMic").disabled = true; $("#inMic").style.opacity = ".45";
+  $("#micNote").textContent = "このブラウザでは音声ボタンが使えません。文字を打つ欄をタップして、キーボードのマイクを使ってください（iPhoneはこちら）。";
+}
+$("#inMic").addEventListener("click", function(){
+  if(!SR) return;
+  if(listening){ try{ recog.stop(); }catch(e){} return; }
+  recog = new SR();
+  recog.lang = "ja-JP"; recog.interimResults = true; recog.continuous = true;
+  var start = $("#inMemo").value;
+  recog.onstart = function(){ listening=true; $("#inMic").textContent="■ 停止"; $("#micNote").textContent="聞いています…"; };
+  recog.onresult = function(e){
+    var txt = "";
+    for(var i=0;i<e.results.length;i++) txt += e.results[i][0].transcript;
+    $("#inMemo").value = (start ? start + "\n" : "") + txt;
+    rec(inKey).memo = $("#inMemo").value; save();
+  };
+  recog.onerror = function(e){ $("#micNote").textContent = "うまく聞き取れませんでした（" + (e.error||"") + "）"; };
+  recog.onend = function(){ listening=false; $("#inMic").textContent="🎙 音声"; if($("#micNote").textContent==="聞いています…") $("#micNote").textContent=""; };
+  try{ recog.start(); }catch(e){ $("#micNote").textContent="マイクを開始できませんでした"; }
+});
+
+/* photo */
+$("#inCam").addEventListener("change", function(){
+  var f = this.files && this.files[0]; if(!f) return;
+  var fr = new FileReader();
+  fr.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var max = 1280, w = img.width, h = img.height;
+      if(w > max || h > max){ var s = max/Math.max(w,h); w = Math.round(w*s); h = Math.round(h*s); }
+      var c = document.createElement("canvas"); c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      var url = c.toDataURL("image/jpeg", 0.72);
+      var r = rec(inKey); r.shots = r.shots || []; r.shots.push(url);
+      save(); drawShots(); toast("写真を貼りました");
+    };
+    img.src = fr.result;
+  };
+  fr.readAsDataURL(f);
+  this.value = "";
+});
+
+/* ---------- CALENDAR ---------- */
+var calCur = new Date();
+function renderCal(){
+  var y = calCur.getFullYear(), m = calCur.getMonth();
+  $("#calM").textContent = y + "年 " + (m+1) + "月";
+  var g = $("#calGrid"); g.innerHTML = "";
+  DOW.forEach(function(d){ g.appendChild(el("div","dowh",d)); });
+  var first = new Date(y,m,1), start = first.getDay();
+  var last = new Date(y,m+1,0).getDate();
+  var todayK = keyOf(new Date());
+  for(var i=0;i<start;i++) g.appendChild(el("div","cell blank"));
+  for(var day=1; day<=last; day++){
+    (function(dd){
+      var k = y+"-"+pad(m+1)+"-"+pad(dd);
+      var dow = new Date(y,m,dd).getDay();
+      var c = el("div","cell" + (dow===0?" sun":dow===6?" sat":"") + (k===todayK?" today":""));
+      c.appendChild(el("div","",String(dd)));
+      var dots = el("div","dots");
+      var r = S.days[k];
+      if(r){
+        var dv = dayOf(k);
+        var chg = r.pat || (r.periods && dv.periods.some(function(p,i){ return (p||"")!==(dv.basePeriods[i]||""); }));
+        if(chg) dots.appendChild(el("i","dot d-chg"));
+        if(r.items && r.items.length) dots.appendChild(el("i","dot d-item"));
+        if(r.ev) dots.appendChild(el("i","dot d-ev"));
+      }
+      c.appendChild(dots);
+      if(r && r.ev) c.appendChild(el("div","ev", r.ev.slice(0,6)));
+      c.addEventListener("click", function(){ inKey = k; go("in"); });
+      g.appendChild(c);
+    })(day);
+  }
+}
+$("#calPrev").addEventListener("click", function(){ calCur = new Date(calCur.getFullYear(), calCur.getMonth()-1, 1); renderCal(); });
+$("#calNext").addEventListener("click", function(){ calCur = new Date(calCur.getFullYear(), calCur.getMonth()+1, 1); renderCal(); });
+
+/* ---------- SETTINGS ---------- */
+var setWk = "mon";
+function renderSet(){
+  var wkbox = $("#setWk"); wkbox.innerHTML = "";
+  ["mon","tue","wed","thu","fri","sat","sun"].forEach(function(id){
+    var label = DOW[WKID.indexOf(id)] + "曜";
+    var b = el("button",null,label); b.type="button";
+    b.setAttribute("aria-pressed", id===setWk ? "true":"false");
+    b.addEventListener("click", function(){ setWk=id; renderSet(); });
+    wkbox.appendChild(b);
+  });
+  var b = S.base[setWk] || (S.base[setWk] = {periods:[], dis:""});
+  var box = $("#setTT"); box.innerHTML = "";
+  for(var i=0;i<S.periods;i++){
+    (function(idx){
+      var btn = el("button","editrow"); btn.type="button";
+      btn.appendChild(el("span","pno",(idx+1)+"限"));
+      btn.appendChild(el("span","val"+(b.periods[idx]?"":" empty"), b.periods[idx] || "えらぶ"));
+      btn.appendChild(el("span","caret","›"));
+      btn.addEventListener("click", function(){
+        openSheet(DOW[WKID.indexOf(setWk)]+"曜 "+(idx+1)+"限", function(bx){
+          var g = el("div","grid-pick");
+          S.subjects.forEach(function(s){
+            var sb = el("button",null,s);
+            sb.addEventListener("click", function(){ b.periods[idx]=s; S.demo=false; save(); closeSheet(); renderSet(); });
+            g.appendChild(sb);
+          });
+          var nb = el("button",null,"なし"); nb.style.color="var(--ink-3)";
+          nb.addEventListener("click", function(){ b.periods[idx]=""; S.demo=false; save(); closeSheet(); renderSet(); });
+          g.appendChild(nb);
+          bx.appendChild(g);
+        });
+      });
+      box.appendChild(btn);
+    })(i);
+  }
+  $("#setDis").value = b.dis || "";
+  $("#setPeriods").value = String(S.periods);
+
+  var pl = $("#patList"); pl.innerHTML = "";
+  S.patterns.forEach(function(p){
+    var row = el("div","spread");
+    row.style.cssText = "border:1px solid var(--line); border-radius:10px; padding:10px 12px";
+    var left = el("div");
+    left.appendChild(el("div","",p.name)).style.fontWeight="700";
+    left.appendChild(el("div","tiny", (p.periods||[]).filter(Boolean).join("・") || "教科は未設定") );
+    var right = el("div","row"); right.style.gap="6px";
+    var e1 = el("button","btn small","編集"); e1.addEventListener("click", function(){ editPattern(p); });
+    var e2 = el("button","btn small danger","削除");
+    e2.addEventListener("click", function(){
+      S.patterns = S.patterns.filter(function(x){ return x.id!==p.id; }); save(); renderSet();
+    });
+    right.appendChild(e1); right.appendChild(e2);
+    row.appendChild(left); row.appendChild(right); pl.appendChild(row);
+  });
+
+  var sc = $("#setSubs"); sc.innerHTML = "";
+  S.subjects.forEach(function(s){
+    var c = el("button","chip", s + " ✕"); c.type="button";
+    c.addEventListener("click", function(){ S.subjects = S.subjects.filter(function(x){return x!==s;}); save(); renderSet(); });
+    sc.appendChild(c);
+  });
+  var ic = $("#setItems"); ic.innerHTML = "";
+  S.items.slice().sort(function(a,b){return (b.c||0)-(a.c||0);}).forEach(function(it){
+    var c = el("button","chip", it.n + " ✕"); c.type="button";
+    c.addEventListener("click", function(){ S.items = S.items.filter(function(x){return x.n!==it.n;}); save(); renderSet(); });
+    ic.appendChild(c);
+  });
+
+  $("#setNight").value = S.notif.night; $("#setMorning").value = S.notif.morning;
+  notifState();
+  $$("#themePick button").forEach(function(t){ t.setAttribute("aria-pressed", t.dataset.t===S.theme ? "true":"false"); });
+  storeInfo();
+}
+$("#setDis").addEventListener("change", function(){ S.base[setWk].dis = this.value; save(); });
+$("#setPeriods").addEventListener("change", function(){ S.periods = +this.value; save(); renderSet(); });
+$("#subAdd").addEventListener("click", function(){
+  var v = $("#subNew").value.trim(); if(!v) return;
+  if(S.subjects.indexOf(v)<0) S.subjects.push(v);
+  $("#subNew").value=""; save(); renderSet();
+});
+$("#itemAdd").addEventListener("click", function(){
+  var v = $("#itemNew").value.trim(); if(!v) return;
+  if(!S.items.some(function(x){return x.n===v;})) S.items.push({n:v,c:0});
+  $("#itemNew").value=""; save(); renderSet();
+});
+$("#patAdd").addEventListener("click", function(){
+  askText("パターンの名前", "例：短縮4時間、テスト日課", function(n){
+    var p = {id:"p_"+Date.now(), name:n, periods:[], dis:""};
+    for(var i=0;i<S.periods;i++) p.periods.push("");
+    S.patterns.push(p); save(); renderSet(); editPattern(p);
+  });
+});
+function editPattern(p){
+  openSheet(p.name, function(box){
+    var wrap = el("div");
+    function draw(){
+      wrap.innerHTML = "";
+      for(var i=0;i<S.periods;i++){
+        (function(idx){
+          while(p.periods.length < S.periods) p.periods.push("");
+          var btn = el("button","editrow"); btn.type="button";
+          btn.appendChild(el("span","pno",(idx+1)+"限"));
+          btn.appendChild(el("span","val"+(p.periods[idx]?"":" empty"), p.periods[idx] || "えらぶ"));
+          btn.appendChild(el("span","caret","›"));
+          btn.addEventListener("click", function(){
+            openSheet((idx+1)+"限", function(bx){
+              var g = el("div","grid-pick");
+              S.subjects.concat([""]).forEach(function(s){
+                var sb = el("button",null, s || "なし");
+                if(!s) sb.style.color = "var(--ink-3)";
+                sb.addEventListener("click", function(){ p.periods[idx]=s; save(); closeSheet(); editPattern(p); });
+                g.appendChild(sb);
+              });
+              bx.appendChild(g);
+            });
+          });
+          wrap.appendChild(btn);
+        })(i);
+      }
+    }
+    draw();
+    box.appendChild(wrap);
+    var r = el("div","row"); r.style.marginTop="14px";
+    r.appendChild(el("span","muted","下校時刻")).style.flex="1";
+    var t = document.createElement("input"); t.type="time"; t.value=p.dis||""; t.style.width="130px";
+    t.addEventListener("change", function(){ p.dis=t.value; save(); });
+    r.appendChild(t); box.appendChild(r);
+    var done = el("button","btn primary","閉じる"); done.style.marginTop="16px"; done.style.width="100%";
+    done.addEventListener("click", function(){ closeSheet(); renderSet(); });
+    box.appendChild(done);
+  });
+}
+$("#themePick").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  S.theme = b.dataset.t; applyTheme(); save(); renderSet();
+});
+function applyTheme(){
+  if(S.theme==="auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", S.theme);
+}
+
+/* ---------- notifications ---------- */
+$("#setNight").addEventListener("change", function(){ S.notif.night=this.value; save(); });
+$("#setMorning").addEventListener("change", function(){ S.notif.morning=this.value; save(); });
+function notifState(){
+  var p = ("Notification" in window) ? Notification.permission : "unsupported";
+  var msg = {granted:"通知は許可されています（アプリを開いているあいだだけ出ます）。",
+             denied:"通知が拒否されています。ブラウザの設定から許可し直してください。",
+             "default":"まだ許可されていません。",
+             unsupported:"このブラウザは通知に対応していません。"}[p];
+  $("#notifState").textContent = msg || "";
+}
+$("#notifAsk").addEventListener("click", function(){
+  if(!("Notification" in window)){ notifState(); return; }
+  Notification.requestPermission().then(function(){ notifState(); });
+});
+function notifyTick(){
+  if(!("Notification" in window) || Notification.permission !== "granted") return;
+  var now = new Date();
+  var hm = pad(now.getHours())+":"+pad(now.getMinutes());
+  var stamp = keyOf(now) + " " + hm;
+  if(S.notif.last === stamp) return;
+  if(hm === S.notif.night){
+    var d = dayOf(keyOf(addDays(now,1)));
+    new Notification("明日の持ち物", { body: (d.items.join("、") || "とくになし") + "\n" + d.periods.filter(Boolean).join(" / ") });
+    S.notif.last = stamp; save();
+  } else if(hm === S.notif.morning){
+    var t = dayOf(keyOf(now));
+    new Notification("今日の時間割", { body: t.periods.filter(Boolean).join(" / ") + (t.dis ? "\n下校 " + t.dis : "") });
+    S.notif.last = stamp; save();
+  }
+}
+setInterval(notifyTick, 20000);
+
+/* ---------- calendar export ---------- */
+$("#hGcal").addEventListener("click", function(){
+  var k = keyOf(addDays(new Date(), homeOff));
+  var d = dayOf(k);
+  var dt = parseKey(k);
+  var ymd = "" + dt.getFullYear() + pad(dt.getMonth()+1) + pad(dt.getDate());
+  var nx = addDays(dt,1);
+  var ymd2 = "" + nx.getFullYear() + pad(nx.getMonth()+1) + pad(nx.getDate());
+  var title = "持ち物：" + (d.items.join("、") || "なし");
+  var lines = [];
+  for(var i=0;i<d.periods.length;i++) if(d.periods[i]) lines.push((i+1)+"限 "+d.periods[i]);
+  var det = lines.join("\n");
+  if(d.dis) det += "\n下校 " + d.dis;
+  if(d.ev) det += "\n行事：" + d.ev;
+  if(d.memo) det += "\n\n" + d.memo;
+  var url = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+    + "&text=" + encodeURIComponent(title)
+    + "&dates=" + ymd + "/" + ymd2
+    + "&details=" + encodeURIComponent(det);
+  window.open(url, "_blank", "noopener");
+});
+
+/* ---------- data ---------- */
+function payload(){ return JSON.stringify(S, null, 2); }
+function fname(){ var n=new Date(); return "kaerinokai-" + keyOf(n) + ".json"; }
+$("#dExport").addEventListener("click", async function(){
+  var data = payload();
+  var dl = null;
+  try{ dl = (window.claude && window.claude.use) ? await window.claude.use("downloads") : null; }catch(e){}
+  if(dl){
+    try{ await dl.save({filename: fname(), data: data}); toast("書き出しました"); }
+    catch(err){ if(!err || err.code !== "declined") showRaw(data); }
+    return;
+  }
+  try{
+    var b = new Blob([data], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = fname();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    toast("書き出しました");
+  }catch(e){ toast("書き出せませんでした。「コピーする」を使ってください"); }
+});
+$("#dCopy").addEventListener("click", function(){
+  var data = payload();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(data).then(function(){ toast("コピーしました"); },
+      function(){ showRaw(data); });
+  } else showRaw(data);
+});
+function showRaw(data){
+  openSheet("バックアップ（全部えらんでコピー）", function(box){
+    var ta = document.createElement("textarea");
+    ta.value = data; ta.style.height = "50vh"; box.appendChild(ta);
+    ta.focus(); ta.select();
+  });
+}
+$("#dImportFile").addEventListener("change", function(){
+  var f = this.files && this.files[0]; if(!f) return;
+  var fr = new FileReader();
+  fr.onload = function(){ applyImport(fr.result); };
+  fr.readAsText(f);
+  this.value = "";
+});
+function applyImport(text){
+  try{
+    var o = JSON.parse(text);
+    if(!o || !o.base) throw new Error("format");
+    S = o; applyTheme(); save(); renderSet(); toast("読みこみました");
+  }catch(e){ toast("読みこめませんでした。バックアップの中身か確かめてください"); }
+}
+$("#dPaste").addEventListener("click", function(){
+  openSheet("バックアップを貼り付ける", function(box){
+    var ta = document.createElement("textarea");
+    ta.style.height = "40vh"; ta.placeholder = "ここに貼り付けてください";
+    box.appendChild(ta);
+    var ok = el("button","btn primary","読みこむ");
+    ok.style.cssText = "margin-top:14px; width:100%";
+    ok.addEventListener("click", function(){ var t = ta.value; closeSheet(); applyImport(t); });
+    box.appendChild(ok);
+    setTimeout(function(){ ta.focus(); }, 60);
+  });
+});
+$("#dWipe").addEventListener("click", function(){
+  askConfirm("ぜんぶ消しますか", "書きこんだ記録・設定・写真がすべて消えて、はじめの状態にもどります。もとには戻せません。", "消す", function(){
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    S = defaults(); applyTheme(); save(); renderSet(); toast("はじめにもどしました");
+  });
+});
+function storeInfo(){
+  var n = Object.keys(S.days).length;
+  var kb = Math.round(payload().length/1024);
+  $("#storeInfo").textContent = "書きこんだ日：" + n + "日ぶん／データの大きさ：約" + kb + "KB";
+}
+
+/* ---------- sheet ---------- */
+function openSheet(title, build){
+  var s = $("#sheet"); s.innerHTML = "";
+  s.appendChild(el("h3",null,title));
+  build(s);
+  $("#sheetBg").classList.add("on");
+}
+function closeSheet(){ $("#sheetBg").classList.remove("on"); }
+function askText(title, placeholder, cb){
+  openSheet(title, function(box){
+    var inp = document.createElement("input");
+    inp.type = "text"; inp.placeholder = placeholder || "";
+    box.appendChild(inp);
+    var row = el("div","row"); row.style.cssText = "margin-top:14px; gap:8px";
+    var ok = el("button","btn primary","決定"); ok.style.flex = "1";
+    var no = el("button","btn","やめる");
+    function done(){ var v = inp.value.trim(); if(!v) return; closeSheet(); cb(v); }
+    ok.addEventListener("click", done);
+    inp.addEventListener("keydown", function(e){ if(e.key === "Enter") done(); });
+    no.addEventListener("click", closeSheet);
+    row.appendChild(ok); row.appendChild(no); box.appendChild(row);
+    setTimeout(function(){ inp.focus(); }, 60);
+  });
+}
+function askConfirm(title, msg, label, cb){
+  openSheet(title, function(box){
+    box.appendChild(el("p","muted",msg)).style.margin = "0 0 16px";
+    var row = el("div","row"); row.style.gap = "8px";
+    var ok = el("button","btn danger",label); ok.style.flex = "1";
+    var no = el("button","btn primary","やめる");
+    ok.addEventListener("click", function(){ closeSheet(); cb(); });
+    no.addEventListener("click", closeSheet);
+    row.appendChild(ok); row.appendChild(no); box.appendChild(row);
+  });
+}
+$("#sheetBg").addEventListener("click", function(e){ if(e.target === this) closeSheet(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
+
+/* ---------- boot ---------- */
+function tickClock(){
+  var n = new Date();
+  $("#clock").textContent = (n.getMonth()+1)+"/"+n.getDate()+" "+DOW[n.getDay()]+" "+pad(n.getHours())+":"+pad(n.getMinutes());
+}
+load();
+applyTheme();
+tickClock(); setInterval(tickClock, 20000);
+renderHome();
+})();
+</script>
+</body>
+</html>
