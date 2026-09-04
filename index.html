@@ -3,170 +3,172 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#131519">
+<meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="終学活ノート">
 <title>終学活ノート</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=M+PLUS+1:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=M+PLUS+1:wght@400;500;700;800&display=swap">
 <style>
 :root{
-  --bg:#ECEDF0; --panel:#FAFBFC; --panel-2:#E2E4E9;
-  --ink:#14171B; --ink-2:#4F555F; --ink-3:#828892;
-  --line:#D8DADF; --line-2:#BCC0C7;
-  --accent:#1E5FBF; --accent-on:#FFFFFF; --accent-soft:#DEE7F6;
-  --mark:#C4281C; --mark-soft:#F6E2DF;
-  --grid:rgba(20,23,27,.045); --stud:rgba(30,95,191,.30);
+  --bg:#F2F1ED; --panel:#FFFFFF; --panel-2:#E7E6E1;
+  --ink:#141414; --ink-2:#565651; --ink-3:#8A8A84;
+  --line:#DEDCD6; --line-2:#C3C0B9;
+  --accent:#C8961A; --accent-txt:#8A6608; --accent-on:#1A1405; --accent-soft:#F6ECD5;
+  --mark:#B93A28; --mark-soft:#F6E3DF;
+  --ok:#0E8F55;
   --disp:'Archivo','M PLUS 1','Hiragino Kaku Gothic ProN',sans-serif;
   --sans:'M PLUS 1','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace;
+  --mono:var(--disp);
+  --r:6px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#131519; --panel:#1A1D22; --panel-2:#23272E;
-    --ink:#E7EAEE; --ink-2:#99A0AA; --ink-3:#6B727C;
-    --line:#272B31; --line-2:#3A3F47;
-    --accent:#3E8FFF; --accent-on:#0A0D11; --accent-soft:#16233A;
-    --mark:#E4614C; --mark-soft:#2C1B18;
-    --grid:rgba(255,255,255,.030); --stud:rgba(62,143,255,.34);
+    --bg:#111111; --panel:#191919; --panel-2:#232322;
+    --ink:#F1F1EF; --ink-2:#A2A19C; --ink-3:#6F6F6A;
+    --line:#272725; --line-2:#3B3B38;
+    --accent:#E5B01F; --accent-txt:#E5B01F; --accent-on:#1A1405; --accent-soft:#2A2312;
+    --mark:#E4634B; --mark-soft:#2C1C18;
+    --ok:#28C07E;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#131519; --panel:#1A1D22; --panel-2:#23272E;
-  --ink:#E7EAEE; --ink-2:#99A0AA; --ink-3:#6B727C;
-  --line:#272B31; --line-2:#3A3F47;
-  --accent:#3E8FFF; --accent-on:#0A0D11; --accent-soft:#16233A;
-  --mark:#E4614C; --mark-soft:#2C1B18;
-  --grid:rgba(255,255,255,.030); --stud:rgba(62,143,255,.34);
+  --bg:#111111; --panel:#191919; --panel-2:#232322;
+  --ink:#F1F1EF; --ink-2:#A2A19C; --ink-3:#6F6F6A;
+  --line:#272725; --line-2:#3B3B38;
+  --accent:#E5B01F; --accent-txt:#E5B01F; --accent-on:#1A1405; --accent-soft:#2A2312;
+  --mark:#E4634B; --mark-soft:#2C1C18;
+  --ok:#28C07E;
 }
 
 *{box-sizing:border-box}
 ul,ol,dl{margin:0; padding:0; list-style:none}
 dd{margin:0}
 body{
-  margin:0; color:var(--ink);
-  background-color:var(--bg);
-  background-image:linear-gradient(var(--grid) 1px, transparent 1px),
-                   linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:32px 32px;
+  margin:0; background:var(--bg); color:var(--ink);
   font-family:var(--sans); font-size:16px; line-height:1.65;
   -webkit-text-size-adjust:100%;
 }
 button,input,select,textarea{font:inherit; color:inherit}
 button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
-:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
 
-.app{max-width:640px; margin:0 auto; padding:0 18px calc(80px + env(safe-area-inset-bottom))}
+.app{max-width:640px; margin:0 auto; padding:0 18px calc(82px + env(safe-area-inset-bottom))}
 
-/* ---- studs: the Roblox tell, used twice ---- */
-.studs{
-  height:9px; flex:0 0 auto;
-  background-image:radial-gradient(circle at 6px 5px, var(--stud) 0 3px, transparent 3.6px);
-  background-size:16px 9px;
+/* the brick: header block with studs sitting on its top edge */
+.mast{
+  position:relative; margin-top:20px; padding:16px 16px 14px;
+  background:var(--panel); border:1px solid var(--line-2); border-radius:var(--r);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
 }
-
-/* ---- masthead ---- */
-.mast{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 0 12px}
+:root[data-theme="dark"] .mast{box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mast{box-shadow:inset 0 1px 0 rgba(255,255,255,.05)} }
+.mast::before{
+  content:""; position:absolute; left:14px; top:-7px; width:104px; height:14px;
+  background-image:radial-gradient(circle at 7px 7px, var(--accent) 0 6px, transparent 6.6px);
+  background-size:26px 14px; background-repeat:repeat-x;
+}
 .brand{display:flex; align-items:center; gap:10px}
-.brand h1{
-  font-family:var(--disp); font-weight:800; font-size:15px; margin:0; letter-spacing:.06em;
-}
-.brick{width:26px; height:22px; flex:0 0 auto; display:block}
-.sync{font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--ink-3); display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
-.sync i{width:6px; height:6px; background:var(--ink-3); display:inline-block}
-.sync.live i{background:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.brand h1{font-family:var(--disp); font-weight:800; font-size:15px; margin:0; letter-spacing:.05em}
+.brick{width:25px; height:21px; flex:0 0 auto; display:block}
+.sync{font-size:10.5px; letter-spacing:.06em; color:var(--ink-3); display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
+.sync i{width:7px; height:7px; border-radius:50%; background:var(--ink-3); display:inline-block}
+.sync.live i{background:var(--ok)}
+.studs{display:none}
 
-/* ---- sections ---- */
+/* sections */
 .sect{padding:24px 0 0}
 .sect + .sect{border-top:1px solid var(--line); margin-top:24px}
 .lab{
-  font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--ink-3); margin:0 0 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  font-size:11.5px; font-weight:700; letter-spacing:.16em; color:var(--ink-2);
+  margin:0 0 13px; display:flex; align-items:center; gap:9px;
 }
-.lab .r{letter-spacing:0; text-transform:none; font-family:var(--sans)}
+.lab::before{
+  content:""; width:9px; height:9px; border-radius:50%; background:var(--accent); flex:0 0 auto;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45);
+}
+.lab .r{margin-left:auto; letter-spacing:0; font-weight:400; display:flex; gap:6px; align-items:center}
 .muted{color:var(--ink-2); font-size:14px}
 .note{font-size:12.5px; line-height:1.85; color:var(--ink-3)}
 
 .btn{
   display:inline-flex; align-items:center; justify-content:center;
-  border:1px solid var(--line-2); border-radius:2px; background:var(--panel);
+  border:1px solid var(--line-2); border-radius:var(--r); background:var(--panel);
   padding:10px 15px; font-size:13.5px; font-weight:500; transition:.12s;
 }
 .btn:hover{border-color:var(--ink-3)}
-.btn.primary{background:var(--accent); color:var(--accent-on); border-color:var(--accent); font-weight:700; box-shadow:inset 0 1px 0 rgba(255,255,255,.30)}
-.btn.primary:hover{filter:brightness(1.1)}
+.btn.primary,.chip[aria-pressed="true"],.segs button[aria-pressed="true"],.wk button[aria-pressed="true"]{
+  background:var(--accent); color:var(--accent-on); border-color:var(--accent); font-weight:700;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.38), inset 0 -2px 0 rgba(0,0,0,.16);
+}
+.btn.primary:hover{filter:brightness(1.07)}
 .btn.sm{padding:7px 11px; font-size:12.5px}
 .btn.mark{color:var(--mark); border-color:var(--line-2)}
 .btn.bare{border-color:transparent; background:none; color:var(--ink-2); padding-left:0}
 
 input[type=text],input[type=time],input[type=date],textarea,select{
   width:100%; background:var(--panel); color:var(--ink);
-  border:1px solid var(--line-2); border-radius:2px; padding:10px 11px; font-size:15px;
+  border:1px solid var(--line-2); border-radius:var(--r); padding:10px 12px; font-size:15px;
 }
 textarea{resize:vertical; min-height:104px; line-height:1.9}
 input::placeholder,textarea::placeholder{color:var(--ink-3)}
 
-/* ---- bottom nav ---- */
+/* bottom nav */
 .nav{
   position:fixed; left:0; right:0; bottom:0; z-index:40;
   background:var(--panel); border-top:1px solid var(--line-2);
   display:grid; grid-template-columns:repeat(5,1fr);
   padding-bottom:env(safe-area-inset-bottom);
 }
-.nav::before{
-  content:""; position:absolute; left:0; right:0; top:-9px; height:9px;
-  background-image:radial-gradient(circle at 6px 4px, var(--stud) 0 3px, transparent 3.6px);
-  background-size:16px 9px; pointer-events:none;
-}
-.nav button{text-align:center; padding:13px 0 12px; font-size:11.5px; font-weight:500; color:var(--ink-3); position:relative}
+.nav button{text-align:center; padding:14px 0 12px; font-size:11.5px; font-weight:500; color:var(--ink-3); position:relative}
 .nav button[aria-current="page"]{color:var(--ink); font-weight:700}
-.nav button[aria-current="page"]::after{
-  content:""; position:absolute; left:0; right:0; top:0; height:2px; background:var(--accent);
-}
+.nav button[aria-current="page"]::after{content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--accent)}
 .view{display:none}
 .view.on{display:block}
 
-/* ---- segmented ---- */
-.segs{display:flex; border:1px solid var(--line-2); border-radius:2px; overflow:hidden; margin:20px 0 22px; background:var(--panel)}
+/* segmented */
+.segs{display:flex; border:1px solid var(--line-2); border-radius:var(--r); overflow:hidden; margin:22px 0 24px; background:var(--panel)}
 .segs button{flex:1; text-align:center; padding:11px 0; font-size:13.5px; color:var(--ink-2)}
 .segs button + button{border-left:1px solid var(--line)}
-.segs button[aria-pressed="true"]{background:var(--accent); color:var(--accent-on); font-weight:700; box-shadow:inset 0 1px 0 rgba(255,255,255,.30)}
 
-/* ---- date ---- */
+/* date */
 .dateline{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px}
-.dateline .d{font-family:var(--disp); font-weight:900; font-size:44px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums; display:flex; align-items:baseline; gap:2px}
-.dateline .d i{font-style:normal; color:var(--ink-3); font-weight:400; margin:0 2px}
-.dateline .d em{font-style:normal; font-family:var(--sans); font-size:17px; font-weight:700; margin-left:9px; letter-spacing:0}
-.dateline .k{
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink-2);
-  border:1px solid var(--line-2); padding:4px 9px; background:var(--panel); text-align:center; white-space:nowrap;
-}
+.dateline .d{font-family:var(--disp); font-weight:900; font-size:46px; line-height:1; letter-spacing:-.035em; font-variant-numeric:tabular-nums; display:flex; align-items:baseline}
+.dateline .d i{font-style:normal; color:var(--accent-txt); font-weight:700; margin:0 3px}
+.dateline .d em{font-style:normal; font-family:var(--sans); font-size:16px; font-weight:700; margin-left:10px; letter-spacing:0}
+.dateline .k{font-size:11.5px; color:var(--ink-2); border:1px solid var(--line-2); border-radius:var(--r); padding:5px 10px; background:var(--panel); text-align:center; white-space:nowrap}
 
-/* ---- timetable ---- */
+/* timetable */
 .tt{border-top:1px solid var(--line-2)}
 .tt li,.trow{display:flex; align-items:center; gap:14px; width:100%; padding:12px 2px 12px 0; border-bottom:1px solid var(--line); position:relative}
-.tt li.chg,.trow.chg{padding-left:10px}
-.tt li.chg::before,.trow.chg::before{content:""; position:absolute; left:0; top:9px; bottom:9px; width:3px; background:var(--mark)}
-.pn{font-family:var(--mono); font-size:11px; color:var(--ink-3); min-width:56px; letter-spacing:.02em; flex:0 0 auto}
+.tt li.chg,.trow.chg{padding-left:11px}
+.tt li.chg::before,.trow.chg::before{content:""; position:absolute; left:0; top:9px; bottom:9px; width:3px; border-radius:2px; background:var(--mark)}
+.pn{font-size:11px; color:var(--ink-3); min-width:52px; letter-spacing:.06em; flex:0 0 auto; font-variant-numeric:tabular-nums}
 .ps{flex:1; font-size:18px; font-weight:500}
 .ps.none{color:var(--ink-3); font-weight:400; font-size:16px}
 .chg .pn{color:var(--mark)}
 .chg .ps{font-weight:700}
-.tag{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; color:var(--accent-on); background:var(--mark); padding:2px 6px; flex:0 0 auto}
+.tag{font-size:10px; font-weight:700; letter-spacing:.1em; color:#fff; background:var(--mark); padding:2px 7px; border-radius:3px; flex:0 0 auto}
 .arw{color:var(--ink-3); font-size:11px; flex:0 0 auto}
 
 .facts{display:flex; flex-wrap:wrap; gap:8px 30px; margin-top:16px}
 .facts div{display:flex; align-items:baseline; gap:10px}
-.facts dt{font-family:var(--mono); font-size:10px; letter-spacing:.16em; color:var(--ink-3)}
-.facts dd{font-family:var(--disp); font-size:20px; font-weight:700; font-variant-numeric:tabular-nums}
+.facts dt{font-size:11px; letter-spacing:.16em; color:var(--ink-3); font-weight:700}
+.facts dd{font-family:var(--disp); font-size:21px; font-weight:800; font-variant-numeric:tabular-nums}
 
-/* ---- items ---- */
-.mochi{border-left:3px solid var(--mark); padding-left:14px}
-.mochi ul{display:flex; flex-wrap:wrap; gap:6px 18px}
-.mochi li{font-size:18px; font-weight:700}
+/* items — studs */
+.mochi{padding-left:2px}
+.mochi ul{display:flex; flex-wrap:wrap; gap:8px 20px}
+.mochi li{font-size:18px; font-weight:700; display:flex; align-items:center; gap:9px}
+.mochi li::before{
+  content:""; width:11px; height:11px; border-radius:50%; background:var(--accent); flex:0 0 auto;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45), inset 0 -1.5px 0 rgba(0,0,0,.18);
+}
 .mochi li.none{font-size:15px; font-weight:400; color:var(--ink-3)}
+.mochi li.none::before{background:var(--line-2); box-shadow:none}
 
 .memo{
   white-space:pre-wrap; word-break:break-word; font-size:15.5px; line-height:2;
@@ -174,84 +176,85 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
   background-position:0 4px;
 }
 .shots{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px}
-.shots img{height:128px; border:1px solid var(--line-2); flex:0 0 auto; display:block}
+.shots img{height:128px; border:1px solid var(--line-2); border-radius:4px; flex:0 0 auto; display:block}
 .shotwrap{position:relative; flex:0 0 auto}
-.shotwrap .x{position:absolute; top:4px; right:4px; background:var(--panel); border:1px solid var(--line-2); padding:2px 7px; font-size:12px}
+.shotwrap .x{position:absolute; top:5px; right:5px; background:var(--panel); border:1px solid var(--line-2); border-radius:4px; padding:2px 8px; font-size:12px}
 
-/* ---- 課題 ---- */
+/* 課題 */
 .todo{border-top:1px solid var(--line-2)}
 .todo li{display:flex; gap:12px; align-items:flex-start; padding:12px 2px; border-bottom:1px solid var(--line)}
-.tick{width:20px; height:20px; border:1px solid var(--line-2); flex:0 0 auto; margin-top:4px; display:flex; align-items:center; justify-content:center; font-size:12px; background:var(--panel)}
-.tick.on{background:var(--accent); border-color:var(--accent); color:var(--accent-on); box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.tick{width:22px; height:22px; border:1px solid var(--line-2); border-radius:4px; flex:0 0 auto; margin-top:3px; display:flex; align-items:center; justify-content:center; font-size:13px; background:var(--panel)}
+.tick.on{background:var(--ok); border-color:var(--ok); color:#fff; box-shadow:inset 0 2px 0 rgba(255,255,255,.30)}
 .todo .tx{flex:1; font-size:16px; line-height:1.6}
-.todo .du{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); flex:0 0 auto; margin-top:5px; letter-spacing:.02em}
-.todo .du.late{color:var(--mark); font-weight:600}
+.todo .du{font-size:11px; color:var(--ink-3); flex:0 0 auto; margin-top:5px; font-variant-numeric:tabular-nums}
+.todo .du.late{color:var(--mark); font-weight:700}
 .todo li.done .tx{color:var(--ink-3); text-decoration:line-through}
 .todo .rm{color:var(--ink-3); font-size:12px; margin-top:4px; flex:0 0 auto}
 
-.callout{border:1px solid var(--line-2); border-left:3px solid var(--accent); padding:14px 16px; font-size:13.5px; line-height:1.85; background:var(--panel)}
+.callout{border:1px solid var(--line-2); border-left:3px solid var(--accent); border-radius:var(--r); padding:14px 16px; font-size:13.5px; line-height:1.85; background:var(--panel)}
 .callout b{display:block; margin-bottom:4px; font-weight:700}
 
-/* ---- chips ---- */
-.chips{display:flex; flex-wrap:wrap; gap:6px}
-.chip{border:1px solid var(--line-2); border-radius:2px; padding:9px 12px; font-size:14px; background:var(--panel); transition:.12s}
+/* chips */
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{border:1px solid var(--line-2); border-radius:var(--r); padding:9px 13px; font-size:14px; background:var(--panel); transition:.12s}
 .chip:hover{border-color:var(--ink-3)}
-.chip[aria-pressed="true"]{background:var(--accent); color:var(--accent-on); border-color:var(--accent); font-weight:700; box-shadow:inset 0 1px 0 rgba(255,255,255,.30)}
 .chip.add{border-style:dashed; color:var(--ink-2)}
 .chip.del{color:var(--ink-2)}
 
-/* ---- calendar ---- */
-.calbar{display:flex; align-items:center; justify-content:space-between; margin:20px 0 14px}
+/* calendar */
+.calbar{display:flex; align-items:center; justify-content:space-between; margin:22px 0 14px}
 .calbar .m{font-family:var(--disp); font-weight:800; font-size:22px; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
-.cal{display:grid; grid-template-columns:repeat(7,1fr); border-top:1px solid var(--line-2); border-left:1px solid var(--line)}
-.cal .h{font-family:var(--mono); font-size:9.5px; text-align:center; padding:6px 0; color:var(--ink-3); border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); border-top:1px solid var(--line-2); border-left:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.cal .h{font-size:10px; font-weight:700; text-align:center; padding:6px 0; color:var(--ink-3); border-right:1px solid var(--line); border-bottom:1px solid var(--line); letter-spacing:.08em}
 .cal .c{min-height:62px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:5px 4px; display:flex; flex-direction:column; gap:3px; background:var(--panel)}
 .cal .c.blank{background:var(--panel-2)}
-.cal .c .n{font-family:var(--mono); font-size:11.5px; font-variant-numeric:tabular-nums}
-.cal .c.today .n{background:var(--accent); color:var(--accent-on); padding:0 4px; font-weight:600}
+.cal .c .n{font-size:12px; font-variant-numeric:tabular-nums; font-weight:500}
+.cal .c.today .n{background:var(--accent); color:var(--accent-on); padding:0 5px; border-radius:3px; font-weight:700}
 .cal .c.sun .n{color:var(--mark)}
-.cal .c.sat .n{color:var(--accent)}
+.cal .c.sat .n{color:var(--ink-2)}
 .cal .c .e{font-size:9.5px; line-height:1.25; color:var(--ink-2); overflow:hidden; max-height:24px; word-break:break-all}
 .bars{display:flex; gap:2px}
-.bar{display:inline-block; height:3px; width:9px; flex:0 0 auto}
+.bar{display:inline-block; height:4px; width:9px; border-radius:1px; flex:0 0 auto}
 .b1{background:var(--mark)} .b2{background:var(--accent)} .b3{background:var(--ink-3)}
 .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
 .legend span{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-2)}
 
-/* ---- settings ---- */
+/* settings */
 .acc{border-bottom:1px solid var(--line)}
 .acc > summary{padding:16px 2px; font-size:15px; font-weight:500; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center}
 .acc > summary::-webkit-details-marker{display:none}
-.acc > summary::after{content:"OPEN"; font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; color:var(--ink-3)}
-.acc[open] > summary::after{content:"CLOSE"}
-.acc[open] > summary{color:var(--accent); font-weight:700}
+.acc > summary::after{content:"＋"; color:var(--ink-3); font-size:15px}
+.acc[open] > summary::after{content:"−"}
+.acc[open] > summary{font-weight:700}
 .acc .in{padding:2px 2px 22px}
-.wk{display:flex; margin-bottom:16px; border:1px solid var(--line-2); border-radius:2px; overflow:hidden; background:var(--panel)}
+.wk{display:flex; margin-bottom:16px; border:1px solid var(--line-2); border-radius:var(--r); overflow:hidden; background:var(--panel)}
 .wk button{flex:1; text-align:center; padding:9px 2px; font-size:13px; color:var(--ink-2); white-space:nowrap}
 .wk button + button{border-left:1px solid var(--line)}
-.wk button[aria-pressed="true"]{background:var(--accent); color:var(--accent-on); font-weight:700; box-shadow:inset 0 1px 0 rgba(255,255,255,.30)}
 .frow{display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid var(--line)}
 .frow > span:first-child{flex:1; font-size:14.5px; color:var(--ink-2)}
 .frow input,.frow select{width:150px}
 
-/* ---- sheet & toast ---- */
-.bg{position:fixed; inset:0; background:rgba(8,10,13,.62); z-index:60; display:none; align-items:flex-end; justify-content:center}
+/* sheet & toast */
+.bg{position:fixed; inset:0; background:rgba(10,10,9,.60); z-index:60; display:none; align-items:flex-end; justify-content:center}
 .bg.on{display:flex}
 .sheet{
   background:var(--bg); width:100%; max-width:640px; border:1px solid var(--line-2); border-bottom:none;
-  padding:0 18px calc(22px + env(safe-area-inset-bottom)); max-height:84vh; overflow-y:auto;
+  border-radius:12px 12px 0 0; padding:0 18px calc(22px + env(safe-area-inset-bottom));
+  max-height:84vh; overflow-y:auto;
 }
 .sheet h3{
-  font-family:var(--disp); font-weight:800; font-size:14px; margin:0 -18px 16px; letter-spacing:.1em;
-  padding:14px 18px; border-bottom:1px solid var(--line); background:var(--panel);
-  position:sticky; top:0; z-index:2;
+  font-size:14px; font-weight:700; letter-spacing:.1em; margin:0 -18px 16px;
+  padding:16px 18px 14px; border-bottom:1px solid var(--line); background:var(--panel);
+  border-radius:12px 12px 0 0; position:sticky; top:0; z-index:2;
+  display:flex; align-items:center; gap:9px;
 }
-.pick{display:grid; grid-template-columns:repeat(auto-fill,minmax(94px,1fr)); gap:6px}
-.pick button{border:1px solid var(--line-2); border-radius:2px; padding:14px 6px; text-align:center; font-size:14.5px; background:var(--panel)}
-.pick button:hover{border-color:var(--accent); color:var(--accent)}
+.sheet h3::before{content:""; width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45); flex:0 0 auto}
+.pick{display:grid; grid-template-columns:repeat(auto-fill,minmax(94px,1fr)); gap:7px}
+.pick button{border:1px solid var(--line-2); border-radius:var(--r); padding:14px 6px; text-align:center; font-size:14.5px; background:var(--panel)}
+.pick button:hover{border-color:var(--accent); color:var(--accent-txt)}
 .toast{
-  position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom));
-  background:var(--ink); color:var(--bg); padding:9px 16px; font-size:13px; z-index:70;
+  position:fixed; left:50%; transform:translateX(-50%); bottom:calc(88px + env(safe-area-inset-bottom));
+  background:var(--ink); color:var(--bg); padding:10px 17px; border-radius:var(--r); font-size:13px; z-index:70;
   opacity:0; pointer-events:none; transition:opacity .18s;
 }
 .toast.on{opacity:1}
@@ -263,16 +266,15 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
     <div class="brand">
       <svg class="brick" viewBox="0 0 32 27" aria-hidden="true">
         <path d="M16 1.5 30.5 8.5 16 15.5 1.5 8.5Z" fill="var(--accent)"/>
-        <path d="M1.5 8.5 16 15.5 16 25.5 1.5 18.5Z" fill="var(--accent)" opacity=".52"/>
-        <path d="M30.5 8.5 16 15.5 16 25.5 30.5 18.5Z" fill="var(--accent)" opacity=".76"/>
-        <ellipse cx="9.6" cy="8.4" rx="3.5" ry="1.9" fill="#fff" opacity=".30"/>
-        <ellipse cx="22.4" cy="8.4" rx="3.5" ry="1.9" fill="#fff" opacity=".30"/>
+        <path d="M1.5 8.5 16 15.5 16 25.5 1.5 18.5Z" fill="var(--accent)" opacity=".48"/>
+        <path d="M30.5 8.5 16 15.5 16 25.5 30.5 18.5Z" fill="var(--accent)" opacity=".72"/>
+        <ellipse cx="9.6" cy="8.2" rx="3.6" ry="2" fill="#fff" opacity=".42"/>
+        <ellipse cx="22.4" cy="8.2" rx="3.6" ry="2" fill="#fff" opacity=".42"/>
       </svg>
       <h1>終学活ノート</h1>
     </div>
     <span class="sync" id="sync"><i></i><span id="syncT">この端末のみ</span></span>
   </header>
-  <div class="studs"></div>
 
   <!-- ===== 今日・明日 ===== -->
   <section class="view on" id="v-home">
