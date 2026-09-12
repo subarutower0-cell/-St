@@ -681,6 +681,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <input type="text" id="sttUrl" placeholder="https://〜.supabase.co/functions/v1/transcribe">
         <p class="lab" style="margin-top:16px">合言葉</p>
         <input type="text" id="sttPass" placeholder="サーバーに登録したのと同じ言葉">
+        <p class="lab" style="margin-top:16px">Supabaseの公開キー</p>
+        <input type="text" id="sttKey" placeholder="sb_publishable_〜 （空でも動くことがあります）">
+        <p class="note" style="margin-top:6px">Supabaseの Project Settings → API Keys にある、公開してよいほうの鍵です。secret や service_role のほうは入れないでください。</p>
+
         <p class="lab" style="margin-top:16px">ふだん使う音声認識</p>
         <div class="chips" id="sttEngine"></div>
         <button class="btn sm" id="sttTest" style="margin-top:16px">つながるか試す</button>
@@ -909,7 +913,7 @@ function readLocal(){
   if(!S.patterns) S.patterns = [];
   if(!S.plabels) S.plabels = {};
   if(!S.todos) S.todos = [];
-  if(!S.stt) S.stt = {url:"", pass:"", engine:"deepgram"};
+  if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram"};
   if(!S.ui) S.ui = {ga:56, blur:26, aurora:100, tint:"aurora", accent:"blue", fs:100};
   if(!S.disPresets) S.disPresets = defaults().disPresets;
   if(!S.mig1){
@@ -2326,13 +2330,20 @@ var ENGINES = [
 var rcMode = "local", rcMR = null, rcBlobs = [], rcCycle = null, rcBusy = 0;
 var rcChunkMs = 10000, rcWS = null;
 
-function sttCfg(){ if(!S.stt) S.stt = {url:"", pass:"", engine:"deepgram"}; return S.stt; }
+function sttCfg(){ if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram"}; return S.stt; }
+/* Supabaseの入口が鍵を求める設定のときに備えて、公開キーも一緒に送る */
+function sttHead(h){
+  var c = sttCfg();
+  if(c.key){ h["Authorization"] = "Bearer " + c.key; h["apikey"] = c.key; }
+  return h;
+}
 function engName(id){ for(var i=0;i<ENGINES.length;i++) if(ENGINES[i].id===id) return ENGINES[i].n; return id; }
 
 function renderStt(){
   var c = sttCfg();
   $("#sttUrl").value = c.url || "";
   $("#sttPass").value = c.pass || "";
+  $("#sttKey").value = c.key || "";
   var box = $("#sttEngine"); box.innerHTML = "";
   ENGINES.forEach(function(e){
     var b = el("button","chip", e.n); b.type = "button";
@@ -2343,11 +2354,12 @@ function renderStt(){
 }
 $("#sttUrl").addEventListener("change", function(){ sttCfg().url = this.value.trim(); save(); });
 $("#sttPass").addEventListener("change", function(){ sttCfg().pass = this.value.trim(); save(); });
+$("#sttKey").addEventListener("change", function(){ sttCfg().key = this.value.trim(); save(); });
 $("#sttTest").addEventListener("click", function(){
   var c = sttCfg();
   if(!c.url){ $("#sttMsg").textContent = "URLを入れてください。"; return; }
   $("#sttMsg").textContent = "ためしています…";
-  fetch(c.url, {method:"POST", headers:{"content-type":"application/json", "x-test":"1", "x-pass":c.pass||""}, body:"{}"})
+  fetch(c.url, {method:"POST", headers:sttHead({"content-type":"application/json", "x-test":"1", "x-pass":c.pass||""}), body:"{}"})
     .then(function(r){ return r.json(); })
     .then(function(d){
       if(d.ok){
@@ -2355,14 +2367,17 @@ $("#sttTest").addEventListener("click", function(){
         $("#sttMsg").textContent = "つながりました。使えるのは " + (ready || "（鍵が登録されていません）");
       }else $("#sttMsg").textContent = "つながりましたが断られました：" + (d.error || "");
     })
-    .catch(function(){ $("#sttMsg").textContent = "届きませんでした。URLと、サーバーが動いているかを確かめてください。"; });
+    .catch(function(e){
+      $("#sttMsg").textContent = "届きませんでした（" + (e && e.message ? e.message : "通信が遮断されました") +
+        "）。URLの打ち間違い、Verify JWT がオンのまま、または枠の中で開いていることが原因です。";
+    });
 });
 
 function sttSend(blob, engine){
   var c = sttCfg();
   return fetch(c.url, {
     method:"POST",
-    headers:{"content-type": blob.type || "audio/webm", "x-engine": engine || c.engine, "x-pass": c.pass || ""},
+    headers: sttHead({"content-type": blob.type || "audio/webm", "x-engine": engine || c.engine, "x-pass": c.pass || ""}),
     body: blob
   }).then(function(r){ return r.json(); })
     .then(function(d){ if(d.error) throw new Error(d.error); return d.text || ""; });
@@ -2415,7 +2430,7 @@ function tokenGet(){
   var c = sttCfg();
   return fetch(c.url, {
     method:"POST",
-    headers:{"content-type":"application/json", "x-token":"1", "x-pass": c.pass || ""},
+    headers: sttHead({"content-type":"application/json", "x-token":"1", "x-pass": c.pass || ""}),
     body:"{}"
   }).then(function(r){ return r.json(); })
     .then(function(d){ if(!d.access_token) throw new Error(d.error || "合鍵をもらえません"); return d.access_token; });
