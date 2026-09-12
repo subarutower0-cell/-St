@@ -2362,10 +2362,20 @@ $("#sttTest").addEventListener("click", function(){
   fetch(c.url, {method:"POST", headers:sttHead({"content-type":"application/json", "x-test":"1", "x-pass":c.pass||""}), body:"{}"})
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if(d.ok){
+      var m = $("#sttMsg");
+      m.style.whiteSpace = "pre-line";
+      if(!d.ok){ m.textContent = "つながりましたが断られました：" + (d.error || ""); return; }
+      if(!d.checks){
         var ready = (d.ready||[]).map(engName).join("、");
-        $("#sttMsg").textContent = "つながりました。使えるのは " + (ready || "（鍵が登録されていません）");
-      }else $("#sttMsg").textContent = "つながりましたが断られました：" + (d.error || "");
+        m.textContent = "つながりました。使えるのは " + (ready || "（鍵が登録されていません）");
+        return;
+      }
+      var lines = ["サーバーにはつながりました。鍵の状態は次のとおりです。", ""];
+      d.checks.forEach(function(c){
+        lines.push((c.ok ? "○ " : "× ") + engName(c.id) + "：" + c.msg +
+          (c.len ? "（" + c.len + "文字・末尾 " + c.tail + "）" : ""));
+      });
+      m.textContent = lines.join("\n");
     })
     .catch(function(e){
       $("#sttMsg").textContent = "届きませんでした（" + (e && e.message ? e.message : "通信が遮断されました") +
