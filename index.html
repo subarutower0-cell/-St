@@ -2413,8 +2413,9 @@ function pushChunk(blob, t0){
   sttSend(blob).then(function(tx){
     ph.x = tx || "（聞き取れませんでした）";
   }).catch(function(e){
-    ph.x = "（送れませんでした）";
-    $("#rcFoot").textContent = "サーバーに届きませんでした。設定→文字起こしサーバー を確かめてください。";
+    var m = (e && e.message) ? e.message : "サーバーに届きません（通信が遮断されました）";
+    ph.x = "（" + m + "）";
+    $("#rcFoot").textContent = "文字にできませんでした：" + m;
   }).then(function(){
     ph.tmp = false; rcBusy--; drawLive();
     if(!rcWant && rcBusy === 0) $("#rcRaw").value = rcEls();
@@ -2483,7 +2484,8 @@ function wsStart(){
     };
   }).catch(function(){
     if(!rcWant) return;
-    $("#rcFoot").textContent = "合鍵をもらえませんでした。10秒ごとの方式にします。";
+    $("#rcFoot").textContent = "リアルタイムは使えません（" +
+      ((arguments[0] && arguments[0].message) ? arguments[0].message : "理由不明") + "）。10秒ごとの方式にします。";
     chunkStart(10000);
   });
 }
@@ -2560,7 +2562,7 @@ function compareWith(engine){
     $("#rcCmpN").textContent = engName(engine) + " で文字にしています… " + (i+1) + "／" + rcBlobs.length;
     sttSend(rcBlobs[i].b, engine)
       .then(function(tx){ out.push(tx); })
-      .catch(function(){ out.push("（失敗）"); })
+      .catch(function(e){ out.push("（" + ((e && e.message) ? e.message : "失敗") + "）"); })
       .then(function(){ i++; next(); });
   }
   next();
