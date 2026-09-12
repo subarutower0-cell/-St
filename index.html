@@ -702,7 +702,7 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" id="syncDesc" style="margin:0 0 14px"></p>
         <div style="display:flex; gap:8px; flex-wrap:wrap">
           <button class="btn sm" id="syncPull">サーバーの内容を取り直す</button>
-          <button class="btn sm" id="syncPush">この端末の内容を送る</button>
+          <button class="btn sm" id="syncPush">この端末の内容を写真ごと送る</button>
         </div>
       </div>
     </details>
@@ -1035,9 +1035,9 @@ function setSync(on, txt){
   $("#syncT").textContent = txt;
 }
 function initSync(){
-  if(!(window.claude && window.claude.use)){ describeSync(); return; }
+  if(!(window.claude && window.claude.use)){ svStart(); return; }
   window.claude.use("db").then(function(db){
-    if(!db){ describeSync(); return; }
+    if(!db){ svStart(); return; }
     DB = db;
     setSync(true, "同期中");
     describeSync();
@@ -1052,11 +1052,11 @@ function initSync(){
         S = o; writeLocal(); applyTheme(); applyUI(); rerender();
         setSync(true, "同期中");
       }catch(e){}
-    }, function(){ DB = null; setSync(false, "同期できません"); describeSync(); });
-  }, function(){ describeSync(); });
+    }, function(){ DB = null; svStart(); });
+  }, function(){ svStart(); });
 }
 function pushState(){
-  if(!DB) return;
+  if(!DB){ svPush(); return; }
   var t = S.t; lastPush = t;
   DB.doc("app/state").set({json: JSON.stringify(S), t: t}).catch(function(e){
     if(e && (e.code==="revoked" || e.code==="not_granted")){ DB=null; setSync(false,"この端末のみ"); }
@@ -1066,9 +1066,140 @@ function describeSync(){
   var d = $("#syncDesc"); if(!d) return;
   d.textContent = DB
     ? "この公開ページを、同じアカウントでPC・タブレット・スマホから開けば、記入した内容はどの端末にも自動で反映されます。課題や写真もふくみます。"
-    : "いまは同期していません。同期を使うには、Claudeから渡された公開ページのURLを、それぞれの端末で同じアカウントで開いてください。保存したHTMLファイルを直接ひらいた場合は、その端末の中だけの記録になります。";
+    : svOn()
+    ? ("「文字起こしサーバー」に預ける形で同期しています。ほかの端末でも同じURL・同じ合言葉を入れれば、記入した内容・課題・写真がそろいます。"
+       + (rtOn ? "いまは合図がつながっているので、片方で書き換えるともう片方にすぐ出ます。"
+               : "公開キーを入れると、書き換えた瞬間にほかの端末へ届くようになります。いまは念のため定期的に見に行く方式です。"))
+    : "いまは同期していません。「文字起こしサーバー」にURLと合言葉を入れると、そこを経由して端末どうしで同期できるようになります。";
 }
+/* ---- 自前サーバーでの同期（Claudeのページ以外で使う） ---- */
+var svTimer = null, svReady = false, svPend = false, svLater = null;
+var rtCh = null, rtOn = false;
+function svOn(){ return !DB && !!(S.stt && S.stt.url); }
+function svFetch(h, body){
+  var c = S.stt || {}, head = {"content-type":"application/json", "x-pass": c.pass || ""};
+  for(var k in h) head[k] = h[k];
+  if(c.key){ head["Authorization"] = "Bearer " + c.key; head["apikey"] = c.key; }
+  return fetch(c.url, {method:"POST", headers:head, body: body || "{}"});
+}
+function svPull(){
+  if(!svOn()) return;
+  svFetch({"x-state":"get"}).then(function(r){ return r.json(); }).then(function(d){
+    setSync(true, "同期中");
+    if(d && d.json && (d.t||0) > (S.t||0)){
+      /* 文字を打っている最中に画面を作り直すと入力が飛ぶので、後回しにする */
+      var a = document.activeElement;
+      if(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")){
+        if(!svLater) svLater = setTimeout(function(){ svLater = null; svPull(); }, 2500);
+        return;
+      }
+      var o = JSON.parse(d.json);
+      /* 相手の設定でこちらのつなぎ先を壊さないよう、接続情報だけは手元を残す */
+      if(o && o.base){
+        var mine = S.stt;
+        S = o;
+        if(mine && mine.url) S.stt = mine;
+        writeLocal(); applyTheme(); applyUI(); rerender();
+      }
+    }
+    /* ここではじめて送信を許す。取る前に送ると、空の端末が相手を消してしまう */
+    svReady = true;
+    if(svPend){ svPend = false; svPush(); }
+  }).catch(function(){ setSync(false, "同期できません"); });
+}
+function svPush(){
+  if(!svOn()) return;
+  if(!svReady){ svPend = true; return; }
+  svFetch({"x-state":"put"}, JSON.stringify({t:S.t, json:JSON.stringify(S)}))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var ok = !!(d && d.ok);
+      setSync(ok, ok ? (rtOn ? "すぐ反映" : "同期中") : "同期できません");
+      if(ok) rtBump();
+    })
+    .catch(function(){ setSync(false, "同期できません"); });
+}
+function svPushAll(){
+  if(!svOn()){ toast("いまは同期していません"); return; }
+  svReady = true;
+  S.t = Date.now();
+  setSync(true, "送信中");
+  svFetch({"x-state":"put"}, JSON.stringify({t:S.t, json:JSON.stringify(S)}))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d || !d.ok) throw new Error("state");
+      var ids = Object.keys(PH), i = 0;
+      if(!ids.length){ setSync(true, "同期中"); toast("送りました"); return; }
+      (function next(){
+        if(i >= ids.length){ setSync(true, rtOn ? "すぐ反映" : "同期中"); rtBump(); toast("すべて送りました（写真 " + ids.length + "枚）"); return; }
+        setSync(true, "写真 " + (i+1) + "／" + ids.length);
+        svFetch({"x-shot":"put", "x-id":ids[i]}, PH[ids[i]])
+          .catch(function(){})
+          .then(function(){ i++; next(); });
+      })();
+    })
+    .catch(function(){ setSync(false, "同期できません"); toast("送れませんでした"); });
+}
+/* ---- 合図だけをRealtimeで飛ばす。中身は今までどおりサーバー経由 ---- */
+function sbBase(){
+  var u = (S.stt && S.stt.url) || "";
+  var i = u.indexOf("/functions/");
+  return i > 0 ? u.slice(0, i) : "";
+}
+function chanName(pass){
+  var h = 0, p = pass || "default";
+  for(var i=0;i<p.length;i++){ h = ((h<<5) - h + p.charCodeAt(i)) | 0; }
+  return "gakkatsu-" + (h >>> 0).toString(36);
+}
+function loadSb(cb){
+  if(window.supabase){ cb(); return; }
+  var sc = document.createElement("script");
+  sc.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  sc.onload = cb;
+  sc.onerror = function(){ cb(); };
+  document.head.appendChild(sc);
+}
+function rtStart(){
+  if(DB || rtCh || !svOn()) return;
+  var c = S.stt, base = sbBase();
+  if(!base || !c.key) return;          /* 公開キーが無いと合図は飛ばせない */
+  loadSb(function(){
+    if(!window.supabase || rtCh) return;
+    try{
+      var sb = window.supabase.createClient(base, c.key);
+      rtCh = sb.channel(chanName(c.pass), {config:{broadcast:{self:false}}});
+      rtCh.on("broadcast", {event:"bump"}, function(){ svPull(); })
+          .subscribe(function(st){
+            if(st === "SUBSCRIBED"){
+              rtOn = true; setSync(true, "すぐ反映");
+              /* 合図が届くので、念のための見に行きは間隔をのばす */
+              if(svTimer){ clearInterval(svTimer); }
+              svTimer = setInterval(function(){ if(!document.hidden) svPull(); }, 60000);
+            }
+          });
+    }catch(e){}
+  });
+}
+function rtBump(){
+  if(!rtCh || !rtOn) return;
+  try{ rtCh.send({type:"broadcast", event:"bump", payload:{t:S.t}}); }catch(e){}
+}
+
+function svStart(){
+  if(!svOn()){ describeSync(); return; }
+  setSync(true, "同期中");
+  svPull();
+  rtStart();
+  if(svTimer) clearInterval(svTimer);
+  svTimer = setInterval(function(){ if(!document.hidden) svPull(); }, 20000);
+  /* 端末を離れるときに取りこぼさないよう、最後に一度送る */
+  window.addEventListener("pagehide", function(){ if(svOn() && svReady) svPush(); });
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) svPull(); });
+  describeSync();
+}
+
 function pullNow(){
+  if(!DB && svOn()){ svPull(); toast("取り直しました"); return; }
   if(!DB){ toast("いまは同期していません"); return; }
   DB.doc("app/state").get().then(function(s){
     if(!s.exists){ toast("サーバーにはまだ何もありません"); return; }
@@ -1080,20 +1211,32 @@ function pullNow(){
 
 /* photos: one document each, fetched when needed */
 function ensureShots(ids, done){
-  if(!DB || !ids.length){ done(); return; }
+  if(!ids.length){ done(); return; }
   var need = ids.filter(function(i){ return !PH[i]; });
-  if(!need.length){ done(); return; }
+  if(!need.length || (!DB && !svOn())){ done(); return; }
   var left = need.length;
+  function fin(){ if(--left===0){ writeLocal(); done(); } }
   need.forEach(function(id){
-    DB.doc("shots/"+id).get().then(function(s){
-      if(s.exists){ var v=s.data(); if(v && v.d){ PH[id]=v.d; phDirty=true; } }
-      if(--left===0){ writeLocal(); done(); }
-    }, function(){ if(--left===0) done(); });
+    if(DB){
+      DB.doc("shots/"+id).get().then(function(s){
+        if(s.exists){ var v=s.data(); if(v && v.d){ PH[id]=v.d; phDirty=true; } }
+        fin();
+      }, fin);
+    }else{
+      svFetch({"x-shot":"get", "x-id":id}).then(function(r){ return r.json(); })
+        .then(function(d){ if(d && d.d){ PH[id]=d.d; phDirty=true; } fin(); }, fin);
+    }
   });
 }
 function pushShot(id, data){
-  if(!DB) return;
-  DB.doc("shots/"+id).set({d:data, t:Date.now()}).catch(function(){ toast("写真は同期できませんでした（この端末には残ります）"); });
+  if(DB){
+    DB.doc("shots/"+id).set({d:data, t:Date.now()}).catch(function(){ toast("写真は同期できませんでした（この端末には残ります）"); });
+    return;
+  }
+  if(!svOn()) return;
+  svFetch({"x-shot":"put", "x-id":id}, data).catch(function(){
+    toast("写真は同期できませんでした（この端末には残ります）");
+  });
 }
 
 /* ============ navigation ============ */
@@ -1727,6 +1870,7 @@ $("#uiReset").addEventListener("click", function(){
 });
 $("#syncPull").addEventListener("click", pullNow);
 $("#syncPush").addEventListener("click", function(){
+  if(!DB && svOn()){ svPushAll(); return; }
   if(!DB){ toast("いまは同期していません"); return; }
   S.t = Date.now(); pushState(); toast("送りました");
 });
@@ -2367,11 +2511,20 @@ function renderStt(){
     gb.appendChild(b);
   });
 }
-$("#sttUrl").addEventListener("change", function(){ sttCfg().url = this.value.trim(); save(); });
-$("#sttPass").addEventListener("change", function(){ sttCfg().pass = this.value.trim(); save(); });
-$("#sttKey").addEventListener("change", function(){ sttCfg().key = this.value.trim(); save(); });
-$("#sttTest").addEventListener("click", function(){
+/* 打った先から保存する。欄から離れるまで保存しないと、打ってすぐ
+   ボタンを押したときに空のまま送られてしまうため */
+function sttGrab(){
   var c = sttCfg();
+  c.url  = $("#sttUrl").value.trim();
+  c.pass = $("#sttPass").value.trim();
+  c.key  = $("#sttKey").value.trim();
+  return c;
+}
+["#sttUrl","#sttPass","#sttKey"].forEach(function(id){
+  $(id).addEventListener("input", function(){ sttGrab(); save(); });
+});
+$("#sttTest").addEventListener("click", function(){
+  var c = sttGrab(); save();
   if(!c.url){ $("#sttMsg").textContent = "URLを入れてください。"; return; }
   $("#sttMsg").textContent = "ためしています…";
   fetch(c.url, {method:"POST", headers:sttHead({"content-type":"application/json", "x-test":"1", "x-pass":c.pass||""}), body:"{}"})
@@ -2385,6 +2538,7 @@ $("#sttTest").addEventListener("click", function(){
         m.textContent = "つながりました。使えるのは " + (ready || "（鍵が登録されていません）");
         return;
       }
+      svStart();
       var lines = ["サーバーにはつながりました。鍵の状態は次のとおりです。", ""];
       d.checks.forEach(function(c){
         lines.push((c.ok ? "○ " : "× ") + engName(c.id) + "：" + c.msg +
@@ -2546,6 +2700,7 @@ function wsStart(){
 
 function cloudStart(){
   var c = sttCfg();
+  if($("#sttUrl").value.trim()) sttGrab();
   if(!c.url){
     $("#rcFoot").textContent = "先に「設定 → 文字起こしサーバー」にURLを入れてください。";
     return;
