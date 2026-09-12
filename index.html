@@ -3156,7 +3156,10 @@ function drawWarn(list, when){
   var a = el("div", "alert " + cls);
   a.appendChild(el("b", null, head));
   a.appendChild(document.createTextNode(body));
-  var src = el("span","src","気象庁の発表より" + (when ? ("（" + when.slice(5,16).replace("T"," ") + "時点）") : "") +
+  var nowT = new Date();
+  var got = pad(nowT.getHours()) + ":" + pad(nowT.getMinutes());
+  var src = el("span","src", got + "に気象庁から取りました" +
+    (when ? ("（気象庁の更新は " + when.slice(5,16).replace("T"," ") + "）") : "") +
     "。休校や下校時刻を決めるのは学校です。ここの文は目安で、正式な連絡ではありません。");
   a.appendChild(src);
   box.appendChild(a);
