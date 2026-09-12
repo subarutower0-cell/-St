@@ -2092,7 +2092,22 @@ function beginSR(){
   };
   rcG.onend = function(){
     rcRun = false;
-    if(rcWant){ try{ rcG.start(); }catch(e){} return; }
+    if(rcWant){
+      /* ブラウザの音声認識は数十秒で勝手に止まる。すぐには再開できないので少し待つ */
+      $("#rcFoot").textContent = "つなぎ直しています…";
+      setTimeout(function(){
+        if(!rcWant) return;
+        try{ rcG.start(); $("#rcFoot").textContent = "聞き取り中"; }
+        catch(e){
+          try{ beginSR(); }
+          catch(e2){
+            rcWant = false; rcFace();
+            $("#rcFoot").textContent = "つなぎ直せませんでした。もう一度、録音を押してください。";
+          }
+        }
+      }, 400);
+      return;
+    }
     rcIv = ""; rcFace(); drawLive(); ampStop();
     if(rcTick){ clearInterval(rcTick); rcTick = null; }
     $("#rcRaw").value = rcEls();
@@ -2102,8 +2117,10 @@ function beginSR(){
   };
   try{ rcG.start(); }
   catch(e){ rcWant = false; rcFace(); $("#rcFoot").textContent = "開始できませんでした。ページを開き直してください。"; return; }
-  rcT0 = Date.now(); $("#rcTime").textContent = "00:00";
-  rcTick = setInterval(function(){ $("#rcTime").textContent = rcFmt(rcSec()); }, 300);
+  if(!rcTick){
+    rcT0 = Date.now(); $("#rcTime").textContent = "00:00";
+    rcTick = setInterval(function(){ $("#rcTime").textContent = rcFmt(rcSec()); }, 300);
+  }
   $("#rcFoot").textContent = "大事なところで「いま大事」を押すと、要点にかならず入ります。";
 }
 function rcStop(){
@@ -2307,6 +2324,7 @@ var ENGINES = [
   {id:"openai",     n:"OpenAI"}
 ];
 var rcMode = "local", rcMR = null, rcBlobs = [], rcCycle = null, rcBusy = 0;
+var rcChunkMs = 10000, rcWS = null;
 
 function sttCfg(){ if(!S.stt) S.stt = {url:"", pass:"", engine:"deepgram"}; return S.stt; }
 function engName(id){ for(var i=0;i<ENGINES.length;i++) if(ENGINES[i].id===id) return ENGINES[i].n; return id; }
@@ -2370,7 +2388,7 @@ function startCycle(){
     else if(rcBusy === 0) $("#rcRaw").value = rcEls();
   };
   rcMR.start();
-  rcCycle = setTimeout(function(){ try{ rcMR.stop(); }catch(e){} }, 30000);
+  rcCycle = setTimeout(function(){ try{ rcMR.stop(); }catch(e){} }, rcChunkMs);
 }
 function pushChunk(blob, t0){
   rcBlobs.push({t:t0, b:blob});
@@ -2387,6 +2405,74 @@ function pushChunk(blob, t0){
     if(!rcWant && rcBusy === 0) $("#rcRaw").value = rcEls();
   });
 }
+/* ---- Deepgramへ直接つないで、話しているそばから文字にする ---- */
+function chunkStart(ms){
+  rcChunkMs = ms || 10000;
+  $("#rcFoot").textContent = Math.round(rcChunkMs/1000) + "秒ごとに送ります。文字は少し遅れて出ます。";
+  startCycle();
+}
+function tokenGet(){
+  var c = sttCfg();
+  return fetch(c.url, {
+    method:"POST",
+    headers:{"content-type":"application/json", "x-token":"1", "x-pass": c.pass || ""},
+    body:"{}"
+  }).then(function(r){ return r.json(); })
+    .then(function(d){ if(!d.access_token) throw new Error(d.error || "合鍵をもらえません"); return d.access_token; });
+}
+function wsStart(){
+  var type = mrType();
+  /* リアルタイムはDeepgram＋webmのときだけ。iPhoneなどは自動で10秒ずつに落とす */
+  if(sttCfg().engine !== "deepgram" || !type || type.indexOf("webm") < 0){ chunkStart(10000); return; }
+  $("#rcFoot").textContent = "リアルタイムでつないでいます…";
+  tokenGet().then(function(tk){
+    if(!rcWant) return;
+    var url = "wss://api.deepgram.com/v1/listen?model=nova-3&language=ja" +
+              "&smart_format=true&punctuate=true&interim_results=true&endpointing=700" +
+              "&access_token=" + encodeURIComponent(tk);
+    var ws, opened = false;
+    try{ ws = new WebSocket(url); }catch(e){ chunkStart(10000); return; }
+    ws.onopen = function(){
+      opened = true; rcWS = ws;
+      $("#rcFoot").textContent = "リアルタイムで聞いています。話すとすぐ出ます。";
+      try{ rcMR = new MediaRecorder(rcStream, {mimeType:type}); }
+      catch(e){ try{ ws.close(); }catch(e2){} chunkStart(10000); return; }
+      rcMR.ondataavailable = function(e){
+        if(e.data && e.data.size && ws.readyState === 1) ws.send(e.data);
+      };
+      rcMR.start(250);
+    };
+    ws.onmessage = function(ev){
+      var d; try{ d = JSON.parse(ev.data); }catch(e){ return; }
+      var alt = d.channel && d.channel.alternatives && d.channel.alternatives[0];
+      if(!alt) return;
+      var t = (alt.transcript || "").trim();
+      if(!t){ return; }
+      if(d.is_final){
+        var g = {t: Math.max(0, Math.round(d.start || rcSec())), x:t, m:false};
+        if(rcPend){ g.m = true; rcPend = false; }
+        rcSeg.push(g); rcIv = "";
+      }else rcIv = t;
+      drawLive();
+    };
+    ws.onclose = function(){
+      rcWS = null;
+      if(rcMR && rcMR.state !== "inactive"){ try{ rcMR.stop(); }catch(e){} }
+      if(!opened){
+        $("#rcFoot").textContent = "リアルタイムでつなげませんでした。10秒ごとの方式にします。";
+        if(rcWant) chunkStart(10000);
+        return;
+      }
+      if(rcWant){ setTimeout(function(){ if(rcWant) wsStart(); }, 700); }
+      else $("#rcRaw").value = rcEls();
+    };
+  }).catch(function(){
+    if(!rcWant) return;
+    $("#rcFoot").textContent = "合鍵をもらえませんでした。10秒ごとの方式にします。";
+    chunkStart(10000);
+  });
+}
+
 function cloudStart(){
   var c = sttCfg();
   if(!c.url){
@@ -2409,17 +2495,21 @@ function cloudStart(){
     rcRun = true; rcFace(); diag();
     rcT0 = Date.now(); $("#rcTime").textContent = "00:00";
     rcTick = setInterval(function(){ $("#rcTime").textContent = rcFmt(rcSec()); }, 300);
-    $("#rcFoot").textContent = "30秒ごとに送っています。文字は少し遅れて出ます。";
-    startCycle();
+    wsStart();
   });
 }
 function cloudStop(){
   rcWant = false; rcRun = false;
   if(rcCycle){ clearTimeout(rcCycle); rcCycle = null; }
+  if(rcWS){
+    try{ rcWS.send(JSON.stringify({type:"CloseStream"})); }catch(e){}
+    setTimeout(function(){ if(rcWS){ try{ rcWS.close(); }catch(e){} } }, 400);
+  }
   if(rcMR && rcMR.state !== "inactive"){ try{ rcMR.stop(); }catch(e){} }
   if(rcTick){ clearInterval(rcTick); rcTick = null; }
   ampStop(); rcFace();
   $("#rcFoot").textContent = "止めました。残りの文字が出そろうまで少し待ってください。";
+  setTimeout(function(){ if(!rcWant && rcBusy === 0) $("#rcRaw").value = rcEls(); }, 1200);
 }
 
 /* ---- 聞き比べ ---- */
