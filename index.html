@@ -687,6 +687,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
 
         <p class="lab" style="margin-top:16px">ふだん使う音声認識</p>
         <div class="chips" id="sttEngine"></div>
+
+        <p class="lab" style="margin-top:16px">送る間隔</p>
+        <div class="chips" id="sttGap"></div>
+        <p class="note" style="margin-top:6px">短いほど早く文字になりますが、文の途中で切れて精度が落ちます。Deepgramでリアルタイムがつながっているときは、この設定は使いません。</p>
         <button class="btn sm" id="sttTest" style="margin-top:16px">つながるか試す</button>
         <p class="note" id="sttMsg" style="margin-top:12px"></p>
       </div>
@@ -913,7 +917,7 @@ function readLocal(){
   if(!S.patterns) S.patterns = [];
   if(!S.plabels) S.plabels = {};
   if(!S.todos) S.todos = [];
-  if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram"};
+  if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram", gap:5000};
   if(!S.ui) S.ui = {ga:56, blur:26, aurora:100, tint:"aurora", accent:"blue", fs:100};
   if(!S.disPresets) S.disPresets = defaults().disPresets;
   if(!S.mig1){
@@ -2330,7 +2334,11 @@ var ENGINES = [
 var rcMode = "local", rcMR = null, rcBlobs = [], rcCycle = null, rcBusy = 0;
 var rcChunkMs = 10000, rcWS = null;
 
-function sttCfg(){ if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram"}; return S.stt; }
+function sttCfg(){
+  if(!S.stt) S.stt = {url:"", pass:"", key:"", engine:"deepgram", gap:5000};
+  if(!S.stt.gap) S.stt.gap = 5000;
+  return S.stt;
+}
 /* Supabaseの入口が鍵を求める設定のときに備えて、公開キーも一緒に送る */
 function sttHead(h){
   var c = sttCfg();
@@ -2350,6 +2358,13 @@ function renderStt(){
     b.setAttribute("aria-pressed", c.engine === e.id ? "true" : "false");
     b.addEventListener("click", function(){ c.engine = e.id; save(); renderStt(); });
     box.appendChild(b);
+  });
+  var gb = $("#sttGap"); gb.innerHTML = "";
+  [3000,5000,10000,20000].forEach(function(ms){
+    var b = el("button","chip", (ms/1000) + "秒"); b.type = "button";
+    b.setAttribute("aria-pressed", c.gap === ms ? "true" : "false");
+    b.addEventListener("click", function(){ c.gap = ms; save(); renderStt(); });
+    gb.appendChild(b);
   });
 }
 $("#sttUrl").addEventListener("change", function(){ sttCfg().url = this.value.trim(); save(); });
@@ -2431,10 +2446,39 @@ function pushChunk(blob, t0){
     if(!rcWant && rcBusy === 0) $("#rcRaw").value = rcEls();
   });
 }
+/* ---- クラウドの結果を待つあいだ、内蔵の認識を灰色で先に出す ---- */
+var rcHelp = null, rcHelpWant = false;
+function helpStart(){
+  if(!SR || rcHelpWant) return;
+  rcHelpWant = true;
+  try{ rcHelp = new SR(); }catch(e){ rcHelpWant = false; return; }
+  rcHelp.lang = "ja-JP"; rcHelp.continuous = true; rcHelp.interimResults = true;
+  rcHelp.onresult = function(e){
+    var t = "";
+    for(var i=e.resultIndex;i<e.results.length;i++) t += e.results[i][0].transcript;
+    if(t){ rcIv = t; drawLive(); }
+  };
+  rcHelp.onerror = function(e){
+    /* マイクの取り合いで失敗するなら、先出しはあきらめる（本命の録音を守る） */
+    if(e.error === "audio-capture" || e.error === "not-allowed") rcHelpWant = false;
+  };
+  rcHelp.onend = function(){
+    if(!rcHelpWant) return;
+    setTimeout(function(){ if(rcHelpWant){ try{ rcHelp.start(); }catch(e){} } }, 350);
+  };
+  try{ rcHelp.start(); }catch(e){ rcHelpWant = false; }
+}
+function helpStop(){
+  rcHelpWant = false;
+  if(rcHelp){ try{ rcHelp.stop(); }catch(e){} rcHelp = null; }
+  rcIv = ""; drawLive();
+}
+
 /* ---- Deepgramへ直接つないで、話しているそばから文字にする ---- */
 function chunkStart(ms){
-  rcChunkMs = ms || 10000;
-  $("#rcFoot").textContent = Math.round(rcChunkMs/1000) + "秒ごとに送ります。文字は少し遅れて出ます。";
+  rcChunkMs = ms || sttCfg().gap || 5000;
+  $("#rcFoot").textContent = Math.round(rcChunkMs/1000) + "秒ごとに送ります。灰色は内蔵の下書きで、正しい文字はあとから白で入ります。";
+  helpStart();
   startCycle();
 }
 function tokenGet(){
@@ -2449,7 +2493,7 @@ function tokenGet(){
 function wsStart(){
   var type = mrType();
   /* リアルタイムはDeepgram＋webmのときだけ。iPhoneなどは自動で10秒ずつに落とす */
-  if(sttCfg().engine !== "deepgram" || !type || type.indexOf("webm") < 0){ chunkStart(10000); return; }
+  if(sttCfg().engine !== "deepgram" || !type || type.indexOf("webm") < 0){ chunkStart(0); return; }
   $("#rcFoot").textContent = "リアルタイムでつないでいます…";
   tokenGet().then(function(tk){
     if(!rcWant) return;
@@ -2457,12 +2501,12 @@ function wsStart(){
               "&smart_format=true&punctuate=true&interim_results=true&endpointing=700" +
               "&access_token=" + encodeURIComponent(tk);
     var ws, opened = false;
-    try{ ws = new WebSocket(url); }catch(e){ chunkStart(10000); return; }
+    try{ ws = new WebSocket(url); }catch(e){ chunkStart(0); return; }
     ws.onopen = function(){
-      opened = true; rcWS = ws;
+      opened = true; rcWS = ws; helpStop();
       $("#rcFoot").textContent = "リアルタイムで聞いています。話すとすぐ出ます。";
       try{ rcMR = new MediaRecorder(rcStream, {mimeType:type}); }
-      catch(e){ try{ ws.close(); }catch(e2){} chunkStart(10000); return; }
+      catch(e){ try{ ws.close(); }catch(e2){} chunkStart(0); return; }
       rcMR.ondataavailable = function(e){
         if(e.data && e.data.size && ws.readyState === 1) ws.send(e.data);
       };
@@ -2486,7 +2530,7 @@ function wsStart(){
       if(rcMR && rcMR.state !== "inactive"){ try{ rcMR.stop(); }catch(e){} }
       if(!opened){
         $("#rcFoot").textContent = "リアルタイムでつなげませんでした。10秒ごとの方式にします。";
-        if(rcWant) chunkStart(10000);
+        if(rcWant) chunkStart(0);
         return;
       }
       if(rcWant){ setTimeout(function(){ if(rcWant) wsStart(); }, 700); }
@@ -2496,7 +2540,7 @@ function wsStart(){
     if(!rcWant) return;
     $("#rcFoot").textContent = "リアルタイムは使えません（" +
       ((arguments[0] && arguments[0].message) ? arguments[0].message : "理由不明") + "）。10秒ごとの方式にします。";
-    chunkStart(10000);
+    chunkStart(0);
   });
 }
 
@@ -2527,6 +2571,7 @@ function cloudStart(){
 }
 function cloudStop(){
   rcWant = false; rcRun = false;
+  helpStop();
   if(rcCycle){ clearTimeout(rcCycle); rcCycle = null; }
   if(rcWS){
     try{ rcWS.send(JSON.stringify({type:"CloseStream"})); }catch(e){}
