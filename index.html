@@ -247,6 +247,34 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 .mochi li.none{font-size:calc(15px * var(--fs)); font-weight:400; color:var(--label3); background:none; box-shadow:none; padding:0}
 
+/* ===== 時計 ===== */
+.clock .ctop{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
+.clock .cnow{font-size:calc(46px * var(--fs)); font-weight:700; line-height:.95;
+  font-variant-numeric:tabular-nums; letter-spacing:-.03em}
+.clock .cnow small{font-size:calc(20px * var(--fs)); font-weight:600; color:var(--label3); margin-left:3px}
+.clock .cleft{text-align:right; flex:0 0 auto}
+.clock .cleft em{font-style:normal; display:block; font-size:calc(30px * var(--fs)); font-weight:700;
+  line-height:1; color:var(--accent); font-variant-numeric:tabular-nums}
+.clock .cleft span{font-size:calc(11.5px * var(--fs)); color:var(--label3); letter-spacing:.06em}
+.clock.rest .cleft em{color:var(--green)}
+.clock .cbar{height:7px; border-radius:99px; background:var(--glass3); margin-top:14px;
+  box-shadow:inset 0 0 0 1px var(--sep); overflow:hidden}
+.clock .cbar i{display:block; height:100%; border-radius:99px; background:var(--accent);
+  transition:width .9s linear}
+.clock.rest .cbar i{background:var(--green)}
+.clock .cwhat{margin-top:13px; font-size:calc(19px * var(--fs)); font-weight:600; line-height:1.3}
+.clock .cwhat b{font-weight:600}
+.clock .cnext{margin-top:6px; font-size:calc(13.5px * var(--fs)); color:var(--label3)}
+.clock .chint{margin-top:12px}
+
+/* 校時の時刻の設定 */
+.bellrow{padding:13px 0; border-top:1px solid var(--sep)}
+.bellrow:first-child{border-top:none}
+.bellrow .r1,.bellrow .r2{display:flex; gap:8px; align-items:center}
+.bellrow .r2{margin-top:8px}
+.bellrow input,.bellrow select{flex:1 1 auto; min-width:0}
+.bellrow .rm{flex:0 0 auto; color:var(--label3); font-size:calc(13px * var(--fs)); padding:0 4px}
+
 /* ===== 天気・警報 ===== */
 .wxtop{display:flex; align-items:center; gap:14px}
 .wxl{flex:1 1 auto; min-width:0}
@@ -529,6 +557,16 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       </div>
     </div>
 
+    <div class="sect clock" id="hClock" style="display:none">
+      <div class="ctop">
+        <div class="cnow" id="clkNow">--:--</div>
+        <div class="cleft"><em id="clkLeft">—</em><span id="clkLeftL">のこり</span></div>
+      </div>
+      <div class="cbar"><i id="clkBar" style="width:0%"></i></div>
+      <div class="cwhat" id="clkWhat">—</div>
+      <div class="cnext" id="clkNext"></div>
+    </div>
+
     <div class="sect wx" id="hWx" style="display:none">
       <div class="wxtop">
         <div class="wxl">
@@ -765,6 +803,18 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
           <button class="btn" id="itemAdd">追加</button>
         </div>
         <p class="note" style="margin-top:8px">タップで削除できます。よく使うものが上に並びます。</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>校時の時刻</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 8px">授業の始まりと終わりを、好きなだけ作れます。校時にしばられないので、朝読書・昼休み・GKタイムなども足せます。ここを入れると、今日の画面に「いま何をしていて、あと何分か」が出ます。</p>
+        <div id="bellList"></div>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn sm" id="bellAdd">区切りを足す</button>
+          <button class="btn sm bare" id="bellStd">よくある形を入れる</button>
+        </div>
       </div>
     </details>
 
@@ -1483,8 +1533,8 @@ function renderHome(){
   $("#hMemoS").style.display = showM ? "" : "none";
   $("#hMemo").textContent = d.memo;
   drawShots($("#hShots"), d.shots, null);
-  renderCd();
-  if(!wxOnce){ wxOnce = true; wxFetch(); }
+  renderCd(); renderClock();
+  if(!wxOnce){ wxOnce = true; wxFetch(); clockOn(); }
 
   var ns = notesOf(k);
   $("#hNoteS").style.display = ns.length ? "" : "none";
@@ -1752,7 +1802,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt();
+  renderStt(); renderBell();
   var wb = $("#setWk"); wb.innerHTML = "";
   ORDER.forEach(function(id){
     var b = el("button",null,DOW[WKID.indexOf(id)]); b.type="button";
@@ -3298,6 +3348,157 @@ function drawRisk(mw, aw, mornKey, aftKey){
   wrap.appendChild(det);
 
   box.appendChild(wrap);
+}
+
+/* ============ 校時の時刻と時計 ============ */
+/* S.bell = [{l:"1校時", s:"08:40", e:"09:30", p:0}]
+   p は時間割の何コマ目とつなぐかの番号。null なら教科とつながない自由な区切り。 */
+var BELL_STD = [
+  {l:"朝の時間", s:"08:20", e:"08:35", p:null},
+  {l:"1校時",   s:"08:40", e:"09:30", p:0},
+  {l:"休み",    s:"09:30", e:"09:40", p:null},
+  {l:"2校時",   s:"09:40", e:"10:30", p:1},
+  {l:"休み",    s:"10:30", e:"10:40", p:null},
+  {l:"3校時",   s:"10:40", e:"11:30", p:2},
+  {l:"休み",    s:"11:30", e:"11:40", p:null},
+  {l:"4校時",   s:"11:40", e:"12:30", p:3},
+  {l:"昼休み",  s:"12:30", e:"13:15", p:null},
+  {l:"5校時",   s:"13:15", e:"14:05", p:4},
+  {l:"休み",    s:"14:05", e:"14:15", p:null},
+  {l:"6校時",   s:"14:15", e:"15:05", p:5}
+];
+function bells(){ if(!S.bell) S.bell = []; return S.bell; }
+function hm(t){ var p = String(t||"").split(":"); return (+p[0]||0)*60 + (+p[1]||0); }
+function mmss(min){
+  var m = Math.floor(min);
+  if(m >= 60) return Math.floor(m/60) + "時間" + (m%60 ? (m%60 + "分") : "");
+  return m + "分";
+}
+
+function renderBell(){
+  var box = $("#bellList"); if(!box) return;
+  box.innerHTML = "";
+  var list = bells();
+  if(!list.length){
+    box.appendChild(el("p","note","まだ何もありません。「よくある形を入れる」から始めて、自分の学校に合わせて直すのが早いです。"));
+    return;
+  }
+  list.forEach(function(b, i){
+    var row = el("div","bellrow");
+    var r1 = el("div","r1");
+    var l = document.createElement("input");
+    l.type = "text"; l.value = b.l || ""; l.placeholder = "名前（1校時・昼休み など）";
+    l.addEventListener("input", function(){ b.l = this.value; save(); });
+    r1.appendChild(l);
+    var rm = el("button","rm","消す");
+    rm.addEventListener("click", function(){ list.splice(i,1); save(); renderBell(); });
+    r1.appendChild(rm);
+    row.appendChild(r1);
+
+    var r2 = el("div","r2");
+    var si = document.createElement("input"); si.type = "time"; si.value = b.s || "";
+    si.addEventListener("change", function(){ b.s = this.value; save(); renderBell(); });
+    var ei = document.createElement("input"); ei.type = "time"; ei.value = b.e || "";
+    ei.addEventListener("change", function(){ b.e = this.value; save(); });
+    var sel = document.createElement("select");
+    var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "教科なし";
+    sel.appendChild(o0);
+    for(var j=0;j<S.pn;j++){
+      var o = document.createElement("option");
+      o.value = String(j); o.textContent = plabel(j) + "の教科";
+      sel.appendChild(o);
+    }
+    sel.value = (b.p == null) ? "" : String(b.p);
+    sel.addEventListener("change", function(){ b.p = this.value === "" ? null : +this.value; save(); });
+    r2.appendChild(si); r2.appendChild(ei); r2.appendChild(sel);
+    row.appendChild(r2);
+    box.appendChild(row);
+  });
+}
+$("#bellAdd").addEventListener("click", function(){
+  var l = bells();
+  var last = l[l.length-1];
+  l.push({l:"", s: last ? last.e : "08:40", e:"", p:null});
+  save(); renderBell();
+});
+$("#bellStd").addEventListener("click", function(){
+  askConfirm("よくある形を入れますか", "いまの時刻表は置きかわります。だいたいの形なので、入れたあとで学校に合わせて直してください。", "入れる", function(){
+    S.bell = BELL_STD.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+    save(); renderBell(); renderClock();
+  });
+});
+
+/* ---- 今日の画面の時計 ---- */
+var clkTimer = null;
+function renderClock(){
+  var box = $("#hClock"); if(!box) return;
+  var list = bells().filter(function(b){ return b.s && b.e; })
+                    .sort(function(a,b){ return hm(a.s) - hm(b.s); });
+  if(off !== 0 || !list.length){ box.style.display = "none"; return; }
+  box.style.display = "";
+
+  var d = new Date();
+  var now = d.getHours()*60 + d.getMinutes() + d.getSeconds()/60;
+  $("#clkNow").innerHTML = "";
+  $("#clkNow").appendChild(document.createTextNode(pad(d.getHours()) + ":" + pad(d.getMinutes())));
+  var sc = el("small", null, pad(d.getSeconds()));
+  $("#clkNow").appendChild(sc);
+
+  var day = dayOf(keyOf(d));
+  function nameOf(b){
+    if(b.p != null && day.periods[b.p]) return day.periods[b.p];
+    return b.l || "";
+  }
+  function label(b){
+    var n = nameOf(b);
+    return (b.l && n && b.l !== n) ? (b.l + "　" + n) : (n || b.l || "—");
+  }
+
+  var cur = null, nxt = null;
+  for(var i=0;i<list.length;i++){
+    var b = list[i], s0 = hm(b.s), e0 = hm(b.e);
+    if(now >= s0 && now < e0){ cur = b; nxt = list[i+1] || null; break; }
+    if(now < s0){ nxt = b; break; }
+  }
+
+  box.classList.remove("rest");
+  if(cur){
+    var s0 = hm(cur.s), e0 = hm(cur.e);
+    var left = e0 - now, prog = ((now - s0) / (e0 - s0)) * 100;
+    if(/休み|昼/.test(cur.l || "")) box.classList.add("rest");
+    $("#clkLeft").textContent = mmss(left);
+    $("#clkLeftL").textContent = "のこり";
+    $("#clkBar").style.width = Math.max(0, Math.min(100, prog)) + "%";
+    $("#clkWhat").textContent = "いま　" + label(cur);
+    $("#clkNext").textContent = nxt ? ("つぎ　" + label(nxt) + "　" + nxt.s + "から") : "このあとの予定はありません";
+  }else if(nxt){
+    box.classList.add("rest");
+    var until = hm(nxt.s) - now;
+    $("#clkLeft").textContent = mmss(until);
+    $("#clkLeftL").textContent = "ではじまる";
+    $("#clkBar").style.width = "0%";
+    $("#clkWhat").textContent = "まだ始まっていません";
+    $("#clkNext").textContent = "つぎ　" + label(nxt) + "　" + nxt.s + "から";
+  }else{
+    box.classList.add("rest");
+    $("#clkBar").style.width = "100%";
+    $("#clkWhat").textContent = "今日の授業は終わりました";
+    if(day.dis){
+      var dl = hm(day.dis) - now;
+      if(dl > 0){ $("#clkLeft").textContent = mmss(dl); $("#clkLeftL").textContent = "で最終下校"; }
+      else{ $("#clkLeft").textContent = "—"; $("#clkLeftL").textContent = "おつかれさま"; }
+      $("#clkNext").textContent = "最終下校　" + day.dis;
+    }else{
+      $("#clkLeft").textContent = "—"; $("#clkLeftL").textContent = "おつかれさま";
+      $("#clkNext").textContent = "";
+    }
+  }
+}
+function clockOn(){
+  if(clkTimer) clearInterval(clkTimer);
+  clkTimer = setInterval(function(){
+    if(!document.hidden && view === "home") renderClock();
+  }, 1000);
 }
 
 /* ============ boot ============ */
