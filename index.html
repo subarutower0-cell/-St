@@ -674,6 +674,21 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </details>
 
     <details class="acc">
+      <summary>文字起こしサーバー</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">「クラウド」で録音するときだけ必要です。手順書のとおりに作って、できたURLをここに入れてください。</p>
+        <p class="lab">つなぎ先のURL</p>
+        <input type="text" id="sttUrl" placeholder="https://〜.supabase.co/functions/v1/transcribe">
+        <p class="lab" style="margin-top:16px">合言葉</p>
+        <input type="text" id="sttPass" placeholder="サーバーに登録したのと同じ言葉">
+        <p class="lab" style="margin-top:16px">ふだん使う音声認識</p>
+        <div class="chips" id="sttEngine"></div>
+        <button class="btn sm" id="sttTest" style="margin-top:16px">つながるか試す</button>
+        <p class="note" id="sttMsg" style="margin-top:12px"></p>
+      </div>
+    </details>
+
+    <details class="acc">
       <summary>端末どうしの同期</summary>
       <div class="in">
         <p class="note" id="syncDesc" style="margin:0 0 14px"></p>
@@ -750,6 +765,11 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
   <!-- ===== 録音 ===== -->
   <section class="view" id="v-rec">
 
+    <div class="segs" id="rcMode">
+      <button data-m="local" aria-pressed="true">内蔵（無料）</button>
+      <button data-m="cloud" aria-pressed="false">クラウド（賢い）</button>
+    </div>
+
     <div class="studio" id="rcStudio">
       <div class="sthead">
         <span class="dot" id="rcDot"></span>
@@ -765,6 +785,20 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <p class="stfoot" id="rcFoot">話すと、そばから文字になっていきます。音そのものは残しません。</p>
     </div>
 
+    <details class="acc" id="rcHelp">
+      <summary>録音できないとき</summary>
+      <div class="in">
+        <p class="lab" style="margin-bottom:8px">いまの状態</p>
+        <ul class="tt" id="rcDiag"></ul>
+        <p class="note" style="margin-top:14px">
+          いちばん多いのは、<b>Claudeのページの枠の中</b>で開いていて、ブラウザがマイクを渡してくれない場合です。
+          そのときは右上のボタンから新しいタブで開き直すか、ファイルとして保存してChromeで開いてください。
+          iPhoneのSafariは、そもそもこの文字起こしに対応していません。下の「文字を直す」欄をタップして、
+          キーボードのマイクをお使いください。
+        </p>
+      </div>
+    </details>
+
     <div class="sect">
       <p class="lab">文字を直す<span class="r muted" id="rcSaved"></span></p>
       <textarea id="rcRaw" placeholder="録音を止めてから、聞き取りまちがいをここで直せます。"></textarea>
@@ -772,7 +806,17 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <button class="btn primary" style="flex:1" id="rcSave">この授業に保存</button>
         <button class="btn" id="rcSum">要点をまとめる</button>
       </div>
-      <button class="btn bare sm" id="rcNew" style="margin-top:10px">書きかけを消す</button>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn" style="flex:1" id="rcAI">AIに読み直してもらう</button>
+      </div>
+      <p class="note" id="rcAIN" style="margin-top:8px">聞きまちがいを教科の内容から直して、読める文章にします。</p>
+      <button class="btn bare sm" id="rcNew" style="margin-top:12px">書きかけを消す</button>
+    </div>
+
+    <div class="sect">
+      <p class="lab">聞き比べ<span class="r"><button class="btn sm" id="rcCmpBtn">ほかの会社でも試す</button></span></p>
+      <p class="note" id="rcCmpN">クラウドで録音したあとに押すと、同じ音声を別の会社の音声認識にも通して、結果を並べて見られます。</p>
+      <div id="rcCmp" style="margin-top:12px"></div>
     </div>
 
     <div class="sect sumbox" id="rcSumS" style="display:none">
@@ -865,6 +909,7 @@ function readLocal(){
   if(!S.patterns) S.patterns = [];
   if(!S.plabels) S.plabels = {};
   if(!S.todos) S.todos = [];
+  if(!S.stt) S.stt = {url:"", pass:"", engine:"deepgram"};
   if(!S.ui) S.ui = {ga:56, blur:26, aurora:100, tint:"aurora", accent:"blue", fs:100};
   if(!S.disPresets) S.disPresets = defaults().disPresets;
   if(!S.mig1){
@@ -1420,6 +1465,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
+  renderStt();
   var wb = $("#setWk"); wb.innerHTML = "";
   ORDER.forEach(function(id){
     var b = el("button",null,DOW[WKID.indexOf(id)]); b.type="button";
@@ -1876,7 +1922,7 @@ function drawLive(){
     return;
   }
   rcSeg.forEach(function(g, i){
-    var ln = el("div","ln" + (g.m ? " mk" : ""));
+    var ln = el("div","ln" + (g.m ? " mk" : "") + (g.tmp ? " iv" : ""));
     ln.appendChild(el("span","tm", rcFmt(g.t||0)));
     var tx = el("span","tx", g.x);
     ln.appendChild(tx);
@@ -1901,7 +1947,7 @@ function rcFace(){
   var b = $("#rcBig");
   b.classList.toggle("on", rcWant);
   b.textContent = rcWant ? "停止" : "録音";
-  b.disabled = !SR;
+  b.disabled = !SR && rcMode !== "cloud";
   $("#rcMark").disabled = !rcWant;
 }
 
@@ -1940,16 +1986,50 @@ function ampLoop(){
   drawWave();
   rcRaf = requestAnimationFrame(ampLoop);
 }
-function ampStart(){
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-  navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+var rcRetry = false, rcAISum = null;
+/* 先にマイクの許可を取りにいく。ここで止まれば、理由をはっきり出せる */
+function micReady(cb){
+  if(!window.isSecureContext){ cb("insecure"); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ cb("nomedia"); return; }
+  navigator.mediaDevices.getUserMedia({audio:{noiseSuppression:true, autoGainControl:true}}).then(function(st){
     rcStream = st;
-    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
-    rcAC = new AC();
-    rcAn = rcAC.createAnalyser(); rcAn.fftSize = 1024;
-    rcAC.createMediaStreamSource(st).connect(rcAn);
-    waveSize(); ampLoop();
-  }).catch(function(){});
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(AC){
+      try{
+        rcAC = new AC();
+        if(rcAC.state === "suspended") rcAC.resume();
+        rcAn = rcAC.createAnalyser(); rcAn.fftSize = 1024;
+        rcAC.createMediaStreamSource(st).connect(rcAn);
+        waveSize(); ampLoop();
+      }catch(e){}
+    }
+    cb(null);
+  }).catch(function(e){ cb((e && e.name) || "error"); });
+}
+function micErr(n){
+  if(n === "NotAllowedError" || n === "SecurityError")
+    return inFrame() ? "ブラウザがマイクを渡してくれませんでした。このページを新しいタブで開き直してください。"
+                     : "マイクが許可されていません。アドレスバーの左にあるアイコンから許可してください。";
+  if(n === "NotFoundError" || n === "OverconstrainedError") return "マイクが見つかりません。";
+  if(n === "NotReadableError") return "ほかのアプリがマイクを使っています。それを閉じてからもう一度。";
+  if(n === "insecure") return "この開き方ではマイクを使えません。https のページか、保存したファイルとして開いてください。";
+  if(n === "nomedia") return "このブラウザではマイクを使えません。";
+  return "マイクを開けませんでした（" + n + "）";
+}
+function inFrame(){ try{ return window.self !== window.top; }catch(e){ return true; } }
+function diagRow(a, b, ok){
+  var li = el("li");
+  li.appendChild(el("span","pn",a));
+  li.appendChild(el("span","ps" + (ok ? "" : " none"), b));
+  li.appendChild(el("span", ok ? "tag" : "tag ntag", ok ? "よし" : "注意"));
+  return li;
+}
+function diag(){
+  var l = $("#rcDiag"); l.innerHTML = "";
+  l.appendChild(diagRow("文字起こし", SR ? "使えます" : "このブラウザは非対応です", !!SR));
+  l.appendChild(diagRow("接続", window.isSecureContext ? "安全な接続です" : "安全な接続ではありません", !!window.isSecureContext));
+  l.appendChild(diagRow("開き方", inFrame() ? "枠の中で開いています" : "そのまま開いています", !inFrame()));
+  l.appendChild(diagRow("マイク", rcStream ? "つながっています" : "まだつないでいません", !!rcStream));
 }
 function ampStop(){
   if(rcRaf){ cancelAnimationFrame(rcRaf); rcRaf = null; }
@@ -1961,11 +2041,27 @@ window.addEventListener("resize", function(){ if(view==="rec"){ waveSize(); draw
 
 /* ---- 録音のはじめ／おわり ---- */
 function rcStart(){
-  if(!SR){ toast("このブラウザでは録音できません"); return; }
   if(rcWant) return;
-  if(rcP < 0){ pickSlot(); toast("どの授業かをえらんでください"); return; }
+  if(!SR){
+    $("#rcFoot").textContent = "このブラウザは声から文字にできません。";
+    $("#rcHelp").open = true; diag(); return;
+  }
   if(hearing && rg){ try{ rg.stop(); }catch(e){} }
-  rcG = new SR(); rcG.lang = "ja-JP"; rcG.continuous = true; rcG.interimResults = true;
+  rcWant = true; rcSeg = []; rcIv = ""; rcAmp = []; rcPend = false; rcRetry = false; rcAISum = null;
+  rcFace(); drawLive();
+  $("#rcFoot").textContent = "マイクの用意をしています…";
+  micReady(function(err){
+    if(err){
+      rcWant = false; rcFace();
+      $("#rcFoot").textContent = micErr(err);
+      $("#rcHelp").open = true; diag();
+      return;
+    }
+    diag(); beginSR();
+  });
+}
+function beginSR(){
+  rcG = new SR(); rcG.lang = "ja-JP"; rcG.continuous = true; rcG.interimResults = true; rcG.maxAlternatives = 1;
   rcG.onstart = function(){ rcRun = true; rcFace(); };
   rcG.onresult = function(e){
     var iv = "";
@@ -1985,7 +2081,14 @@ function rcStart(){
           : e.error === "no-speech"   ? "声が聞こえません。もう少し近づいて話してください。"
           : "うまく聞き取れませんでした（" + (e.error||"") + "）";
     $("#rcFoot").textContent = m;
-    if(e.error === "not-allowed"){ rcWant = false; }
+    if(e.error === "not-allowed" || e.error === "service-not-allowed"){
+      rcWant = false; $("#rcHelp").open = true; diag();
+    }
+    /* マイクの取り合いで失敗したときは、波形をあきらめて文字だけにする */
+    if(e.error === "audio-capture" && !rcRetry){
+      rcRetry = true; ampStop();
+      $("#rcFoot").textContent = "波形をやめて、文字起こしだけでつなぎ直します…";
+    }
   };
   rcG.onend = function(){
     rcRun = false;
@@ -1997,14 +2100,11 @@ function rcStart(){
       ? "止めました。聞きまちがいを直してから保存してください。"
       : "何も聞き取れませんでした。";
   };
-  rcWant = true; rcSeg = []; rcIv = ""; rcAmp = []; rcPend = false;
-  rcFace(); drawLive();
   try{ rcG.start(); }
   catch(e){ rcWant = false; rcFace(); $("#rcFoot").textContent = "開始できませんでした。ページを開き直してください。"; return; }
   rcT0 = Date.now(); $("#rcTime").textContent = "00:00";
   rcTick = setInterval(function(){ $("#rcTime").textContent = rcFmt(rcSec()); }, 300);
   $("#rcFoot").textContent = "大事なところで「いま大事」を押すと、要点にかならず入ります。";
-  ampStart();
 }
 function rcStop(){
   rcWant = false;
@@ -2012,7 +2112,7 @@ function rcStop(){
   else{ rcFace(); ampStop(); if(rcTick){ clearInterval(rcTick); rcTick=null; } $("#rcRaw").value = rcEls(); }
 }
 function rcClear(){
-  rcSeg = []; rcIv = ""; rcEdit = null; rcAmp = [];
+  rcSeg = []; rcIv = ""; rcEdit = null; rcAmp = []; rcAISum = null;
   $("#rcRaw").value = ""; $("#rcTime").textContent = "00:00";
   showSum([]); drawLive(); drawWave();
 }
@@ -2090,7 +2190,7 @@ function renderRec(){
   $("#rcSlot").appendChild(el("em", null, when));
   $("#rcSlot").appendChild(document.createTextNode(
     rcP >= 0 ? plabel(rcP) + "　" + (d.periods[rcP] || "教科は空です") : "授業をえらぶ"));
-  rcFace(); drawLive(); waveSize(); drawWave();
+  rcFace(); drawLive(); waveSize(); drawWave(); diag();
 
   var ns = notesOf(rcKey);
   $("#rcCount").textContent = ns.length ? ns.length + "件" : "";
@@ -2123,7 +2223,10 @@ function renderRec(){
   });
 }
 
-$("#rcBig").addEventListener("click", function(){ rcWant ? rcStop() : rcStart(); });
+$("#rcBig").addEventListener("click", function(){
+  if(rcMode === "cloud") rcWant ? cloudStop() : cloudStart();
+  else rcWant ? rcStop() : rcStart();
+});
 $("#rcMark").addEventListener("click", function(){
   var last = rcSeg[rcSeg.length-1];
   if(last && (rcSec() - (last.t||0)) < 9){ last.m = true; drawLive(); }
@@ -2131,8 +2234,36 @@ $("#rcMark").addEventListener("click", function(){
   toast("大事なところとして印をつけました");
 });
 $("#rcSlot").addEventListener("click", pickSlot);
+$("#rcAI").addEventListener("click", function(){
+  var tx = $("#rcRaw").value.trim();
+  if(!tx){ toast("読み直す文章がありません"); return; }
+  var sub = rcP >= 0 ? (dayOf(rcKey).periods[rcP] || "") : "";
+  var b = $("#rcAI"); b.disabled = true;
+  $("#rcAIN").textContent = "AIが読み直しています…";
+  var ask =
+    "次の文章は、日本の学校の" + (sub ? sub + "の" : "") + "授業を、スマホの音声認識で文字にしたものです。" +
+    "聞きまちがいや誤変換がたくさん混ざっています。教科の内容から見て明らかにおかしい言葉を直し、" +
+    "話し言葉を読みやすい文にしてください。書かれていない内容を足してはいけません。" +
+    "読み取れない部分は（聞き取れず）と書いてください。\n" +
+    "返事はJSONだけにしてください。前置きも記号も付けないでください。" +
+    "形式: {\"text\":\"整えた全文\",\"points\":[\"要点\",\"要点\"]}\n\n" + tx;
+  fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:1000, messages:[{role:"user", content:ask}] })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    var t = (d.content||[]).filter(function(x){ return x.type === "text"; })
+                           .map(function(x){ return x.text; }).join("");
+    var o = JSON.parse(t.replace(/```json|```/g,"").trim());
+    if(o.text) $("#rcRaw").value = o.text;
+    if(o.points && o.points.length){ rcAISum = o.points; showSum(o.points, [], 0); }
+    $("#rcAIN").textContent = "整えました。中身が変わっていないか、目でも確かめてください。";
+  }).catch(function(){
+    $("#rcAIN").textContent = "AIに届きませんでした。Claudeのページとして開いているときだけ使えます。";
+  }).then(function(){ b.disabled = false; });
+});
 $("#rcNew").addEventListener("click", function(){ rcClear(); renderRec(); });
 $("#rcSum").addEventListener("click", function(){
+  rcAISum = null;
   var r = summarizeJa($("#rcRaw").value, rcSeg);
   if(!r){ toast("まとめるだけの文章がまだありません"); return; }
   showSum(r.sum, r.keys, r.mk);
@@ -2149,7 +2280,7 @@ $("#rcSave").addEventListener("click", function(){
     var o = rcSeg[i];
     return {t:(o && o.t) || 0, x:x, m:!!(o && o.m && o.x === x)};
   });
-  var got = summarizeJa(tx, seg) || {sum:[], keys:[], mk:0};
+  var got = rcAISum ? {sum:rcAISum, keys:[], mk:0} : (summarizeJa(tx, seg) || {sum:[], keys:[], mk:0});
   var sub = dayOf(rcKey).periods[rcP] || "";
   var r = rec(rcKey); if(!r.notes) r.notes = [];
   var old = rcEdit ? noteById(rcKey, rcEdit) : noteAt(rcKey, rcP);
@@ -2168,6 +2299,178 @@ $("#rcSave").addEventListener("click", function(){
   toast(old ? "上書きしました" : "この授業に保存しました");
 });
 if(!SR) $("#rcFoot").textContent = "このブラウザでは声から文字にできません。下の欄をタップして、キーボードのマイクをお使いください（iPhoneはこちら）。";
+
+/* ============ クラウド文字起こし ============ */
+var ENGINES = [
+  {id:"deepgram",   n:"Deepgram"},
+  {id:"assemblyai", n:"AssemblyAI"},
+  {id:"openai",     n:"OpenAI"}
+];
+var rcMode = "local", rcMR = null, rcBlobs = [], rcCycle = null, rcBusy = 0;
+
+function sttCfg(){ if(!S.stt) S.stt = {url:"", pass:"", engine:"deepgram"}; return S.stt; }
+function engName(id){ for(var i=0;i<ENGINES.length;i++) if(ENGINES[i].id===id) return ENGINES[i].n; return id; }
+
+function renderStt(){
+  var c = sttCfg();
+  $("#sttUrl").value = c.url || "";
+  $("#sttPass").value = c.pass || "";
+  var box = $("#sttEngine"); box.innerHTML = "";
+  ENGINES.forEach(function(e){
+    var b = el("button","chip", e.n); b.type = "button";
+    b.setAttribute("aria-pressed", c.engine === e.id ? "true" : "false");
+    b.addEventListener("click", function(){ c.engine = e.id; save(); renderStt(); });
+    box.appendChild(b);
+  });
+}
+$("#sttUrl").addEventListener("change", function(){ sttCfg().url = this.value.trim(); save(); });
+$("#sttPass").addEventListener("change", function(){ sttCfg().pass = this.value.trim(); save(); });
+$("#sttTest").addEventListener("click", function(){
+  var c = sttCfg();
+  if(!c.url){ $("#sttMsg").textContent = "URLを入れてください。"; return; }
+  $("#sttMsg").textContent = "ためしています…";
+  fetch(c.url, {method:"POST", headers:{"content-type":"application/json", "x-test":"1", "x-pass":c.pass||""}, body:"{}"})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.ok){
+        var ready = (d.ready||[]).map(engName).join("、");
+        $("#sttMsg").textContent = "つながりました。使えるのは " + (ready || "（鍵が登録されていません）");
+      }else $("#sttMsg").textContent = "つながりましたが断られました：" + (d.error || "");
+    })
+    .catch(function(){ $("#sttMsg").textContent = "届きませんでした。URLと、サーバーが動いているかを確かめてください。"; });
+});
+
+function sttSend(blob, engine){
+  var c = sttCfg();
+  return fetch(c.url, {
+    method:"POST",
+    headers:{"content-type": blob.type || "audio/webm", "x-engine": engine || c.engine, "x-pass": c.pass || ""},
+    body: blob
+  }).then(function(r){ return r.json(); })
+    .then(function(d){ if(d.error) throw new Error(d.error); return d.text || ""; });
+}
+
+function mrType(){
+  var t = ["audio/webm;codecs=opus","audio/webm","audio/mp4"];
+  if(!window.MediaRecorder) return null;
+  for(var i=0;i<t.length;i++) if(MediaRecorder.isTypeSupported(t[i])) return t[i];
+  return "";
+}
+/* 30秒ごとに録り直す。切れ端ではなく、そのまま再生できる形で送るため */
+function startCycle(){
+  if(!rcWant || !rcStream) return;
+  var type = mrType(), parts = [], t0 = rcSec();
+  try{ rcMR = type ? new MediaRecorder(rcStream, {mimeType:type}) : new MediaRecorder(rcStream); }
+  catch(e){ $("#rcFoot").textContent = "この端末では録音の形式が合いません。"; rcWant = false; rcFace(); return; }
+  rcMR.ondataavailable = function(e){ if(e.data && e.data.size) parts.push(e.data); };
+  rcMR.onstop = function(){
+    var b = new Blob(parts, {type: rcMR.mimeType || type || "audio/webm"});
+    if(b.size > 3000) pushChunk(b, t0);
+    if(rcWant) startCycle();
+    else if(rcBusy === 0) $("#rcRaw").value = rcEls();
+  };
+  rcMR.start();
+  rcCycle = setTimeout(function(){ try{ rcMR.stop(); }catch(e){} }, 30000);
+}
+function pushChunk(blob, t0){
+  rcBlobs.push({t:t0, b:blob});
+  var ph = {t:t0, x:"（文字にしています…）", m:false, tmp:true};
+  if(rcPend){ ph.m = true; rcPend = false; }
+  rcSeg.push(ph); drawLive(); rcBusy++;
+  sttSend(blob).then(function(tx){
+    ph.x = tx || "（聞き取れませんでした）";
+  }).catch(function(e){
+    ph.x = "（送れませんでした）";
+    $("#rcFoot").textContent = "サーバーに届きませんでした。設定→文字起こしサーバー を確かめてください。";
+  }).then(function(){
+    ph.tmp = false; rcBusy--; drawLive();
+    if(!rcWant && rcBusy === 0) $("#rcRaw").value = rcEls();
+  });
+}
+function cloudStart(){
+  var c = sttCfg();
+  if(!c.url){
+    $("#rcFoot").textContent = "先に「設定 → 文字起こしサーバー」にURLを入れてください。";
+    return;
+  }
+  if(!window.MediaRecorder){
+    $("#rcFoot").textContent = "この端末では録音できません。";
+    return;
+  }
+  rcWant = true; rcSeg = []; rcIv = ""; rcAmp = []; rcBlobs = []; rcBusy = 0; rcPend = false; rcAISum = null;
+  rcFace(); drawLive();
+  $("#rcFoot").textContent = "マイクの用意をしています…";
+  micReady(function(err){
+    if(err){
+      rcWant = false; rcFace();
+      $("#rcFoot").textContent = micErr(err);
+      $("#rcHelp").open = true; diag(); return;
+    }
+    rcRun = true; rcFace(); diag();
+    rcT0 = Date.now(); $("#rcTime").textContent = "00:00";
+    rcTick = setInterval(function(){ $("#rcTime").textContent = rcFmt(rcSec()); }, 300);
+    $("#rcFoot").textContent = "30秒ごとに送っています。文字は少し遅れて出ます。";
+    startCycle();
+  });
+}
+function cloudStop(){
+  rcWant = false; rcRun = false;
+  if(rcCycle){ clearTimeout(rcCycle); rcCycle = null; }
+  if(rcMR && rcMR.state !== "inactive"){ try{ rcMR.stop(); }catch(e){} }
+  if(rcTick){ clearInterval(rcTick); rcTick = null; }
+  ampStop(); rcFace();
+  $("#rcFoot").textContent = "止めました。残りの文字が出そろうまで少し待ってください。";
+}
+
+/* ---- 聞き比べ ---- */
+$("#rcCmpBtn").addEventListener("click", function(){
+  if(!rcBlobs.length){ toast("先にクラウドで録音してください"); return; }
+  openSheet("どの会社で試すか", function(bx){
+    var g = el("div","pick");
+    ENGINES.forEach(function(e){
+      var b = el("button", null, e.n);
+      b.addEventListener("click", function(){ closeSheet(); compareWith(e.id); });
+      g.appendChild(b);
+    });
+    bx.appendChild(g);
+  });
+});
+function compareWith(engine){
+  var box = $("#rcCmp"); box.innerHTML = "";
+  $("#rcCmpN").textContent = engName(engine) + " に同じ音声を送っています…（" + rcBlobs.length + "本）";
+  var out = [], i = 0;
+  function next(){
+    if(i >= rcBlobs.length){
+      $("#rcCmpN").textContent = "左が今の文章、下が " + engName(engine) + " の結果です。よいほうを使ってください。";
+      box.innerHTML = "";
+      var h = el("p","lab", engName(engine)); box.appendChild(h);
+      var d = el("div","memo", out.join("\n")); box.appendChild(d);
+      var use = el("button","btn sm","こちらを使う"); use.style.marginTop = "12px";
+      use.addEventListener("click", function(){
+        $("#rcRaw").value = out.join("\n"); toast("入れかえました");
+      });
+      box.appendChild(use);
+      return;
+    }
+    $("#rcCmpN").textContent = engName(engine) + " で文字にしています… " + (i+1) + "／" + rcBlobs.length;
+    sttSend(rcBlobs[i].b, engine)
+      .then(function(tx){ out.push(tx); })
+      .catch(function(){ out.push("（失敗）"); })
+      .then(function(){ i++; next(); });
+  }
+  next();
+}
+
+/* ---- 方式の切り替え ---- */
+$("#rcMode").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  if(rcWant) return;
+  rcMode = b.dataset.m;
+  $$("#rcMode button").forEach(function(x){ x.setAttribute("aria-pressed", x===b ? "true" : "false"); });
+  $("#rcFoot").textContent = rcMode === "cloud"
+    ? "音を30秒ずつサーバーへ送って、賢い音声認識で文字にします。"
+    : "ブラウザに入っている音声認識で、その場で文字にします。";
+});
 
 /* ============ boot ============ */
 readLocal();
