@@ -119,13 +119,17 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 .mast{
   position:sticky; top:0; z-index:30;
   display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:16px 6px 10px; margin:0 -6px;
+  padding:16px 6px 10px; margin:0 -6px; min-height:52px;
   -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
   -webkit-mask-image:linear-gradient(#000 68%, transparent); mask-image:linear-gradient(#000 68%, transparent);
 }
-.brand h1{font-size:calc(15px * var(--fs)); font-weight:600; margin:0; letter-spacing:-.01em; color:var(--label2)}
+.brand{flex:1 1 auto; min-width:0}
+.brand h1{font-size:calc(15px * var(--fs)); font-weight:600; margin:0; letter-spacing:-.01em; color:var(--label2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.4}
 .brick,.studs{display:none}
-.sync{font-size:calc(12px * var(--fs)); color:var(--label3); display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
+.sync{font-size:calc(12px * var(--fs)); color:var(--label3); display:inline-flex; align-items:center; gap:6px;
+  white-space:nowrap; flex:0 0 auto; max-width:52%; overflow:hidden; line-height:1.4}
+.sync #syncT{overflow:hidden; text-overflow:ellipsis}
 .sync i{width:7px; height:7px; border-radius:50%; background:var(--label3); display:inline-block}
 .sync.live i{background:var(--green); box-shadow:0 0 8px var(--green)}
 
@@ -240,6 +244,63 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
   background:var(--glass3); box-shadow:inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--sep);
 }
 .mochi li.none{font-size:calc(15px * var(--fs)); font-weight:400; color:var(--label3); background:none; box-shadow:none; padding:0}
+
+/* ===== 天気・警報 ===== */
+.wxtop{display:flex; align-items:center; gap:14px}
+.wxl{flex:1 1 auto; min-width:0}
+.wxl b{display:block; font-size:calc(18px * var(--fs)); font-weight:600; line-height:1.35;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.wxr{flex:0 0 auto}
+.wxr em{font-style:normal; font-size:calc(24px * var(--fs)); font-weight:700; color:var(--label2);
+  font-variant-numeric:tabular-nums}
+.alert{margin-top:14px; border-radius:14px; padding:13px 15px; font-size:calc(14px * var(--fs)); line-height:1.7}
+.alert b{display:block; font-size:calc(15.5px * var(--fs)); margin-bottom:4px}
+.alert.warn{background:rgba(255,149,0,.14); box-shadow:inset 0 0 0 1px rgba(255,149,0,.4)}
+.alert.bad{background:rgba(255,59,48,.14); box-shadow:inset 0 0 0 1px rgba(255,59,48,.45)}
+.alert.calm{background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep); color:var(--label3)}
+.alert .src{display:block; margin-top:7px; font-size:calc(11.5px * var(--fs)); color:var(--label3)}
+
+/* ===== 休校・下校の可能性 ===== */
+.risk{margin-top:16px}
+.risk .rrow{display:flex; align-items:center; gap:10px; margin-top:12px}
+.risk .rn{flex:0 0 auto; width:calc(104px * var(--fs)); font-size:calc(13.5px * var(--fs)); color:var(--label2)}
+.risk .rb{flex:1 1 auto; height:9px; border-radius:99px; background:var(--glass3);
+  box-shadow:inset 0 0 0 1px var(--sep); overflow:hidden}
+.risk .rb i{display:block; height:100%; border-radius:99px; background:var(--green);
+  transition:width .5s var(--ease)}
+.risk .rb i.mid{background:var(--orange)}
+.risk .rb i.hi{background:#FF453A}
+.risk .rp{flex:0 0 auto; width:calc(46px * var(--fs)); text-align:right;
+  font-size:calc(16px * var(--fs)); font-weight:700; font-variant-numeric:tabular-nums}
+.risk .rsub{margin-top:12px; font-size:calc(12.5px * var(--fs)); color:var(--label3); line-height:1.7}
+.risk details{margin-top:10px}
+.risk summary{font-size:calc(12.5px * var(--fs)); color:var(--accent); cursor:pointer}
+.risk details ul{margin:8px 0 0; padding-left:1.2em; font-size:calc(12.5px * var(--fs));
+  color:var(--label3); line-height:1.8}
+
+/* ===== もうすぐ ===== */
+.cd .cdtop{display:flex; align-items:center; gap:14px}
+.cdl{flex:1 1 auto; min-width:0}
+.cdk{display:block; font-size:calc(11.5px * var(--fs)); color:var(--label3); letter-spacing:.08em; margin-bottom:2px}
+.cdl b{display:block; font-size:calc(18px * var(--fs)); font-weight:600; line-height:1.35;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cdd{font-size:calc(12.5px * var(--fs)); color:var(--label3)}
+.cdr{flex:0 0 auto; display:flex; align-items:baseline; gap:3px; color:var(--accent)}
+.cdr em{font-style:normal; font-size:calc(42px * var(--fs)); font-weight:700; line-height:.95;
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.cdr i{font-style:normal; font-size:calc(14px * var(--fs)); font-weight:600}
+.cd.soon .cdr{color:var(--orange)}
+.cd.today .cdr em{font-size:calc(26px * var(--fs))}
+.cdlist{margin:16px 0 0; padding:0; list-style:none}
+.cdlist li{display:flex; align-items:baseline; gap:10px; padding:8px 0 0; margin-top:8px;
+  border-top:1px solid var(--sep); font-size:calc(14.5px * var(--fs))}
+.cdlist li span{flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cdlist li b{flex:0 0 auto; font-weight:600; font-variant-numeric:tabular-nums; color:var(--label2)}
+
+/* 持ち物のチェック */
+.mochi li.on{color:var(--label3); text-decoration:line-through; background:none;
+  box-shadow:inset 0 0 0 1px var(--sep)}
+.mochi li.tap{cursor:pointer; -webkit-user-select:none; user-select:none}
 
 .memo{white-space:pre-wrap; word-break:break-word; font-size:calc(16px * var(--fs)); line-height:1.8; background:none}
 .shots{display:flex; gap:10px; overflow-x:auto; padding-bottom:4px}
@@ -433,6 +494,13 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
 .keys span{font-size:calc(12.5px * var(--fs)); color:var(--label2); border-radius:999px; padding:4px 11px;
   background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep)}
 </style>
+<meta name="theme-color" content="#1E2B4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="終学活">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
 </head>
 <body>
 <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -457,6 +525,31 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         「設定」→「通常時程」を自分のものに直すと、終学活では変わった校時を選ぶだけになります。
         <div style="margin-top:12px"><button class="btn sm" id="toSet">設定をひらく</button></div>
       </div>
+    </div>
+
+    <div class="sect wx" id="hWx" style="display:none">
+      <div class="wxtop">
+        <div class="wxl">
+          <span class="cdk">今日の天気</span>
+          <b id="wxNow">—</b>
+          <span class="cdd" id="wxSub"></span>
+        </div>
+        <div class="wxr"><em id="wxTmp">—</em></div>
+      </div>
+      <div id="wxWarn"></div>
+      <div id="wxRisk"></div>
+    </div>
+
+    <div class="sect cd" id="hCd" style="display:none">
+      <div class="cdtop">
+        <div class="cdl">
+          <span class="cdk">もうすぐ</span>
+          <b id="cdName">—</b>
+          <span class="cdd" id="cdDate"></span>
+        </div>
+        <div class="cdr"><em id="cdNum">0</em><i id="cdUnit">日</i></div>
+      </div>
+      <ul class="cdlist" id="cdMore"></ul>
     </div>
 
     <div class="dateline">
@@ -674,15 +767,41 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </details>
 
     <details class="acc">
+      <summary>3年A組の時間割</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">配られた暫定時間割を、通常時程として入れます。いま入っている通常時程は上書きされます。</p>
+        <button class="btn sm" id="ttImp">3年A組の時間割を入れる</button>
+        <p class="note" style="margin-top:14px">移動教室：数学・英語はSクラスが3A教室、Jクラスが401教室。音楽・器楽は音楽室、美術は美術室。体育は体育委員が確認。</p>
+        <p class="note" id="ttMsg" style="margin-top:10px"></p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>学校の年間行事</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">令和8年度 星城中学校 第3学年の年間行事予定（4月〜3月）を、月間予定に流し込みます。すでに書いてある予定は消さず、後ろに足します。</p>
+        <button class="btn sm" id="evImp">年間行事を取り込む</button>
+        <button class="btn sm bare" id="evDel" style="margin-top:10px">取り込んだ行事を消す</button>
+
+        <p class="lab" style="margin-top:20px">通知</p>
+        <p class="note" style="margin:0 0 10px">ファイルを作ってスマホのカレンダーに取り込むと、テスト・入試・行事などの前日20時に通知が来ます。アプリを閉じていても鳴ります。</p>
+        <button class="btn sm" id="evIcs">カレンダー用ファイルを作る</button>
+        <p class="note" id="evMsg" style="margin-top:14px"></p>
+      </div>
+    </details>
+
+    <details class="acc">
       <summary>文字起こしサーバー</summary>
       <div class="in">
         <p class="note" style="margin:0 0 14px">「クラウド」で録音するときだけ必要です。手順書のとおりに作って、できたURLをここに入れてください。</p>
         <p class="lab">つなぎ先のURL</p>
-        <input type="text" id="sttUrl" placeholder="https://〜.supabase.co/functions/v1/transcribe">
+        <input type="url" id="sttUrl" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="https://〜.supabase.co/functions/v1/transcribe">
         <p class="lab" style="margin-top:16px">合言葉</p>
-        <input type="text" id="sttPass" placeholder="サーバーに登録したのと同じ言葉">
+        <input type="text" id="sttPass" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="サーバーに登録したのと同じ言葉">
+        <p class="note" id="sttPassN" style="margin-top:6px"></p>
+
         <p class="lab" style="margin-top:16px">Supabaseの公開キー</p>
-        <input type="text" id="sttKey" placeholder="sb_publishable_〜 （空でも動くことがあります）">
+        <input type="text" id="sttKey" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="sb_publishable_〜 （空でも動くことがあります）">
         <p class="note" style="margin-top:6px">Supabaseの Project Settings → API Keys にある、公開してよいほうの鍵です。secret や service_role のほうは入れないでください。</p>
 
         <p class="lab" style="margin-top:16px">ふだん使う音声認識</p>
@@ -1073,7 +1192,7 @@ function describeSync(){
     : "いまは同期していません。「文字起こしサーバー」にURLと合言葉を入れると、そこを経由して端末どうしで同期できるようになります。";
 }
 /* ---- 自前サーバーでの同期（Claudeのページ以外で使う） ---- */
-var svTimer = null, svReady = false, svPend = false, svLater = null;
+var svTimer = null, svReady = false, svPend = false, svLater = null, wxOnce = false;
 var rtCh = null, rtOn = false;
 function svOn(){ return !DB && !!(S.stt && S.stt.url); }
 function svFetch(h, body){
@@ -1336,7 +1455,20 @@ function renderHome(){
 
   var ul = $("#hItems"); ul.innerHTML = "";
   if(!d.items.length) ul.appendChild(el("li","none","とくになし"));
-  else d.items.forEach(function(n){ ul.appendChild(el("li",null,n)); });
+  else{
+    if(!S.chk) S.chk = {};
+    var ck = S.chk[k] || {};
+    d.items.forEach(function(n){
+      var li = el("li","tap" + (ck[n] ? " on" : ""), n);
+      li.addEventListener("click", function(){
+        if(!S.chk[k]) S.chk[k] = {};
+        if(S.chk[k][n]) delete S.chk[k][n]; else S.chk[k][n] = 1;
+        li.classList.toggle("on");
+        trimChk(); save();
+      });
+      ul.appendChild(li);
+    });
+  }
 
   var pend = S.todos.filter(function(t){ return !t.k && (!t.d || t.d <= k); }).sort(sortTodos);
   $("#hTodoS").style.display = pend.length ? "" : "none";
@@ -1349,6 +1481,8 @@ function renderHome(){
   $("#hMemoS").style.display = showM ? "" : "none";
   $("#hMemo").textContent = d.memo;
   drawShots($("#hShots"), d.shots, null);
+  renderCd();
+  if(!wxOnce){ wxOnce = true; wxFetch(); }
 
   var ns = notesOf(k);
   $("#hNoteS").style.display = ns.length ? "" : "none";
@@ -2496,6 +2630,8 @@ function renderStt(){
   $("#sttUrl").value = c.url || "";
   $("#sttPass").value = c.pass || "";
   $("#sttKey").value = c.key || "";
+  var pn = $("#sttPassN");
+  if(pn) pn.textContent = c.pass ? ("いま " + c.pass.length + "文字（末尾 " + c.pass.slice(-2) + "）") : "未入力";
   var box = $("#sttEngine"); box.innerHTML = "";
   ENGINES.forEach(function(e){
     var b = el("button","chip", e.n); b.type = "button";
@@ -2788,6 +2924,376 @@ $("#rcMode").addEventListener("click", function(e){
     ? "音を30秒ずつサーバーへ送って、賢い音声認識で文字にします。"
     : "ブラウザに入っている音声認識で、その場で文字にします。";
 });
+
+/* ============ 学校の年間行事 ============ */
+var SCHOOL_EV = {"2026-04-03":"1限:LT 2限:入学式予行 3限:式準備","2026-04-04":"第34回入学式","2026-04-06":"1限:LT 2限:クラス役員選出 3限:生徒指導集会","2026-04-07":"1限:LT 2限:始業式 3限:クラス写真・個人写真","2026-04-08":"1限:LT 2限:身体測定・聴力視力検査 3限:LT（学校案内撮影）","2026-04-09":"1限:LT 2・3限:標準学力検査 4限:情報モラル 5限:委員会／自転車点検(15:00)","2026-04-10":"1限:LT 2〜4限:標準学力検査 5限:防災訓練","2026-04-11":"家庭学習日","2026-04-13":"授業開始／第Ⅰ期GKテスト開始／GKタイム開始（英語講座なし）","2026-04-15":"6限:写生大会事前指導／GKタイム①英語講座開始","2026-04-16":"1〜4限:第1回学力推移調査","2026-04-18":"家庭学習日","2026-04-21":"検尿","2026-04-22":"6限:前期役員任命式","2026-04-23":"検尿（予備日）","2026-04-24":"検尿（予備日）","2026-04-25":"家庭学習日","2026-04-29":"昭和の日","2026-04-30":"新入生歓迎アクティビティ","2026-05-01":"写生大会（鶴舞公園）／女子合服衣替","2026-05-02":"家庭学習日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-05-07":"確定時間割実施","2026-05-08":"写生大会予備日","2026-05-09":"家庭学習日","2026-05-11":"第Ⅰ期GKテスト本日まで","2026-05-13":"中間テスト時間割発表","2026-05-16":"家庭学習日","2026-05-20":"中間テスト①","2026-05-21":"中間テスト②","2026-05-22":"中間テスト③","2026-05-23":"家庭学習日","2026-05-25":"第1回保護者会①","2026-05-26":"第1回保護者会②","2026-05-27":"第1回保護者会③","2026-05-28":"短縮45分授業","2026-05-29":"短縮45分授業／1〜3限:第1回英検一次試験／第1回いじめアンケート配信","2026-05-30":"家庭学習日","2026-06-01":"夏服衣替え／第Ⅱ期GKテスト開始","2026-06-06":"学年保護者会（保護者のみ）／後援会総会・懇親会","2026-06-11":"歯科検診","2026-06-12":"内科検診","2026-06-13":"家庭学習日","2026-06-15":"第Ⅱ期GKテスト本日まで","2026-06-16":"期末テスト時間割発表","2026-06-18":"6限:授業参観","2026-06-19":"オープンスクール用特別清掃（GK①）","2026-06-20":"家庭学習日","2026-06-22":"第1回英検一次発表","2026-06-23":"期末テスト①","2026-06-24":"期末テスト②","2026-06-25":"期末テスト③","2026-06-26":"期末テスト④／器楽講習会","2026-06-27":"第1回オープンスクール（午前・午後）","2026-07-04":"家庭学習日","2026-07-05":"第1回英検二次試験（校外）","2026-07-11":"家庭学習日","2026-07-13":"1〜3限:平常授業／昼食・弁論大会・大掃除","2026-07-14":"第2回保護者会①／第1回英検二次発表","2026-07-15":"第2回保護者会②","2026-07-16":"第2回保護者会③","2026-07-17":"1限:LT 2限:終業式・表彰式 3限:LT","2026-07-18":"家庭学習日","2026-07-20":"海の日","2026-07-21":"家庭学習日","2026-07-22":"家庭学習日","2026-07-23":"家庭学習日","2026-07-24":"第1回ミニマムエッセンシャルズ確認テスト","2026-07-25":"家庭学習日","2026-07-27":"不合格者GKタイム①（午前3限）","2026-07-28":"不合格者GKタイム②（午前3限）","2026-07-29":"第2回ミニマムエッセンシャルズ確認テスト","2026-07-30":"不合格者GKタイム③（午前3限）","2026-07-31":"不合格者GKタイム④（午前3限）","2026-08-01":"家庭学習日","2026-08-03":"第3回ミニマムエッセンシャルズ確認テスト／オープンスクール用特別清掃（午後）","2026-08-04":"不合格者GKタイム⑤（午前3限）","2026-08-05":"不合格者GKタイム⑥（午前3限）","2026-08-06":"不合格者GKタイム⑦（午前3限）","2026-08-07":"不合格者GKタイム⑧（午前3限）","2026-08-08":"第2回オープンスクール（午前）","2026-08-11":"山の日","2026-08-12":"夏期休暇","2026-08-13":"夏期休暇","2026-08-14":"夏期休暇","2026-08-15":"夏期休暇","2026-08-16":"夏期休暇","2026-08-17":"1限:出校日 2・3限:夏期講座①","2026-08-18":"1〜3限:夏期講座②","2026-08-19":"1〜3限:夏期講座③","2026-08-20":"1〜3限:夏期講座④","2026-08-21":"1〜3限:夏期講座⑤","2026-08-22":"数学検定（希望者）／家庭学習日","2026-08-24":"1〜3限:夏期講座⑥","2026-08-25":"1〜3限:夏期講座⑦","2026-08-26":"1〜4限:第2回学力推移調査","2026-08-27":"家庭学習日","2026-08-28":"家庭学習日","2026-08-29":"家庭学習日","2026-08-31":"家庭学習日","2026-09-01":"1限:防災学習 2限:始業式 3限:LT","2026-09-02":"第Ⅲ期GKテスト開始／感謝祭準備活動開始","2026-09-04":"オープンスクール用特別清掃（GK①）","2026-09-05":"第3回オープンスクール（午前・午後）","2026-09-12":"家庭学習日／アジア競技大会 聖火リレー 13:00〜13:30（セレモニー12:30・12:00から入場可・入場許可証が必要・スタート高校正門→ゴール第2グラウンド・当日は駐輪場と駐車場は使えません）","2026-09-13":"舘区 音楽の集い（豊明市立舘小学校 体育館）現地集合8:30・現地解散12:00／開場9:30 開演10:00 終演11:40／3年生の出演10:00〜10:20／バイオリン・ビオラ・譜面台は持参（チェロとコントラバスは先生が運搬）／振替休日なし","2026-09-16":"短縮40分授業","2026-09-17":"短縮40分授業","2026-09-18":"感謝祭準備（終日）","2026-09-19":"感謝祭","2026-09-21":"敬老の日","2026-09-22":"国民の休日","2026-09-23":"秋分の日","2026-09-24":"4・5限:プレハイスクールライフ","2026-09-25":"5・6限:体育祭練習","2026-09-26":"家庭学習日","2026-09-28":"第Ⅲ期GKテスト本日まで","2026-09-29":"中間テスト時間割発表","2026-10-01":"技術・家庭科 入れ替え","2026-10-02":"1〜3限:第2回英検一次試験／オープンスクール用特別清掃（GK①）","2026-10-03":"第4回オープンスクール（午前）","2026-10-06":"中間テスト①","2026-10-07":"中間テスト②","2026-10-08":"中間テスト③／第2回いじめアンケート配信","2026-10-09":"5・6限:体育祭練習","2026-10-10":"家庭学習日","2026-10-12":"スポーツの日","2026-10-13":"短縮45分授業","2026-10-14":"短縮45分授業／第Ⅳ期GKテスト開始","2026-10-15":"短縮45分授業","2026-10-16":"短縮45分授業／5・6限:体育祭練習・準備","2026-10-17":"体育祭","2026-10-19":"体育祭予備日","2026-10-21":"6限:後期クラス役員選出","2026-10-24":"家庭学習日","2026-10-26":"第2回英検一次発表","2026-10-28":"6限:後期委員会活動","2026-10-31":"家庭学習日","2026-11-03":"文化の日","2026-11-04":"6限:後期役員任命式","2026-11-07":"学年保護者会（保護者のみ）／後期学年保護者会（校内）","2026-11-08":"第2回英検二次試験（校外）","2026-11-09":"第Ⅳ期GKテスト本日まで","2026-11-10":"期末テスト時間割発表","2026-11-11":"6限:防災訓練","2026-11-14":"家庭学習日","2026-11-17":"期末テスト①／第2回英検二次発表","2026-11-18":"期末テスト②","2026-11-19":"期末テスト③","2026-11-20":"期末テスト④／器楽講習会","2026-11-21":"家庭学習日","2026-11-23":"勤労感謝の日","2026-11-24":"県民の日学校ホリデー","2026-11-28":"家庭学習日","2026-12-04":"入試説明会特別清掃（GK①）","2026-12-05":"入試説明会","2026-12-06":"家庭学習日","2026-12-09":"4〜6限:百人一首大会","2026-12-11":"入試説明会特別清掃（GK①）","2026-12-12":"入試説明会","2026-12-17":"1〜3限:平常授業／昼食・大掃除","2026-12-18":"第3回保護者会①","2026-12-19":"語学研修説明会（親子で参加）","2026-12-21":"第3回保護者会②","2026-12-22":"第3回保護者会③","2026-12-23":"1限:LT 2限:終業式・表彰式","2026-12-24":"第1回ミニマムエッセンシャルズ確認テスト／Ⅰ期入試A日程 清掃・準備","2026-12-25":"不合格者GKタイム（午前3限）","2026-12-26":"冬期休暇","2026-12-27":"冬期休暇","2026-12-28":"冬期休暇","2026-12-29":"冬期休暇","2026-12-30":"冬期休暇","2026-12-31":"冬期休暇","2027-01-01":"冬期休暇","2027-01-02":"冬期休暇","2027-01-03":"冬期休暇","2027-01-04":"冬期休暇","2027-01-05":"冬期休暇","2027-01-06":"Ⅰ期入試A日程","2027-01-07":"1限:LT 2限:始業式 3限:LT／第3回いじめアンケート配信","2027-01-08":"第Ⅴ期GKテスト開始","2027-01-09":"家庭学習日","2027-01-11":"成人の日","2027-01-15":"Ⅰ期入試B日程 清掃・準備","2027-01-16":"Ⅰ期入試B日程／家庭学習日・数学検定（希望者）","2027-01-19":"1〜3限:平常授業／午後:家庭学習","2027-01-20":"星城高校一般入試（受験）","2027-01-22":"1〜3限:第3回英検一次試験","2027-01-23":"家庭学習日","2027-01-27":"1〜4限:第3回学力推移調査","2027-01-29":"健脚会","2027-01-30":"家庭学習日","2027-02-02":"語学研修準備（終日）","2027-02-05":"第Ⅴ期GKテスト本日まで／5・6限:語学研修結団式","2027-02-06":"星城高校入学者ガイダンス（推薦入学者ガイダンスに参加）","2027-02-07":"Ⅱ期入試","2027-02-08":"語学研修①","2027-02-09":"語学研修②","2027-02-10":"語学研修③","2027-02-11":"建国記念の日／語学研修④","2027-02-12":"語学研修⑤","2027-02-13":"語学研修⑥","2027-02-14":"語学研修⑦","2027-02-15":"語学研修⑧／第3回英検一次発表","2027-02-16":"語学研修⑨","2027-02-17":"語学研修⑩","2027-02-18":"語学研修振替休日","2027-02-19":"語学研修振替休日","2027-02-20":"語学研修振替休日","2027-02-22":"特別学級活動（終日）","2027-02-23":"天皇誕生日","2027-02-24":"特別学級活動（午前3限）","2027-02-25":"特別学級活動（午前3限）","2027-02-26":"特別学級活動（午前3限）","2027-02-27":"星城高校入学者ガイダンス（推薦入学者ガイダンスに参加）","2027-02-28":"第3回英検二次試験（校外）","2027-03-01":"特別学級活動（午前3限）","2027-03-02":"特別学級活動（短縮40分6限）","2027-03-03":"特別学級活動（短縮40分6限）","2027-03-04":"卒業式予行・年度末表彰式","2027-03-05":"第32回卒業式","2027-03-06":"家庭学習日","2027-03-08":"学習室開放","2027-03-09":"学習室開放／第3回英検二次発表","2027-03-10":"学習室開放","2027-03-11":"学習室開放","2027-03-12":"学習室開放","2027-03-13":"家庭学習日","2027-03-15":"学習室開放","2027-03-16":"学習室開放","2027-03-17":"学習室開放","2027-03-18":"学習室開放","2027-03-19":"春期休暇","2027-03-20":"春期休暇","2027-03-21":"春期休暇","2027-03-22":"春期休暇","2027-03-23":"春期休暇","2027-03-24":"春期休暇","2027-03-25":"春期休暇","2027-03-26":"春期休暇","2027-03-27":"春期休暇","2027-03-28":"春期休暇","2027-03-29":"春期休暇","2027-03-30":"春期休暇","2027-03-31":"春期休暇"};
+/* 通知を鳴らす価値のある行事だけを選ぶ。毎日鳴ると誰も見なくなる */
+var EV_ALERT = /(テスト|入試|検診|検尿|大会|体育祭|感謝祭|卒業式|入学式|始業式|終業式|保護者会|授業参観|オープンスクール|訓練|検定|英検|調査|説明会|講習|点検|ガイダンス|結団式|任命式|アンケート)/;
+
+function evImport(){
+  if(!S.impEv) S.impEv = {};
+  var n = 0;
+  for(var k in SCHOOL_EV){
+    var t = SCHOOL_EV[k], r = rec(k), cur = r.ev || "";
+    if(cur.indexOf(t) >= 0) continue;
+    r.ev = cur ? (cur + "／" + t) : t;
+    S.impEv[k] = t; n++;
+  }
+  save(); rerender();
+  $("#evMsg").textContent = n ? (n + "日ぶんを入れました。月間予定で確認できます。") : "すでに全部入っています。";
+}
+function evRemove(){
+  var mm = S.impEv || {}, n = 0;
+  for(var k in mm){
+    var r = S.days[k]; if(!r || !r.ev) continue;
+    var t = mm[k], v = r.ev;
+    if(v.indexOf("／" + t) >= 0) v = v.split("／" + t).join("");
+    else if(v.indexOf(t + "／") >= 0) v = v.split(t + "／").join("");
+    else v = v.split(t).join("");
+    r.ev = v.trim(); n++;
+  }
+  S.impEv = {}; save(); rerender();
+  $("#evMsg").textContent = n ? (n + "日ぶんを消しました。") : "消すものがありません。";
+}
+function icsEsc(t){
+  return String(t).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g," ");
+}
+function icsStamp(){
+  var d = new Date();
+  function p(x){ return (x<10?"0":"") + x; }
+  return d.getUTCFullYear() + p(d.getUTCMonth()+1) + p(d.getUTCDate()) + "T" +
+         p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + "Z";
+}
+function evIcs(){
+  var L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//gakkatsu-note//JP","CALSCALE:GREGORIAN",
+           "METHOD:PUBLISH","X-WR-CALNAME:学校行事","X-WR-TIMEZONE:Asia/Tokyo"];
+  var keys = Object.keys(SCHOOL_EV).sort(), i = 0, al = 0;
+  keys.forEach(function(k){
+    var t = SCHOOL_EV[k];
+    var d0 = k.replace(/-/g,"");
+    var d1 = keyOf(addDays(parseKey(k), 1)).replace(/-/g,"");
+    L.push("BEGIN:VEVENT");
+    L.push("UID:gk-" + d0 + "-" + (i++) + "@gakkatsu");
+    L.push("DTSTAMP:" + icsStamp());
+    L.push("DTSTART;VALUE=DATE:" + d0);
+    L.push("DTEND;VALUE=DATE:" + d1);
+    L.push("SUMMARY:" + icsEsc(t));
+    if(EV_ALERT.test(t)){
+      al++;
+      L.push("BEGIN:VALARM","TRIGGER:-PT4H","ACTION:DISPLAY","DESCRIPTION:" + icsEsc(t),"END:VALARM");
+    }
+    L.push("END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  var blob = new Blob([L.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "school-events.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  $("#evMsg").textContent = keys.length + "件を書き出しました（うち " + al + "件に前日20時の通知つき）。ファイルを開いてカレンダーに追加してください。";
+}
+$("#evImp").addEventListener("click", evImport);
+$("#evDel").addEventListener("click", function(){
+  askConfirm("取り込んだ行事を消しますか", "アプリが入れた行事だけを消します。自分で書いた予定は残ります。", "消す", evRemove);
+});
+$("#evIcs").addEventListener("click", evIcs);
+
+/* ============ もうすぐ ============ */
+/* 学校行事のうち知らせる価値のあるもの、それに自分で書いた予定を拾う。
+   家庭学習日や休暇まで数えると、肝心なものが埋もれるため */
+function cdPick(k, ev){
+  var src = SCHOOL_EV[k] || "";
+  return ev.split("／").map(function(x){ return x.trim(); }).filter(function(x){
+    if(!x) return false;
+    if(EV_ALERT.test(x)) return true;
+    return src.indexOf(x) < 0;      /* 自分で書いた予定は無条件で拾う */
+  });
+}
+function cdList(limit){
+  var today = keyOf(new Date()), out = [];
+  var keys = Object.keys(S.days).filter(function(k){ return k >= today && S.days[k] && S.days[k].ev; }).sort();
+  for(var i=0;i<keys.length && out.length<limit;i++){
+    var k = keys[i], names = cdPick(k, S.days[k].ev);
+    for(var j=0;j<names.length && out.length<limit;j++){
+      out.push({k:k, name:names[j], d:Math.round((parseKey(k) - parseKey(today)) / 86400000)});
+    }
+  }
+  return out;
+}
+function renderCd(){
+  var box = $("#hCd"), list = cdList(4);
+  if(!list.length){ box.style.display = "none"; return; }
+  box.style.display = "";
+  var top = list[0], dt = parseKey(top.k);
+  $("#cdName").textContent = top.name;
+  $("#cdDate").textContent = (dt.getMonth()+1) + "月" + dt.getDate() + "日(" + DOW[dt.getDay()] + ")";
+  box.classList.toggle("soon", top.d <= 3);
+  box.classList.toggle("today", top.d === 0);
+  if(top.d === 0){ $("#cdNum").textContent = "今日"; $("#cdUnit").style.display = "none"; }
+  else{ $("#cdNum").textContent = top.d; $("#cdUnit").style.display = ""; $("#cdUnit").textContent = "日"; }
+  var ml = $("#cdMore"); ml.innerHTML = "";
+  list.slice(1).forEach(function(o){
+    var li = el("li");
+    li.appendChild(el("span", null, o.name));
+    li.appendChild(el("b", null, o.d === 0 ? "今日" : ("あと" + o.d + "日")));
+    ml.appendChild(li);
+  });
+}
+/* 持ち物のチェックは、古い日のぶんをためこまない */
+function trimChk(){
+  if(!S.chk) return;
+  var lim = keyOf(addDays(new Date(), -3));
+  for(var k in S.chk) if(k < lim) delete S.chk[k];
+}
+
+/* ============ 3年A組の暫定時間割 ============ */
+var TT_3A = {
+  mon:["英語2","国語","理科","数学","音楽","社会"],
+  tue:["社会","英語1","美術","理科","家庭","数学"],
+  wed:["体育","英語2","英会話／器楽","器楽／英会話","数学","特活"],
+  thu:["英語1","体育","社会","国語","数学","理科"],
+  fri:["理科","英語1","社会","体育","国語","道徳"]
+};
+/* 月〜木はGKタイム②まであるので遅く、金はGKテスト追試で終わり */
+var TT_DIS = {mon:"17:40", tue:"17:40", wed:"17:40", thu:"17:40", fri:"15:20"};
+
+$("#ttImp").addEventListener("click", function(){
+  askConfirm("時間割を入れますか", "いまの通常時程は上書きされます。日ごとに変えた分はそのまま残ります。", "入れる", function(){
+    for(var w in TT_3A){
+      S.base[w] = {periods: TT_3A[w].slice(0, S.pn), dis: TT_DIS[w] || ""};
+    }
+    S.demo = false;
+    save(); renderSet(); rerender();
+    $("#ttMsg").textContent = "入れました。今日・明日の画面で確認してください。";
+  });
+});
+
+/* ============ 天気と警報（気象庁） ============ */
+var WCODE = {
+  "02":"暴風雪警報","03":"大雨警報","04":"洪水警報","05":"暴風警報","06":"大雪警報",
+  "07":"波浪警報","08":"高潮警報","10":"大雨注意報","12":"大雪注意報","13":"風雪注意報",
+  "14":"雷注意報","15":"強風注意報","16":"波浪注意報","17":"融雪注意報","18":"洪水注意報",
+  "19":"高潮注意報","20":"濃霧注意報","21":"乾燥注意報","22":"なだれ注意報","23":"低温注意報",
+  "24":"霜注意報","25":"着氷注意報","26":"着雪注意報",
+  "32":"暴風雪特別警報","33":"大雨特別警報","35":"暴風特別警報","36":"大雪特別警報",
+  "37":"波浪特別警報","38":"高潮特別警報"
+};
+var JMA_PREF = "230000";        /* 愛知県 */
+var JMA_AREA = "230010";        /* 愛知県西部（豊明市） */
+var JMA_CITY = "2322900";       /* 豊明市 */
+
+function wxFetch(){
+  fetch("https://www.jma.go.jp/bosai/forecast/data/forecast/" + JMA_PREF + ".json")
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var ts = d[0].timeSeries, box = $("#hWx");
+      var a0 = ts[0].areas.filter(function(a){ return a.area.code === JMA_AREA; })[0] || ts[0].areas[0];
+      $("#wxNow").textContent = (a0.weathers && a0.weathers[0]) ? a0.weathers[0].replace(/\u3000+/g," ") : "—";
+      var sub = [];
+      if(ts[1] && ts[1].areas[0] && ts[1].areas[0].pops){
+        var pops = ts[1].areas[0].pops.filter(function(x){ return x !== ""; });
+        if(pops.length) sub.push("降水確率 " + Math.max.apply(null, pops.map(Number)) + "%");
+      }
+      if(ts[2] && ts[2].areas[0] && ts[2].areas[0].temps){
+        var t = ts[2].areas[0].temps.filter(function(x){ return x !== ""; });
+        if(t.length >= 2){ $("#wxTmp").textContent = t[0] + "/" + t[1] + "℃"; }
+        else if(t.length === 1){ $("#wxTmp").textContent = t[0] + "℃"; }
+      }
+      $("#wxSub").textContent = sub.join("　");
+      box.style.display = "";
+    })
+    .catch(function(){});
+  wxWarn();
+}
+
+function wxWarn(){
+  fetch("https://www.jma.go.jp/bosai/warning/data/warning/" + JMA_PREF + ".json")
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var live = [];
+      (d.areaTypes || []).forEach(function(at){
+        (at.areas || []).forEach(function(a){
+          if(a.code !== JMA_CITY) return;
+          (a.warnings || []).forEach(function(w){
+            if(!w.status || w.status.indexOf("解除") >= 0 || w.status === "なし") return;
+            var n = WCODE[w.code];
+            if(n && live.indexOf(n) < 0) live.push(n);
+          });
+        });
+      });
+      riskWarn = live;
+      drawWarn(live, d.reportDatetime);
+      $("#hWx").style.display = "";
+      riskFetch();
+    })
+    .catch(function(){
+      $("#wxWarn").innerHTML = "";
+      riskWarn = []; riskFetch();
+    });
+}
+
+function drawWarn(list, when){
+  var box = $("#wxWarn"); box.innerHTML = "";
+  var tokubetsu = list.filter(function(n){ return n.indexOf("特別警報") >= 0; });
+  var keiho     = list.filter(function(n){ return n.indexOf("警報") >= 0 && n.indexOf("特別") < 0; });
+  var chui      = list.filter(function(n){ return n.indexOf("注意報") >= 0; });
+
+  var cls = "calm", head = "豊明市に警報は出ていません", body = "ふだんどおりの登下校です。";
+  if(tokubetsu.length){
+    cls = "bad"; head = tokubetsu.join("・");
+    body = "命を守る行動が最優先です。学校は休校か、activityを中止して早く帰す判断になる可能性が非常に高い状態です。学校からの連絡を必ず確認してください。";
+  }else if(keiho.some(function(n){ return n.indexOf("暴風") >= 0; })){
+    cls = "bad"; head = keiho.join("・");
+    body = "暴風警報が出ています。多くの学校で休校、または業後の活動を中止して最終下校を早める判断になります。学校からの連絡を確認してください。";
+  }else if(keiho.length){
+    cls = "warn"; head = keiho.join("・");
+    body = "警報が出ています。授業はある場合が多いですが、業後の活動を中止して下校を早めることがあります。学校からの連絡を確認してください。";
+  }else if(chui.length){
+    cls = "warn"; head = chui.join("・");
+    body = "注意報のみです。ふだんどおりの見込みですが、天気が荒れる可能性があります。";
+  }
+  var a = el("div", "alert " + cls);
+  a.appendChild(el("b", null, head));
+  a.appendChild(document.createTextNode(body));
+  var src = el("span","src","気象庁の発表より" + (when ? ("（" + when.slice(5,16).replace("T"," ") + "時点）") : "") +
+    "。休校や下校時刻を決めるのは学校です。ここの文は目安で、正式な連絡ではありません。");
+  a.appendChild(src);
+  box.appendChild(a);
+}
+
+var wxTimer = setInterval(function(){ if(!document.hidden) wxFetch(); }, 600000);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) wxFetch(); });
+
+/* ============ ホーム画面に追加できるように ============ */
+(function(){
+  try{
+    var mf = {
+      name:"終学活ノート", short_name:"終学活",
+      start_url: location.href, scope: location.href.replace(/[^\/]*$/, ""),
+      display:"standalone", background_color:"#0E1420", theme_color:"#1E2B4A",
+      lang:"ja", orientation:"portrait",
+      icons:[
+        {src:"icon-192.png", sizes:"192x192", type:"image/png", purpose:"any"},
+        {src:"icon-512.png", sizes:"512x512", type:"image/png", purpose:"any"}
+      ]
+    };
+    var u = URL.createObjectURL(new Blob([JSON.stringify(mf)], {type:"application/manifest+json"}));
+    var l = document.createElement("link"); l.rel = "manifest"; l.href = u;
+    document.head.appendChild(l);
+  }catch(e){}
+})();
+
+/* ============ 休校・下校繰り上げの可能性 ============ */
+/* 公式にこんな数字を出しているところは無いので、自分で決めた式で出している。
+   もとになる数は全部画面に出して、あとから疑えるようにしてある。 */
+var LAT = 35.0533, LON = 137.0130;   /* 豊明市 */
+var riskWarn = [];                    /* いま出ている警報・注意報 */
+
+function riskFetch(){
+  var u = "https://api.open-meteo.com/v1/forecast?latitude=" + LAT + "&longitude=" + LON +
+          "&hourly=precipitation,wind_gusts_10m&timezone=Asia%2FTokyo&forecast_days=2";
+  fetch(u).then(function(r){ return r.json(); }).then(function(d){
+    var h = d.hourly; if(!h || !h.time) return;
+    var now = new Date();
+    var todayK = keyOf(now), tomK = keyOf(addDays(now,1));
+    /* 朝の判断は6〜8時。もうその時間を過ぎていたら、翌日の朝を見る */
+    var mornKey = (now.getHours() >= 8) ? tomK : todayK;
+    var m = peak(h, mornKey, 6, 8);
+    var a = peak(h, todayK, 14, 18);
+    if(now.getHours() >= 18) a = peak(h, tomK, 14, 18);
+    drawRisk(m, a, mornKey, (now.getHours() >= 18) ? tomK : todayK);
+  }).catch(function(){});
+}
+function peak(h, dayKey, h0, h1){
+  var g = 0, p = 0, n = 0;
+  for(var i=0;i<h.time.length;i++){
+    var t = h.time[i];
+    if(t.slice(0,10) !== dayKey) continue;
+    var hh = +t.slice(11,13);
+    if(hh < h0 || hh > h1) continue;
+    n++;
+    g = Math.max(g, (h.wind_gusts_10m[i] || 0) / 3.6);   /* km/h → m/s */
+    p = Math.max(p, h.precipitation[i] || 0);
+  }
+  return {gust:g, rain:p, has:n > 0};
+}
+function pct(x){ return Math.max(1, Math.min(95, Math.round(x))); }
+
+function calcRisk(w){
+  /* w = {gust(m/s), rain(mm/h)} と、いま出ている警報から出す */
+  var close = 2, early = 4, why = [];
+  var has = function(re){ return riskWarn.some(function(n){ return re.test(n); }); };
+
+  if(has(/特別警報/)){ close += 92; early += 90; why.push("特別警報が出ている（+92）"); }
+  else if(has(/暴風/)){ close += 80; early += 85; why.push("暴風警報が出ている（+80）"); }
+  else if(has(/大雨警報|洪水警報/)){ close += 16; early += 55; why.push("大雨か洪水の警報が出ている（+16／下校+55）"); }
+  else if(has(/警報/)){ close += 8; early += 25; why.push("なにかの警報が出ている（+8／下校+25）"); }
+  else if(has(/注意報/)){ close += 2; early += 8; why.push("注意報が出ている（+2／下校+8）"); }
+
+  if(w.gust >= 25){ close += 55; early += 55; why.push("予想の最大瞬間風速が25m/s以上（+55）"); }
+  else if(w.gust >= 20){ close += 32; early += 34; why.push("予想の最大瞬間風速が20m/s以上（+32）"); }
+  else if(w.gust >= 15){ close += 12; early += 16; why.push("予想の最大瞬間風速が15m/s以上（+12）"); }
+  else if(w.gust >= 11){ close += 3; early += 6; why.push("予想の最大瞬間風速が11m/s以上（+3）"); }
+
+  if(w.rain >= 30){ close += 22; early += 40; why.push("予想の雨量が1時間30mm以上（+22／下校+40）"); }
+  else if(w.rain >= 20){ close += 12; early += 26; why.push("予想の雨量が1時間20mm以上（+12／下校+26）"); }
+  else if(w.rain >= 10){ close += 5; early += 14; why.push("予想の雨量が1時間10mm以上（+5／下校+14）"); }
+  else if(w.rain >= 4){ close += 1; early += 5; why.push("予想の雨量が1時間4mm以上（+1／下校+5）"); }
+
+  return {close:pct(close), early:pct(early), why:why};
+}
+
+function schoolDay(k){
+  var dt = parseKey(k);
+  if(dt.getDay() === 0) return false;
+  var ev = (S.days[k] && S.days[k].ev) || "";
+  if(/家庭学習日|休暇|振替休日|の日|敬老|秋分|春分|元日|成人|建国|昭和|憲法|みどり|こどもの日|海の日|山の日|勤労感謝|天皇誕生日|文化の日|ホリデー/.test(ev)) return false;
+  return true;
+}
+
+function drawRisk(mw, aw, mornKey, aftKey){
+  var box = $("#wxRisk"); box.innerHTML = "";
+  if(!mw.has && !aw.has) return;
+  var r1 = calcRisk(mw), r2 = calcRisk(aw);
+  if(!schoolDay(mornKey)) r1.close = 1;
+  if(!schoolDay(aftKey))  r2.early = 1;
+
+  var wrap = el("div","risk");
+  function row(name, v){
+    var d = el("div","rrow");
+    d.appendChild(el("span","rn",name));
+    var b = el("div","rb"), i = el("i");
+    i.style.width = v + "%";
+    if(v >= 50) i.className = "hi"; else if(v >= 20) i.className = "mid";
+    b.appendChild(i); d.appendChild(b);
+    d.appendChild(el("span","rp", v + "%"));
+    wrap.appendChild(d);
+  }
+  var md = parseKey(mornKey), ad = parseKey(aftKey);
+  row((md.getMonth()+1) + "/" + md.getDate() + " 休校", r1.close);
+  row((ad.getMonth()+1) + "/" + ad.getDate() + " 下校繰り上げ", r2.early);
+
+  var sub = el("div","rsub");
+  sub.textContent =
+    "朝6〜8時の予想：最大瞬間風速 " + mw.gust.toFixed(0) + "m/s・雨 " + mw.rain.toFixed(1) + "mm/h　／　" +
+    "放課後14〜18時の予想：最大瞬間風速 " + aw.gust.toFixed(0) + "m/s・雨 " + aw.rain.toFixed(1) + "mm/h";
+  wrap.appendChild(sub);
+
+  var det = el("details");
+  det.appendChild(el("summary", null, "この数字の出し方"));
+  var ul = el("ul");
+  var lines = (r1.why.concat(r2.why)).filter(function(x,i,a){ return a.indexOf(x) === i; });
+  if(!lines.length) lines = ["荒れる要素がないので、どちらも最低値のままです。"];
+  lines.forEach(function(x){ ul.appendChild(el("li",null,x)); });
+  ul.appendChild(el("li",null,"出発点は休校2%・下校繰り上げ4%。上の項目を足して、上限95%で止めています。"));
+  ul.appendChild(el("li",null,"風と雨の予想はOpen-Meteo、警報は気象庁のものです。"));
+  ul.appendChild(el("li",null,"この式は公式のものではありません。学校が実際にどう判断するかとは関係ありません。"));
+  det.appendChild(ul);
+  wrap.appendChild(det);
+
+  box.appendChild(wrap);
+}
 
 /* ============ boot ============ */
 readLocal();
