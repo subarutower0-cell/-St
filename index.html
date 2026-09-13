@@ -247,6 +247,79 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 .mochi li.none{font-size:calc(15px * var(--fs)); font-weight:400; color:var(--label3); background:none; box-shadow:none; padding:0}
 
+/* 乗るべき列車 */
+.mtbest{border-radius:14px; padding:14px 15px; margin-bottom:14px;
+  background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep)}
+.mtbest .k{font-size:calc(11.5px * var(--fs)); color:var(--label3); letter-spacing:.06em}
+.mtbest b{display:block; font-size:calc(19px * var(--fs)); font-weight:700; margin-top:3px; line-height:1.35}
+.mtbest .sub{font-size:calc(13px * var(--fs)); color:var(--label3); margin-top:4px}
+.mtbest .left{float:right; font-size:calc(20px * var(--fs)); font-weight:700; color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.mtbest.gone{opacity:.55}
+.mtbest.gone .left{color:#FF453A}
+#mtList{margin:0 0 4px; padding:0; list-style:none}
+#mtList li{display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--sep);
+  font-size:calc(14px * var(--fs))}
+#mtList li .d{flex:0 0 auto; width:calc(46px * var(--fs)); font-variant-numeric:tabular-nums; font-weight:600}
+#mtList li .k{flex:1 1 auto; min-width:0; color:var(--label2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#mtList li .a{flex:0 0 auto; font-size:calc(12.5px * var(--fs)); color:var(--label3);
+  font-variant-numeric:tabular-nums}
+#mtList li .ok{flex:0 0 auto; font-size:calc(12px * var(--fs)); border-radius:999px; padding:2px 8px}
+#mtList li .ok.y{background:rgba(52,199,89,.16); color:var(--label)}
+#mtList li .ok.n{background:rgba(255,59,48,.14); color:var(--label3)}
+
+/* 登校ルート */
+.route .rtgoal{font-size:calc(17px * var(--fs)); font-weight:600; line-height:1.45; margin-bottom:4px}
+.route .rtgoal em{font-style:normal; color:var(--accent)}
+.route .rtgoal.late em{color:#FF453A}
+.route ul{margin:10px 0 0; padding:0; list-style:none}
+.route li{display:flex; align-items:center; gap:11px; padding:10px 0; border-top:1px solid var(--sep)}
+.route li .rt{flex:0 0 auto; width:calc(52px * var(--fs)); font-size:calc(13.5px * var(--fs));
+  font-variant-numeric:tabular-nums; color:var(--label3)}
+.route li .rn{flex:1 1 auto; min-width:0; font-size:calc(15.5px * var(--fs));
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.route li .rd{flex:0 0 auto; font-size:calc(12.5px * var(--fs)); color:var(--label3)}
+.route li.here{background:var(--glass3); border-radius:12px; margin:0 -8px; padding-left:8px; padding-right:8px}
+.route li.here .rn{font-weight:700}
+.route li.done{opacity:.45}
+.rtrow{display:flex; gap:8px; align-items:center; padding:11px 0; border-top:1px solid var(--sep); flex-wrap:wrap}
+.rtrow .nm{flex:2 1 120px; min-width:0}
+.rtrow .tm{flex:0 0 auto; width:calc(112px * var(--fs))}
+.rtrow .gp{flex:0 0 auto; font-size:calc(12px * var(--fs)); color:var(--accent); padding:0 4px}
+
+/* 電車 */
+.train ul{margin:0; padding:0; list-style:none}
+.train li{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--sep)}
+.train li:first-child{border-top:none}
+.train .tl{flex:1 1 auto; min-width:0}
+.train .tl b{display:block; font-size:calc(16px * var(--fs)); font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.train .tl span{font-size:calc(12.5px * var(--fs)); color:var(--label3)}
+.train .tr{flex:0 0 auto; text-align:right}
+.train .tr em{font-style:normal; display:block; font-size:calc(21px * var(--fs)); font-weight:700;
+  font-variant-numeric:tabular-nums; line-height:1.1}
+.train .tr span{font-size:calc(11px * var(--fs)); color:var(--label3)}
+.train li.soon .tr em{color:var(--orange)}
+.train li.gone{opacity:.45}
+.train li.gone .tr em{font-size:calc(15px * var(--fs))}
+.train .badge{flex:0 0 auto; font-size:calc(11.5px * var(--fs)); border-radius:999px; padding:3px 9px;
+  background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep); color:var(--label3)}
+.train .badge.bad{background:rgba(255,59,48,.16); box-shadow:inset 0 0 0 1px rgba(255,59,48,.4); color:var(--label)}
+.trrow{display:flex; gap:8px; align-items:center; padding:11px 0; border-top:1px solid var(--sep)}
+.trrow:first-child{border-top:none}
+.trrow input{min-width:0}
+.trrow .nm{flex:2 1 auto}
+.trrow .tm{flex:0 0 auto; width:calc(112px * var(--fs))}
+
+/* 時間割／行事予定の切り替え */
+.segs.mini{display:inline-flex; margin:0; padding:2px; vertical-align:middle}
+.segs.mini button{padding:5px 12px; font-size:calc(12.5px * var(--fs)); flex:0 0 auto}
+.tt li .tmm{flex:0 0 auto; min-width:calc(84px * var(--fs)); font-size:calc(13px * var(--fs));
+  color:var(--label3); font-variant-numeric:tabular-nums; letter-spacing:.02em}
+.tt li.nowline{background:var(--glass3); border-radius:12px; margin:0 -8px; padding-left:8px; padding-right:8px}
+.tt li.nowline .ps{font-weight:700}
+
 /* ===== 時計 ===== */
 .clock .ctop{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
 .clock .cnow{font-size:calc(46px * var(--fs)); font-weight:700; line-height:.95;
@@ -557,6 +630,22 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       </div>
     </div>
 
+    <div class="sect route" id="hRoute" style="display:none">
+      <p class="lab">登校<span class="r"><button class="btn sm" id="rtWhere">いまどこ？</button></span></p>
+      <div class="rtgoal" id="rtGoal">—</div>
+      <ul id="rtList"></ul>
+      <p class="note" id="rtNote" style="margin-top:12px"></p>
+    </div>
+
+    <div class="sect train" id="hTrain" style="display:none">
+      <p class="lab">電車<span class="r muted" id="trStatus"></span></p>
+      <div class="mtbest" id="hyBest" style="display:none"></div>
+      <div class="mtbest" id="mtBest" style="display:none"></div>
+      <ul id="mtList"></ul>
+      <ul id="trList"></ul>
+      <p class="note" id="trNote" style="margin-top:12px"></p>
+    </div>
+
     <div class="sect clock" id="hClock" style="display:none">
       <div class="ctop">
         <div class="cnow" id="clkNow">--:--</div>
@@ -601,7 +690,11 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </div>
 
     <div class="sect">
-      <p class="lab">時間割</p>
+      <p class="lab" id="hTTLab">時間割<span class="r">
+        <span class="segs mini" id="ttSw">
+          <button data-v="tt" aria-pressed="true">時間割</button>
+          <button data-v="ev" aria-pressed="false">行事予定</button>
+        </span></span></p>
       <ul class="tt" id="hTT"></ul>
       <dl class="facts" id="hFacts"></dl>
     </div>
@@ -810,6 +903,50 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
           <button class="btn" id="itemAdd">追加</button>
         </div>
         <p class="note" style="margin-top:8px">タップで削除できます。よく使うものが上に並びます。</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>登校ルート</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">学校に着いていないといけない時刻から逆算します。各地点で「いまの場所」を押すと、その場所の座標を覚えます。次からは現在地と照らし合わせて、どこまで来ているか・予定より早いか遅いかが出ます。</p>
+        <p class="lab">学校に着く時刻</p>
+        <input type="time" id="rtArrive">
+        <div id="rtEdit" style="margin-top:16px"></div>
+        <button class="btn sm" id="rtAdd" style="margin-top:12px">地点を足す</button>
+        <p class="note" style="margin-top:14px">位置情報はこの端末の中だけで使います。どこへも送りません。</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>電車</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">これに乗らないと間に合わない、という電車を登録します。今日の画面に、発車まであと何分かと、その路線が乱れていないかが出ます。</p>
+        <p class="lab">名鉄名古屋から前後まで</p>
+        <p class="note" style="margin:-2px 0 10px">2026年3月14日改正の平日・土休日ダイヤを、行きと帰りの両方ぶん入れてあります。曜日と時間帯で自動的に切りかわります。</p>
+        <div style="display:flex; gap:8px; align-items:center">
+          <span class="note" style="flex:0 0 auto">前後から学校まで</span>
+          <input type="number" id="trWalk" min="1" max="90" style="width:calc(84px * var(--fs))">
+          <span class="note" style="flex:0 0 auto">分</span>
+        </div>
+        <p class="note" style="margin-top:8px">徒歩なら20分ほど（直線で1.2km）。スクールバスを使うなら、その所要時間に。</p>
+
+        <p class="lab" style="margin-top:20px">東山公園から名鉄名古屋まで</p>
+        <p class="note" style="margin:-2px 0 10px">東山線（栄・名古屋・高畑方面）の時刻を入れてあります。乗車時間と、地下鉄から名鉄への乗り換えにかかる時間を足して逆算します。</p>
+        <div style="display:flex; gap:8px; align-items:center">
+          <span class="note" style="flex:0 0 auto">乗車</span>
+          <input type="number" id="hyRide" min="1" max="60" style="width:calc(72px * var(--fs))">
+          <span class="note" style="flex:0 0 auto">分　乗り換え</span>
+          <input type="number" id="hyTrans" min="0" max="30" style="width:calc(72px * var(--fs))">
+          <span class="note" style="flex:0 0 auto">分</span>
+        </div>
+        <p class="note" style="margin-top:8px">東山公園から名古屋までは9駅で19分ほど。乗り換えは初期値5分にしてあります。実際に何分かかるか測って直すと、判定が正確になります。なお東山線は「名古屋方面」の時刻表しか入っていないので、帰り（藤が丘方面）は出せません。</p>
+
+        <p class="lab" style="margin-top:20px">そのほかの電車</p>
+        <p class="note" style="margin:-2px 0 10px">東山線など、時刻表を持っていない路線はここに手で入れます。</p>
+        <div id="trEdit"></div>
+        <button class="btn sm" id="trAdd" style="margin-top:12px">電車を足す</button>
+        <p class="note" style="margin-top:14px">運行情報は「文字起こしサーバー」を通して各社の公式ページを読んでいます。サーバーを設定していないと、時刻のカウントだけになります。</p>
       </div>
     </details>
 
@@ -1501,7 +1638,8 @@ function renderHome(){
   $("#hPat").textContent = d.patName;
 
   var tt = $("#hTT"); tt.innerHTML = "";
-  for(var i=0;i<S.pn;i++){
+  if(drawSchedule(k)) tt = null;      /* 行事予定で描いたので、時間割は飛ばす */
+  for(var i=0; tt && i<S.pn; i++){
     var li = el("li", chg(d,i) ? "chg" : "");
     li.appendChild(el("span","pn",plabel(i)));
     li.appendChild(el("span","ps"+(d.periods[i]?"":" none"), d.periods[i] || "—"));
@@ -1540,8 +1678,9 @@ function renderHome(){
   $("#hMemoS").style.display = showM ? "" : "none";
   $("#hMemo").textContent = d.memo;
   drawShots($("#hShots"), d.shots, null);
-  renderCd(); renderClock();
+  renderCd(); renderClock(); renderTrain(); renderRoute();
   if(!wxOnce){ wxOnce = true; wxFetch(); clockOn(); }
+  if(!trOnce){ trOnce = true; setTimeout(trFetch, 600); setInterval(function(){ if(!document.hidden) trFetch(); }, 600000); }
 
   var ns = notesOf(k);
   $("#hNoteS").style.display = ns.length ? "" : "none";
@@ -1810,7 +1949,10 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit();
+  $("#trWalk").value = walkMin();
+  $("#hyRide").value = hyRide();
+  $("#hyTrans").value = hyTrans();
   var wb = $("#setWk"); wb.innerHTML = "";
   ORDER.forEach(function(id){
     var b = el("button",null,DOW[WKID.indexOf(id)]); b.type="button";
@@ -3400,6 +3542,12 @@ function bellEditor(box, list, again, empty){
     l.type = "text"; l.value = b.l || ""; l.placeholder = "名前（1校時・昼休み など）";
     l.addEventListener("input", function(){ b.l = this.value; save(); });
     r1.appendChild(l);
+    var ins = el("button","rm","↓ここに足す");
+    ins.addEventListener("click", function(){
+      list.splice(i+1, 0, {l:"", s: b.e || b.s || "", e:"", p:null});
+      save(); again();
+    });
+    r1.appendChild(ins);
     var rm = el("button","rm","消す");
     rm.addEventListener("click", function(){ list.splice(i,1); save(); again(); });
     r1.appendChild(rm);
@@ -3526,7 +3674,7 @@ function renderClock(){
 function clockOn(){
   if(clkTimer) clearInterval(clkTimer);
   clkTimer = setInterval(function(){
-    if(!document.hidden && view === "home") renderClock();
+    if(!document.hidden && view === "home"){ renderClock(); renderTrain(); renderRoute(); }
   }, 1000);
 }
 
@@ -3596,6 +3744,8 @@ function renderInBell(){
       toast("入れました");
     });
   }
+  btn("btn sm bare", "テンプレートに保存", function(){ tplSave(k); });
+  btn("btn sm bare", "テンプレートから入れる", function(){ tplPick(k); });
   if(!own){
     var g = el("button","btn sm bare","通常の時刻を直す");
     g.addEventListener("click", function(){
@@ -3608,6 +3758,483 @@ function renderInBell(){
     });
     bx.appendChild(g);
   }
+}
+
+/* ============ 時間割／行事予定の切り替え ============ */
+var ttView = null;   /* null = その日に合わせて自動 */
+
+function ttModeFor(k){
+  if(ttView) return ttView;
+  var r = S.days[k];
+  return (r && r.bell && r.bell.length) ? "ev" : "tt";   /* その日だけの時刻があれば行事予定 */
+}
+function drawSchedule(k){
+  var mode = ttModeFor(k);
+  $$("#ttSw button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.dataset.v === mode ? "true" : "false");
+  });
+  if(mode === "tt") return false;      /* ふだんの時間割は今までどおり描く */
+
+  var d = dayOf(k);
+  var list = bellFor(k).filter(function(b){ return b.s; })
+                       .sort(function(a,b){ return hm(a.s) - hm(b.s); });
+  var ul = $("#hTT"); ul.innerHTML = "";
+  if(!list.length){
+    var e0 = el("li"); e0.appendChild(el("span","ps none","時刻がまだ入っていません。記入の「この日の時刻」から入れられます。"));
+    ul.appendChild(e0); return true;
+  }
+  var now = new Date(), isToday = (k === keyOf(now));
+  var mnow = now.getHours()*60 + now.getMinutes();
+  list.forEach(function(b){
+    var li = el("li");
+    if(isToday && b.e && mnow >= hm(b.s) && mnow < hm(b.e)) li.className = "nowline";
+    li.appendChild(el("span","tmm", b.s + (b.e ? ("–" + b.e) : "")));
+    var name = (b.p != null && d.periods[b.p]) ? d.periods[b.p] : "";
+    var txt = (b.l && name && b.l !== name) ? (b.l + "　" + name) : (name || b.l || "—");
+    li.appendChild(el("span","ps" + (txt === "—" ? " none" : ""), txt));
+    ul.appendChild(li);
+  });
+  return true;
+}
+$("#ttSw").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  ttView = b.dataset.v;
+  rerender();
+});
+
+/* ============ テンプレート ============ */
+/* その日に書いた内容をまるごと保存して、別の日に貼れるようにする */
+function tpls(){ if(!S.tpl) S.tpl = []; return S.tpl; }
+function tplSave(k){
+  var r = S.days[k] || {}, d = dayOf(k);
+  var name = prompt("テンプレートの名前", d.patName || "行事の日");
+  if(name === null) return;
+  name = (name || "名前なし").trim();
+  var t = {
+    n: name,
+    periods: (r.periods || []).slice(),
+    items: (r.items || []).slice(),
+    dis: r.dis || "",
+    bell: (r.bell || []).map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; }),
+    ev: r.ev || ""
+  };
+  var old = tpls().filter(function(x){ return x.n === name; })[0];
+  if(old){ tpls()[tpls().indexOf(old)] = t; } else tpls().push(t);
+  save(); renderInBell();
+  toast("「" + name + "」として保存しました");
+}
+function tplPick(k){
+  var list = tpls();
+  if(!list.length){ toast("まだテンプレートがありません"); return; }
+  openSheet("テンプレートから入れる", function(bx){
+    var g = el("div","pick");
+    list.forEach(function(t){
+      var b = el("button", null, "");
+      b.appendChild(el("div", null, t.n));
+      var cnt = [];
+      if(t.bell && t.bell.length) cnt.push("時刻" + t.bell.length);
+      if(t.items && t.items.length) cnt.push("持ち物" + t.items.length);
+      if(t.dis) cnt.push("下校" + t.dis);
+      b.appendChild(el("div", null, cnt.join("・") || "　")).style.cssText =
+        "font-size:12px; color:var(--label3); margin-top:3px";
+      b.addEventListener("click", function(){ closeSheet(); tplApply(k, t); });
+      g.appendChild(b);
+    });
+    bx.appendChild(g);
+    var rm = el("button","btn bare sm","テンプレートを消す");
+    rm.style.marginTop = "14px";
+    rm.addEventListener("click", function(){ closeSheet(); tplDel(); });
+    bx.appendChild(rm);
+  });
+}
+function tplApply(k, t){
+  var r = rec(k);
+  if(t.periods && t.periods.length) r.periods = t.periods.slice();
+  if(t.items && t.items.length)     r.items   = t.items.slice();
+  if(t.dis)                          r.dis     = t.dis;
+  if(t.ev)                           r.ev      = r.ev ? (r.ev + "／" + t.ev) : t.ev;
+  if(t.bell && t.bell.length) r.bell = t.bell.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+  save(); renderIn(); renderInBell(); renderClock();
+  toast("「" + t.n + "」を入れました");
+}
+function tplDel(){
+  openSheet("消すテンプレート", function(bx){
+    var g = el("div","pick");
+    tpls().forEach(function(t, i){
+      var b = el("button", null, t.n);
+      b.addEventListener("click", function(){
+        closeSheet();
+        askConfirm("消しますか", "「" + t.n + "」を消します。", "消す", function(){
+          tpls().splice(i,1); save(); toast("消しました");
+        });
+      });
+      g.appendChild(b);
+    });
+    bx.appendChild(g);
+  });
+}
+
+/* ============ 電車 ============ */
+var TRAIN_DEF = [
+  {n:"東山線",              t:"07:21", m:"これに乗らないと遅刻", line:"東山線"},
+  {n:"名鉄 急行 国府行",    t:"07:46", m:"これに乗らないと間に合わない", line:"名鉄"}
+];
+var trInfo = null, trOnce = false;
+
+function trains(){
+  if(!S.trains) S.trains = TRAIN_DEF.map(function(x){ return {n:x.n, t:x.t, m:x.m, line:x.line}; });
+  return S.trains;
+}
+function renderTrEdit(){
+  var box = $("#trEdit"); if(!box) return;
+  box.innerHTML = "";
+  trains().forEach(function(t, i){
+    var row = el("div","trrow");
+    var nm = document.createElement("input");
+    nm.type = "text"; nm.className = "nm"; nm.value = t.n || ""; nm.placeholder = "電車の名前";
+    nm.addEventListener("input", function(){ t.n = this.value; t.line = this.value; save(); });
+    var tm = document.createElement("input");
+    tm.type = "time"; tm.className = "tm"; tm.value = t.t || "";
+    tm.addEventListener("change", function(){ t.t = this.value; save(); renderTrain(); });
+    var rm = el("button","rm","消す");
+    rm.addEventListener("click", function(){ trains().splice(i,1); save(); renderTrEdit(); renderTrain(); });
+    row.appendChild(nm); row.appendChild(tm); row.appendChild(rm);
+    box.appendChild(row);
+  });
+}
+$("#trAdd").addEventListener("click", function(){
+  trains().push({n:"", t:"07:00", m:"", line:""});
+  save(); renderTrEdit();
+});
+
+function trFetch(){
+  var c = S.stt || {};
+  if(!c.url) return;
+  svFetch({"x-train":"1"}).then(function(r){ return r.json(); }).then(function(d){
+    if(d && d.ok){ trInfo = d; renderTrain(); }
+  }).catch(function(){});
+}
+function trStateFor(t){
+  if(!trInfo) return null;
+  var nm = (t.n || "") + " " + (t.line || "");
+  if(/名鉄/.test(nm) && trInfo.meitetsu && trInfo.meitetsu.ok)
+    return trInfo.meitetsu.calm ? {ok:true, s:"平常"} : {ok:false, s:"乱れています"};
+  if(trInfo.subway && trInfo.subway.ok){
+    var keys = Object.keys(trInfo.subway.lines || {});
+    for(var i=0;i<keys.length;i++){
+      if(nm.indexOf(keys[i]) >= 0){
+        var v = trInfo.subway.lines[keys[i]];
+        return {ok: v === "平常運行", s: v};
+      }
+    }
+  }
+  return null;
+}
+function renderTrain(){
+  var box = $("#hTrain"); if(!box) return;
+  var list = trains().filter(function(t){ return t.t; });
+  var dt = new Date();
+  var k = keyOf(addDays(dt, off));
+  if(off !== 0 || !schoolDay(k)){ box.style.display = "none"; return; }
+  if(!list.length){ list = []; }
+  var now = dt.getHours()*60 + dt.getMinutes() + dt.getSeconds()/60;
+  var last = Math.max.apply(null, list.map(function(t){ return hm(t.t); }));
+  var dd = dayOf(k).dis;
+  last = Math.max(last, hm(arriveT()), dd ? hm(dd) + 120 : 0);
+  if(now > last + 60){ box.style.display = "none"; return; }
+  box.style.display = "";
+
+  renderMt();
+  var ul = $("#trList"); ul.innerHTML = "";
+  list.sort(function(a,b){ return hm(a.t) - hm(b.t); }).forEach(function(t){
+    var li = el("li");
+    var left = hm(t.t) - now;
+    var l = el("div","tl");
+    l.appendChild(el("b", null, t.n || "電車"));
+    l.appendChild(el("span", null, t.t + (t.m ? ("　" + t.m) : "")));
+    li.appendChild(l);
+    var st = trStateFor(t);
+    if(st) li.appendChild(el("span","badge" + (st.ok ? "" : " bad"), st.s));
+    var r = el("div","tr");
+    if(left >= 0){
+      r.appendChild(el("em", null, mmss(left)));
+      r.appendChild(el("span", null, "であと"));
+      if(left <= 15) li.className = "soon";
+    }else{
+      li.className = "gone";
+      r.appendChild(el("em", null, "発車ずみ"));
+      r.appendChild(el("span", null, mmss(-left) + "前"));
+    }
+    li.appendChild(r);
+    ul.appendChild(li);
+  });
+
+  var n = $("#trNote"); n.innerHTML = "";
+  if(trInfo){
+    var w = (trInfo.subway && trInfo.subway.when) ? ("地下鉄は " + trInfo.subway.when + " 現在。") : "";
+    n.textContent = w + "各社の公式ページから読んでいます。10分以上の遅れでないと出ないので、少しの遅れは分かりません。" +
+      (isHoliday(keyOf(new Date())) ? "　なお名鉄の時刻表は平日ぶんしか入っていないので、今日の名鉄の表示はあてになりません。" : "");
+  }else if(!(S.stt && S.stt.url)){
+    n.textContent = "運行情報は、設定の「文字起こしサーバー」を入れると出せます。いまは時刻だけです。";
+  }else{
+    n.textContent = "運行情報を取りにいっています…";
+  }
+  $("#trStatus").textContent = "";
+}
+
+/* ============ 登校ルート ============ */
+/* 時刻表そのものは手に入らないので、通る地点と時刻を自分で決めてもらい、
+   そこに現在地を突き合わせる。何時の電車かは、この表が答えになる。 */
+var ROUTE_DEF = [
+  {n:"東山線に乗る",            t:"07:21", la:null, lo:null},
+  {n:"名鉄名古屋 急行 国府行",  t:"07:46", la:35.169745, lo:136.883804},
+  {n:"前後駅に着く",            t:"08:11", la:35.052212, lo:136.995690},
+  {n:"星城中学校に着く",        t:"08:45", la:35.044505, lo:136.986527}
+];
+var myPos = null, myPosAt = 0;
+
+function route(){ if(!S.route) S.route = ROUTE_DEF.map(function(x){ return {n:x.n,t:x.t,la:x.la,lo:x.lo}; }); return S.route; }
+function arriveT(){ return S.arrive || "08:45"; }
+function dist(la1, lo1, la2, lo2){
+  var R = 6371000, p = Math.PI/180;
+  var a = Math.sin((la2-la1)*p/2), b = Math.sin((lo2-lo1)*p/2);
+  var h = a*a + Math.cos(la1*p)*Math.cos(la2*p)*b*b;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+function mstr(m){ return m >= 1000 ? (m/1000).toFixed(1) + "km" : Math.round(m) + "m"; }
+
+function renderRtEdit(){
+  var box = $("#rtEdit"); if(!box) return;
+  $("#rtArrive").value = arriveT();
+  box.innerHTML = "";
+  route().forEach(function(r, i){
+    var row = el("div","rtrow");
+    var nm = document.createElement("input");
+    nm.type = "text"; nm.className = "nm"; nm.value = r.n || ""; nm.placeholder = "地点や電車の名前";
+    nm.addEventListener("input", function(){ r.n = this.value; save(); });
+    var tm = document.createElement("input");
+    tm.type = "time"; tm.className = "tm"; tm.value = r.t || "";
+    tm.addEventListener("change", function(){ r.t = this.value; save(); renderRoute(); });
+    var gp = el("button","gp", (r.la != null) ? "場所あり" : "いまの場所");
+    gp.addEventListener("click", function(){
+      if(!navigator.geolocation){ toast("この端末では場所を取れません"); return; }
+      gp.textContent = "取得中…";
+      navigator.geolocation.getCurrentPosition(function(p){
+        r.la = p.coords.latitude; r.lo = p.coords.longitude;
+        save(); renderRtEdit(); toast("覚えました");
+      }, function(){ gp.textContent = "取れません"; }, {enableHighAccuracy:true, timeout:10000});
+    });
+    var rm = el("button","rm","消す");
+    rm.addEventListener("click", function(){ route().splice(i,1); save(); renderRtEdit(); renderRoute(); });
+    row.appendChild(nm); row.appendChild(tm); row.appendChild(gp); row.appendChild(rm);
+    box.appendChild(row);
+  });
+}
+$("#rtAdd").addEventListener("click", function(){
+  route().push({n:"", t:"", la:null, lo:null}); save(); renderRtEdit();
+});
+$("#rtArrive").addEventListener("change", function(){ S.arrive = this.value; save(); renderRoute(); });
+
+function renderRoute(){
+  var box = $("#hRoute"); if(!box) return;
+  var list = route().filter(function(r){ return r.t; })
+                    .sort(function(a,b){ return hm(a.t) - hm(b.t); });
+  var dt = new Date(), k = keyOf(addDays(dt, off));
+  var now = dt.getHours()*60 + dt.getMinutes() + dt.getSeconds()/60;
+  var goal = hm(arriveT());
+  if(off !== 0 || !list.length || !schoolDay(k) || now > goal + 30){ box.style.display = "none"; return; }
+  box.style.display = "";
+
+  /* いちばん近い未通過の地点 */
+  var next = null;
+  for(var i=0;i<list.length;i++){ if(hm(list[i].t) >= now - 1){ next = list[i]; break; } }
+
+  var g = $("#rtGoal");
+  g.classList.remove("late");
+  if(next){
+    var left = hm(next.t) - now;
+    g.innerHTML = "";
+    g.appendChild(document.createTextNode(next.n + " まで "));
+    var em = el("em", null, left <= 0 ? "いま" : mmss(left));
+    g.appendChild(em);
+    if(left <= 3) g.classList.add("late");
+  }else{
+    g.textContent = "登校の時間は過ぎています";
+  }
+
+  var ul = $("#rtList"); ul.innerHTML = "";
+  var near = null, nearD = 1e12;
+  if(myPos){
+    list.forEach(function(r){
+      if(r.la == null) return;
+      var d = dist(myPos.la, myPos.lo, r.la, r.lo);
+      if(d < nearD){ nearD = d; near = r; }
+    });
+  }
+  list.forEach(function(r){
+    var li = el("li");
+    if(hm(r.t) < now - 1) li.className = "done";
+    if(next === r) li.className = "here";
+    li.appendChild(el("span","rt", r.t));
+    li.appendChild(el("span","rn", r.n));
+    if(myPos && r.la != null){
+      var d = dist(myPos.la, myPos.lo, r.la, r.lo);
+      li.appendChild(el("span","rd", (r === near && d < 400) ? "いまここ" : mstr(d)));
+    }
+    ul.appendChild(li);
+  });
+
+  var n = $("#rtNote");
+  if(myPos && near){
+    var lag = now - hm(near.t);
+    var when = new Date(myPosAt);
+    var judge;
+    if(nearD < 400){
+      judge = (lag > 1.5) ? ("予定より " + mmss(lag) + " 遅れています")
+            : (lag < -1.5) ? ("予定より " + mmss(-lag) + " 早いです")
+            : "予定どおりです";
+      n.textContent = "いま「" + near.n + "」のあたりにいます。" + judge +
+        "（" + pad(when.getHours()) + ":" + pad(when.getMinutes()) + "に測定）";
+    }else{
+      n.textContent = "いちばん近いのは「" + near.n + "」で " + mstr(nearD) + " 先です。" +
+        "（" + pad(when.getHours()) + ":" + pad(when.getMinutes()) + "に測定）";
+    }
+  }else{
+    n.textContent = "「いまどこ？」を押すと、現在地と照らし合わせて、予定より早いか遅いかが出ます。";
+  }
+}
+$("#rtWhere").addEventListener("click", function(){
+  if(!navigator.geolocation){ toast("この端末では場所を取れません"); return; }
+  $("#rtNote").textContent = "現在地を調べています…";
+  navigator.geolocation.getCurrentPosition(function(p){
+    myPos = {la:p.coords.latitude, lo:p.coords.longitude};
+    myPosAt = Date.now();
+    renderRoute();
+  }, function(e){
+    $("#rtNote").textContent = (e && e.code === 1)
+      ? "場所の利用が許可されていません。ブラウザの設定から許可してください。"
+      : "現在地を取れませんでした。";
+  }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
+});
+
+/* ============ 名鉄名古屋 → 前後（2026年3月14日改正・平日） ============ */
+/* PDFの時刻表から、名鉄名古屋の発車時刻と前後の到着時刻だけを抜き出したもの。
+   前後に止まらない特急・快特は入っていない。 */
+var TT={"gw":[["05:39","06:01","準急","豊橋"],["05:48","06:17","普通","伊奈"],["06:04","06:29","準急","豊橋"],["06:09","06:39","普通","東岡崎"],["06:18","06:41","急行","豊橋"],["06:20","06:51","普通","東岡崎"],["06:35","06:55","急行","豊川"],["06:43","07:18","普通","東岡崎"],["06:51","07:15","急行","伊奈"],["06:56","07:36","普通","東岡崎"],["07:03","07:26","急行","伊奈"],["07:10","07:33","準急","伊奈"],["07:13","07:55","普通","東岡崎"],["07:15","07:41","急行","吉良"],["07:24","07:46","準急","本宿"],["07:29","08:00","快急","吉良"],["07:34","07:58","普通","豊橋"],["07:39","08:15","普通","豊明"],["07:46","08:10","急行","国府"],["07:54","08:38","普通","東岡崎"],["07:56","08:25","普通","豊明"],["08:03","08:28","急行","東岡崎"],["08:08","08:33","快急","豊橋"],["08:14","08:45","普通","東岡崎"],["08:25","08:47","普通","豊川"],["08:27","09:07","快急","東岡崎"],["08:38","09:02","急行","豊橋"],["08:42","09:15","普通","東岡崎"],["08:54","09:32","普通","東岡崎"],["08:58","09:19","快急","豊川"],["09:00","09:46","普通","東岡崎"],["09:07","09:29","準急","豊明"],["09:12","09:35","急行","豊橋"],["09:21","09:40","普通","吉良"],["09:23","09:57","普通","東岡崎"],["09:27","09:51","急行","豊川"],["09:36","09:59","普通","豊明"],["09:38","10:16","普通","東岡崎"],["09:42","10:05","急行","豊橋"],["09:51","10:10","準急","吉良"],["09:53","10:27","普通","東岡崎"],["09:57","10:21","急行","国府"],["10:06","10:29","普通","豊明"],["10:08","10:46","普通","東岡崎"],["10:12","10:35","急行","豊橋"],["10:21","10:40","普通","吉良"],["10:23","11:02","普通","東岡崎"],["10:35","10:58","準急","豊明"],["10:37","11:16","普通","東岡崎"],["10:41","11:05","急行","豊橋"],["10:51","11:10","普通","吉良"],["10:53","11:31","普通","東岡崎"],["11:05","11:28","準急","豊明"],["11:07","11:46","普通","東岡崎"],["11:11","11:35","急行","豊橋"],["11:21","11:40","普通","吉良"],["11:23","12:01","普通","東岡崎"],["11:35","11:58","準急","豊明"],["11:37","12:16","普通","東岡崎"],["11:41","12:05","急行","豊橋"],["11:51","12:10","普通","吉良"],["11:53","12:31","普通","東岡崎"],["12:05","12:28","準急","豊明"],["12:07","12:46","普通","東岡崎"],["12:11","12:35","急行","豊橋"],["12:21","12:40","普通","吉良"],["12:23","13:01","普通","東岡崎"],["12:35","12:58","準急","豊明"],["12:37","13:16","普通","東岡崎"],["12:41","13:05","急行","豊橋"],["12:51","13:10","普通","吉良"],["12:53","13:31","普通","東岡崎"],["13:05","13:28","準急","豊明"],["13:07","13:46","普通","東岡崎"],["13:11","13:35","急行","豊橋"],["13:21","13:40","普通","吉良"],["13:23","14:01","普通","東岡崎"],["13:35","13:58","準急","豊明"],["13:37","14:16","普通","東岡崎"],["13:41","14:05","急行","豊橋"],["13:51","14:10","普通","吉良"],["13:53","14:31","普通","先東岡崎"],["14:05","14:28","準急","豊明"],["14:07","14:46","普通","東岡崎"],["14:11","14:35","急行","豊橋"],["14:21","14:40","普通","吉良"],["14:23","15:01","普通","東岡崎"],["14:35","14:58","普通","豊明"],["14:37","15:16","普通","東岡崎"],["14:41","15:05","急行","豊橋"],["14:51","15:10","準急","吉良"],["14:53","15:31","普通","東岡崎"],["15:05","15:28","普通","豊明"],["15:07","15:46","普通","東岡崎"],["15:11","15:35","急行","豊橋"],["15:21","15:40","準急","吉良"],["15:23","15:57","普通","東岡崎"],["15:28","15:51","急行","豊川"],["15:35","15:59","普通","豊明"],["15:37","16:16","普通","東岡崎"],["15:41","16:05","急行","豊橋"],["15:51","16:10","準急","吉良"],["15:53","16:27","普通","東岡崎"],["15:58","16:21","急行","豊川"],["16:05","16:29","普通","豊明"],["16:07","16:46","普通","東岡崎"],["16:11","16:35","急行","豊橋"],["16:21","16:40","準急","吉良"],["16:23","16:57","普通","東岡崎"],["16:28","16:51","急行","豊川"],["16:36","16:59","普通","豊明"],["16:38","17:16","普通","東岡崎"],["16:42","17:05","急行","豊橋"],["16:50","17:10","準急","吉良"],["16:53","17:27","普通","東岡崎"],["16:58","17:21","急行","豊川"],["17:06","17:29","普通","豊明"],["17:08","17:46","普通","東岡崎"],["17:12","17:35","急行","豊橋"],["17:20","17:40","準急","吉良"],["17:23","17:57","普通","東岡崎"],["17:28","17:51","急行","豊川"],["17:36","17:59","普通","豊明"],["17:38","18:16","普通","東岡崎"],["17:42","18:05","急行","豊橋"],["17:50","18:10","準急","吉良"],["17:53","18:27","普通","東岡崎"],["17:58","18:21","急行","豊川"],["18:06","18:29","普通","豊明"],["18:08","18:46","普通","東岡崎"],["18:12","18:35","急行","豊橋"],["18:20","18:40","準急","吉良"],["18:23","18:57","普通","東岡崎"],["18:28","18:51","急行","豊川"],["18:36","18:59","普通","豊明"],["18:38","19:16","普通","東岡崎"],["18:42","19:05","急行","豊橋"],["18:50","19:10","準急","吉良"],["18:53","19:27","普通","東岡崎"],["18:58","19:21","急行","豊川"],["19:06","19:29","普通","豊明"],["19:08","19:46","普通","東岡崎"],["19:12","19:35","急行","豊橋"],["19:20","19:40","準急","吉良"],["19:23","19:57","普通","東岡崎"],["19:28","19:51","急行","豊川"],["19:36","19:59","普通","豊明"],["19:38","20:16","普通","東岡崎"],["19:42","20:05","急行","豊橋"],["19:50","20:10","準急","吉良"],["19:53","20:27","普通","東岡崎"],["19:58","20:21","急行","豊川"],["20:06","20:29","普通","豊明"],["20:08","20:46","普通","東岡崎"],["20:12","20:35","急行","豊橋"],["20:20","20:40","準急","吉良"],["20:23","20:57","普通","東岡崎"],["20:28","20:51","急行","豊川"],["20:36","20:59","普通","豊明"],["20:38","21:16","普通","豊明"],["20:42","21:05","急行","豊橋"],["20:50","21:10","準急","吉良"],["20:53","21:27","普通","東岡崎"],["20:58","21:21","急行","豊川"],["21:06","21:29","普通","豊明"],["21:08","21:46","普通","豊明"],["21:12","21:35","急行","豊橋"],["21:20","21:40","準急","吉良"],["21:23","21:57","普通","東岡崎"],["21:28","21:51","急行","豊川"],["21:36","21:59","普通","豊明"],["21:38","22:16","普通","豊明"],["21:42","22:05","急行","伊奈"],["21:50","22:10","準急","西尾"],["21:53","22:27","普通","東岡崎"],["21:58","22:21","急行","豊川"],["22:08","22:42","普通","豊明"],["22:12","22:35","急行","伊奈"],["22:22","22:56","普通","先東岡崎"],["22:28","22:50","急行","伊奈"],["22:36","23:14","普通","新安城"],["22:49","23:09","急行","伊奈"],["22:52","23:27","普通","豊明"],["23:03","23:22","急行","西尾"],["23:11","23:40","準急","東岡崎"],["23:21","23:56","普通","新安城"],["23:28","23:48","急行","東岡崎"]],"gh":[["05:46","06:08","準急","豊橋"],["05:51","06:21","普通","伊奈"],["06:04","06:29","準急","豊橋"],["06:10","06:43","普通","東岡崎"],["06:18","06:38","急行","豊橋"],["06:24","06:54","普通","東岡崎"],["06:39","06:58","急行","豊橋"],["06:47","07:16","普通","東岡崎"],["06:58","07:21","急行","川"],["07:05","07:31","普通","東岡崎"],["07:07","07:46","普通","東岡崎"],["07:11","07:35","急行","豊橋"],["07:21","07:40","準急","良"],["07:23","07:57","普通","東岡崎"],["07:28","07:51","急行","川"],["07:35","07:59","普通","豊明"],["07:37","08:16","普通","東岡崎"],["07:41","08:05","急行","豊橋"],["07:51","08:10","準急","良"],["07:53","08:27","普通","東岡崎"],["07:58","08:21","急行","川"],["08:05","08:29","普通","豊明"],["08:07","08:46","普通","東岡崎"],["08:11","08:35","急行","豊橋"],["08:21","08:40","準急","良"],["08:23","08:57","普通","東岡崎"],["08:28","08:51","急行","川"],["08:35","08:59","普通","豊明"],["08:37","09:16","普通","東岡崎"],["08:41","09:05","急行","豊橋"],["08:51","09:10","準急","良"],["08:53","09:27","普通","東岡崎"],["08:58","09:21","急行","川"],["09:05","09:29","普通","豊明"],["09:07","09:46","普通","先東岡崎"],["09:11","09:35","急行","豊橋"],["09:21","09:40","準急","良"],["09:23","09:57","普通","東岡崎"],["09:28","09:51","急行","川"],["09:35","09:59","普通","豊明"],["09:37","10:16","普通","東岡崎"],["09:41","10:05","急行","豊橋"],["09:51","10:10","準急","良"],["09:53","10:27","普通","東岡崎"],["10:05","10:29","普通","豊明"],["10:07","10:46","普通","東岡崎"],["10:11","10:35","急行","豊橋"],["10:21","10:40","普通","良"],["10:23","11:01","普通","東岡崎"],["10:35","10:58","準急","豊明"],["10:37","11:16","普通","東岡崎"],["10:41","11:05","急行","豊橋"],["10:51","11:10","普通","良"],["10:53","11:31","普通","東岡崎"],["11:05","11:28","準急","豊明"],["11:07","11:46","普通","東岡崎"],["11:11","11:35","急行","豊橋"],["11:21","11:40","普通","良"],["11:23","12:01","普通","東岡崎"],["11:35","11:58","準急","豊明"],["11:37","12:16","普通","東岡崎"],["11:41","12:05","急行","豊橋"],["11:51","12:10","普通","良"],["11:53","12:31","普通","東岡崎"],["12:05","12:28","準急","豊明"],["12:07","12:46","普通","東岡崎"],["12:11","12:35","急行","豊橋"],["12:21","12:40","普通","良"],["12:23","13:01","普通","東岡崎"],["12:35","12:58","準急","豊明"],["12:37","13:16","普通","先東岡崎"],["12:41","13:05","急行","豊橋"],["12:51","13:10","普通","良"],["12:53","13:31","普通","東岡崎"],["13:05","13:28","準急","豊明"],["13:07","13:46","普通","東岡崎"],["13:11","13:35","急行","豊橋"],["13:21","13:40","普通","良"],["13:23","14:01","普通","東岡崎"],["13:35","13:58","準急","豊明"],["13:37","14:16","普通","東岡崎"],["13:41","14:05","急行","豊橋"],["13:51","14:10","普通","良"],["13:53","14:31","普通","東岡崎"],["14:05","14:28","準急","豊明"],["14:07","14:46","普通","東岡崎"],["14:11","14:35","急行","豊橋"],["14:21","14:40","普通","良"],["14:23","15:01","普通","東岡崎"],["14:35","14:58","準急","豊明"],["14:37","15:16","普通","東岡崎"],["14:41","15:05","急行","豊橋"],["14:51","15:10","普通","良"],["14:53","15:31","普通","東岡崎"],["15:05","15:28","準急","豊明"],["15:07","15:46","普通","東岡崎"],["15:11","15:35","急行","豊橋"],["15:21","15:40","普通","良"],["15:23","15:57","普通","東岡崎"],["15:28","15:52","急行","川"],["15:37","16:16","普通","東岡崎"],["15:41","16:05","急行","豊橋"],["15:51","16:10","普通","良"],["15:53","16:27","普通","東岡崎"],["15:58","16:22","急行","川"],["16:07","16:46","普通","東岡崎"],["16:11","16:35","急行","豊橋"],["16:21","16:40","普通","良"],["16:23","16:57","普通","東岡崎"],["16:28","16:52","急行","川"],["16:37","17:16","普通","東岡崎"],["16:41","17:05","急行","豊橋"],["16:51","17:10","普通","良"],["16:53","17:27","普通","東岡崎"],["16:58","17:22","急行","川"],["17:07","17:46","普通","東岡崎"],["17:11","17:35","急行","豊橋"],["17:21","17:40","普通","良"],["17:23","17:57","普通","東岡崎"],["17:28","17:52","急行","川"],["17:37","18:16","普通","東岡崎"],["17:41","18:05","急行","豊橋"],["17:51","18:10","普通","良"],["17:53","18:27","普通","東岡崎"],["17:58","18:22","急行","川"],["18:07","18:46","普通","東岡崎"],["18:11","18:35","急行","豊橋"],["18:21","18:40","普通","良"],["18:23","18:57","普通","東岡崎"],["18:28","18:52","急行","川"],["18:37","19:16","普通","東岡崎"],["18:41","19:05","急行","豊橋"],["18:51","19:10","普通","良"],["18:53","19:27","普通","東岡崎"],["18:58","19:22","急行","川"],["19:07","19:46","普通","東岡崎"],["19:11","19:35","急行","豊橋"],["19:21","19:40","普通","良"],["19:23","19:57","普通","東岡崎"],["19:28","19:52","急行","川"],["19:37","20:16","普通","豊明"],["19:41","20:05","急行","豊橋"],["19:51","20:10","普通","良"],["19:53","20:27","普通","先東岡崎"],["19:58","20:22","急行","川"],["20:07","20:46","普通","豊明"],["20:11","20:35","急行","豊橋"],["20:21","20:40","普通","良"],["20:23","20:57","普通","東岡崎"],["20:28","20:52","急行","川"],["20:37","21:16","普通","豊明"],["20:41","21:05","急行","豊橋"],["20:51","21:10","普通","良"],["20:53","21:27","普通","東岡崎"],["20:58","21:22","急行","川"],["21:07","21:46","普通","豊明"],["21:11","21:35","急行","豊橋"],["21:21","21:40","普通","良"],["21:23","21:57","普通","東岡崎"],["21:28","21:51","急行","川"],["21:37","22:16","普通","豊明"],["21:41","22:05","急行","伊奈"],["21:51","22:10","普通","西尾"],["21:53","22:27","普通","東岡崎"],["21:58","22:21","急行","川"],["22:07","22:45","普通","豊明"],["22:11","22:35","急行","伊奈"],["22:21","22:41","普通","豊明"],["22:23","22:56","普通","東岡崎"],["22:28","22:50","急行","伊奈"],["22:36","23:14","普通","豊明"],["22:49","23:09","急行","伊奈"],["22:52","23:27","普通","豊明"],["23:03","23:22","急行","西尾"],["23:11","23:40","準急","東岡崎"],["23:21","23:56","普通","新安城"],["23:28","23:48","急行","東岡崎"]],"bw":[["05:21","05:45","普通","犬山"],["05:42","06:15","普通","弥富"],["05:47","06:07","急行","新鵜沼"],["06:02","06:30","普通","新鵜沼"],["06:10","06:46","普通","岐阜"],["06:17","06:37","急行","一宮"],["06:19","06:54","普通","岩倉"],["06:26","06:48","急行","岐阜"],["06:35","06:56","急行","岐阜"],["06:37","07:11","普通","岐阜"],["06:43","07:19","普通","新鵜沼"],["06:51","07:13","普通","新鵜沼"],["06:54","07:29","普通","弥富"],["06:59","07:22","急行","岩倉"],["07:10","07:33","急行","一宮"],["07:11","07:51","普通","岩倉"],["07:20","07:44","急行","津島"],["07:23","08:04","普通","岩倉"],["07:32","07:55","急行","弥富"],["07:42","08:06","急行","須ケ口"],["07:43","08:12","普通","佐屋"],["07:51","08:16","急行","犬山"],["07:58","08:23","普通","弥富"],["07:59","08:33","普通","岐阜"],["08:11","08:37","普通","犬山"],["08:12","08:47","普通","犬山"],["08:22","08:53","普通","岩倉"],["08:29","09:03","普通","犬山"],["08:35","08:58","普通","犬山"],["08:39","09:22","普通","岩倉"],["08:48","09:11","急行","犬山"],["08:54","09:33","普通","岩倉"],["09:05","09:29","急行","一宮"],["09:11","09:48","普通","犬山"],["09:18","09:44","準急","一宮"],["09:24","10:01","普通","岩倉"],["09:30","09:50","急行","弥富"],["09:36","09:57","急行","一宮"],["09:39","10:03","準急","佐屋"],["09:41","10:17","普通","岩倉"],["09:48","10:13","準急","一宮"],["09:54","10:32","普通","岩倉"],["10:00","10:21","急行","弥富"],["10:06","10:27","急行","一宮"],["10:10","10:47","普通","岩倉"],["10:16","10:43","急行","一宮"],["10:24","11:02","普通","岩倉"],["10:30","10:51","急行","弥富"],["10:36","10:57","急行","一宮"],["10:40","11:17","普通","岩倉"],["10:44","11:13","準急","佐屋"],["10:54","11:32","普通","岩倉"],["11:00","11:21","急行","弥富"],["11:06","11:27","急行","一宮"],["11:10","11:47","普通","岩倉"],["11:14","11:43","準急","佐屋"],["11:24","12:02","普通","岩倉"],["11:30","11:51","急行","弥富"],["11:36","11:57","急行","一宮"],["11:40","12:17","普通","岩倉"],["11:44","12:13","準急","佐屋"],["11:54","12:32","普通","岩倉"],["12:00","12:21","急行","弥富"],["12:06","12:27","急行","一宮"],["12:10","12:47","普通","岩倉"],["12:14","12:43","準急","佐屋"],["12:24","13:02","普通","岩倉"],["12:30","12:51","急行","弥富"],["12:36","12:57","急行","一宮"],["12:40","13:17","普通","岩倉"],["12:44","13:13","準急","佐屋"],["12:54","13:32","普通","岩倉"],["13:00","13:21","急行","弥富"],["13:06","13:27","急行","一宮"],["13:10","13:47","普通","岩倉"],["13:14","13:43","準急","佐屋"],["13:24","14:02","普通","岩倉"],["13:30","13:51","急行","弥富"],["13:36","13:57","急行","一宮"],["13:40","14:17","普通","岩倉"],["13:44","14:13","準急","佐屋"],["13:54","14:32","普通","岩倉"],["14:00","14:21","急行","弥富"],["14:06","14:27","急行","一宮"],["14:10","14:47","普通","岩倉"],["14:14","14:43","準急","佐屋"],["14:24","15:02","普通","岩倉"],["14:30","14:51","急行","弥富"],["14:36","14:57","急行","一宮"],["14:40","15:17","普通","岩倉"],["14:44","15:13","準急","佐屋"],["14:54","15:32","普通","岩倉"],["15:00","15:21","急行","弥富"],["15:06","15:27","急行","一宮"],["15:09","15:34","準急","佐屋"],["15:11","15:47","普通","犬山"],["15:18","15:43","急行","須ケ口"],["15:24","16:02","普通","岩倉"],["15:30","15:50","急行","佐屋"],["15:36","15:57","急行","一宮"],["15:39","16:04","準急","佐屋"],["15:41","16:17","普通","犬山"],["15:48","16:13","準急","一宮"],["15:54","16:31","普通","岩倉"],["16:00","16:20","急行","佐屋"],["16:06","16:27","急行","一宮"],["16:09","16:34","準急","佐屋"],["16:11","16:47","普通","犬山"],["16:18","16:43","準急","一宮"],["16:24","17:01","普通","岩倉"],["16:30","16:50","急行","佐屋"],["16:36","16:57","急行","一宮"],["16:39","17:04","準急","佐屋"],["16:41","17:17","普通","犬山"],["16:48","17:13","準急","一宮"],["16:54","17:31","普通","岩倉"],["17:00","17:20","急行","佐屋"],["17:06","17:27","急行","一宮"],["17:09","17:34","準急","佐屋"],["17:11","17:47","普通","犬山"],["17:18","17:43","準急","一宮"],["17:24","18:01","普通","岩倉"],["17:30","17:50","急行","佐屋"],["17:36","17:57","急行","一宮"],["17:39","18:04","準急","佐屋"],["17:41","18:17","普通","犬山"],["17:48","18:13","準急","一宮"],["17:54","18:31","普通","岩倉"],["18:00","18:20","急行","佐屋"],["18:06","18:27","急行","一宮"],["18:09","18:34","準急","佐屋"],["18:11","18:47","普通","犬山"],["18:18","18:43","準急","一宮"],["18:24","19:01","普通","岩倉"],["18:30","18:50","急行","佐屋"],["18:36","18:57","急行","一宮"],["18:39","19:04","準急","佐屋"],["18:41","19:17","普通","犬山"],["18:48","19:13","準急","一宮"],["18:54","19:31","普通","岩倉"],["19:00","19:20","急行","佐屋"],["19:06","19:27","急行","一宮"],["19:09","19:34","準急","佐屋"],["19:11","19:47","普通","犬山"],["19:18","19:43","準急","一宮"],["19:24","20:01","普通","岩倉"],["19:30","19:50","急行","佐屋"],["19:36","19:57","急行","一宮"],["19:39","20:04","準急","佐屋"],["19:41","20:17","普通","犬山"],["19:48","20:13","準急","一宮"],["19:54","20:31","普通","岩倉"],["20:00","20:20","急行","佐屋"],["20:06","20:27","急行","一宮"],["20:09","20:34","準急","佐屋"],["20:11","20:47","普通","犬山"],["20:18","20:43","準急","一宮"],["20:24","21:01","普通","岩倉"],["20:30","20:50","急行","弥富"],["20:36","20:57","急行","一宮"],["20:39","21:04","準急","佐屋"],["20:41","21:17","普通","犬山"],["20:48","21:13","準急","一宮"],["20:54","21:31","普通","岩倉"],["21:00","21:20","急行","弥富"],["21:06","21:27","急行","一宮"],["21:11","21:47","普通","犬山"],["21:18","21:43","準急","一宮"],["21:24","22:01","普通","岩倉"],["21:30","21:50","急行","弥富"],["21:36","21:57","急行","一宮"],["21:41","22:17","普通","犬山"],["21:48","22:13","準急","一宮"],["21:54","22:31","普通","岩倉"],["22:06","22:27","急行","岐阜"],["22:11","22:47","普通","犬山"],["22:18","22:43","急行","岐阜"],["22:36","22:57","急行","岐阜"],["22:39","23:14","普通","岩倉"],["23:05","23:26","急行","一宮"],["23:12","23:49","普通","須ケ口"],["23:18","23:42","急行","須ケ口"],["23:40","24:00","普通","津島"]],"bh":[["05:21","05:45","普通","犬山"],["05:43","06:16","普通","佐屋"],["05:48","06:08","急行","須ケ口"],["06:02","06:30","普通","岐阜"],["06:15","06:35","急行","新鵜沼"],["06:22","07:00","普通","岩倉"],["06:34","06:54","急行","岐阜"],["06:42","07:17","普通","岩倉"],["06:53","07:15","急行","岐阜"],["06:55","07:32","普通","岩倉"],["07:07","07:28","急行","新鵜沼"],["07:08","07:44","普通","岩倉"],["07:14","07:39","急行","一宮"],["07:21","08:00","普通","岩倉"],["07:27","07:47","急行","佐屋"],["07:32","07:56","急行","一宮"],["07:37","08:02","準急","須ケ口"],["07:41","08:17","普通","岩倉"],["07:48","08:13","準急","一宮"],["07:54","08:31","普通","岩倉"],["08:00","08:20","急行","佐屋"],["08:06","08:27","急行","一宮"],["08:09","08:34","準急","佐屋"],["08:11","08:47","普通","犬山"],["08:18","08:43","準急","一宮"],["08:24","09:01","普通","岩倉"],["08:30","08:50","急行","弥富"],["08:36","08:57","急行","一宮"],["08:39","09:04","準急","佐屋"],["08:41","09:17","普通","犬山"],["08:48","09:13","準急","一宮"],["08:54","09:31","普通","岩倉"],["09:00","09:20","急行","弥富"],["09:06","09:27","急行","一宮"],["09:09","09:34","準急","佐屋"],["09:11","09:47","普通","犬山"],["09:18","09:43","準急","一宮"],["09:24","10:01","普通","岩倉"],["09:30","09:50","急行","弥富"],["09:36","09:57","急行","一宮"],["09:39","10:04","準急","佐屋"],["09:41","10:17","普通","犬山"],["09:48","10:13","準急","一宮"],["09:54","10:32","普通","岩倉"],["10:00","10:21","急行","弥富"],["10:06","10:27","急行","一宮"],["10:10","10:47","普通","岩倉"],["10:16","10:43","急行","一宮"],["10:24","11:02","普通","岩倉"],["10:30","10:51","急行","弥富"],["10:36","10:57","急行","一宮"],["10:40","11:17","普通","岩倉"],["10:44","11:13","準急","佐屋"],["10:54","11:32","普通","岩倉"],["11:00","11:21","急行","弥富"],["11:06","11:27","急行","一宮"],["11:10","11:47","普通","岩倉"],["11:14","11:43","準急","佐屋"],["11:24","12:02","普通","岩倉"],["11:30","11:51","急行","弥富"],["11:36","11:57","急行","一宮"],["11:40","12:17","普通","岩倉"],["11:44","12:13","準急","佐屋"],["11:54","12:32","普通","岩倉"],["12:00","12:21","急行","弥富"],["12:06","12:27","急行","一宮"],["12:10","12:47","普通","岩倉"],["12:14","12:43","準急","佐屋"],["12:24","13:02","普通","岩倉"],["12:30","12:51","急行","弥富"],["12:36","12:57","急行","一宮"],["12:40","13:17","普通","岩倉"],["12:44","13:13","準急","佐屋"],["12:54","13:32","普通","岩倉"],["13:00","13:21","急行","弥富"],["13:06","13:27","急行","一宮"],["13:10","13:47","普通","岩倉"],["13:14","13:43","準急","佐屋"],["13:24","14:02","普通","岩倉"],["13:30","13:51","急行","弥富"],["13:36","13:57","急行","一宮"],["13:40","14:17","普通","岩倉"],["13:44","14:13","準急","佐屋"],["13:54","14:32","普通","岩倉"],["14:00","14:21","急行","弥富"],["14:06","14:27","急行","一宮"],["14:10","14:47","普通","岩倉"],["14:14","14:43","準急","佐屋"],["14:24","15:02","普通","岩倉"],["14:30","14:51","急行","弥富"],["14:36","14:57","急行","一宮"],["14:40","15:17","普通","岩倉"],["14:44","15:13","準急","佐屋"],["14:54","15:32","普通","岩倉"],["15:00","15:21","急行","弥富"],["15:06","15:27","急行","一宮"],["15:10","15:47","普通","岩倉"],["15:14","15:43","準急","佐屋"],["15:24","16:02","普通","岩倉"],["15:30","15:51","急行","弥富"],["15:36","15:57","急行","一宮"],["15:40","16:17","普通","岩倉"],["15:46","16:13","急行","一宮"],["15:54","16:32","普通","岩倉"],["16:00","16:21","急行","弥富"],["16:06","16:27","急行","一宮"],["16:10","16:47","普通","犬山"],["16:16","16:43","急行","一宮"],["16:24","17:02","普通","岩倉"],["16:30","16:51","急行","弥富"],["16:36","16:57","急行","一宮"],["16:40","17:17","普通","犬山"],["16:46","17:13","急行","一宮"],["16:54","17:32","普通","岩倉"],["17:00","17:21","急行","弥富"],["17:06","17:27","急行","一宮"],["17:10","17:47","普通","犬山"],["17:16","17:43","急行","一宮"],["17:24","18:02","普通","岩倉"],["17:30","17:51","急行","弥富"],["17:36","17:57","急行","一宮"],["17:40","18:17","普通","犬山"],["17:46","18:13","急行","一宮"],["17:54","18:32","普通","岩倉"],["18:00","18:21","急行","弥富"],["18:06","18:27","急行","一宮"],["18:10","18:47","普通","犬山"],["18:16","18:43","急行","一宮"],["18:24","19:02","普通","岩倉"],["18:30","18:51","急行","弥富"],["18:36","18:57","急行","一宮"],["18:40","19:17","普通","犬山"],["18:46","19:13","急行","一宮"],["18:54","19:32","普通","岩倉"],["19:00","19:21","急行","弥富"],["19:06","19:27","急行","一宮"],["19:10","19:47","普通","犬山"],["19:16","19:43","急行","一宮"],["19:24","20:02","普通","岩倉"],["19:30","19:51","急行","弥富"],["19:36","19:57","急行","一宮"],["19:40","20:17","普通","犬山"],["19:46","20:13","急行","一宮"],["19:54","20:32","普通","岩倉"],["20:00","20:21","急行","弥富"],["20:06","20:27","急行","一宮"],["20:10","20:47","普通","犬山"],["20:16","20:43","急行","一宮"],["20:24","21:02","普通","岩倉"],["20:30","20:51","急行","弥富"],["20:36","20:57","急行","一宮"],["20:40","21:17","普通","犬山"],["20:46","21:13","急行","一宮"],["20:54","21:32","普通","岩倉"],["21:00","21:21","急行","弥富"],["21:06","21:27","急行","一宮"],["21:10","21:47","普通","犬山"],["21:18","21:43","準急","一宮"],["21:24","22:02","普通","岩倉"],["21:30","21:51","急行","弥富"],["21:36","21:57","急行","一宮"],["21:40","22:17","普通","犬山"],["21:48","22:13","準急","一宮"],["21:54","22:31","普通","岩倉"],["22:06","22:27","急行","岐阜"],["22:10","22:47","普通","犬山"],["22:18","22:43","急行","一宮"],["22:36","22:57","急行","岐阜"],["22:41","23:15","普通","岩倉"],["23:05","23:26","急行","一宮"],["23:12","23:49","普通","須ケ口"],["23:18","23:42","急行","須ケ口"],["23:40","24:00","普通","津島"]]};
+function hhmm(t){ t = Math.round(t); return pad(Math.floor(t/60) % 24) + ":" + pad(t%60); }
+function walkMin(){ return (S.walk == null) ? 20 : S.walk; }
+$("#trWalk").addEventListener("input", function(){
+  var v = parseInt(this.value, 10);
+  S.walk = (isFinite(v) && v > 0) ? v : 20; save(); renderTrain();
+});
+
+function ttSet(go){
+  var h = isHoliday(keyOf(new Date()));
+  return TT[(go ? "g" : "b") + (h ? "h" : "w")];
+}
+function renderMt(){
+  var box = $("#mtBest"), ul = $("#mtList");
+  ul.innerHTML = ""; box.style.display = "none"; box.innerHTML = "";
+  $("#hyBest").style.display = "none";
+  var dt = new Date();
+  var now = dt.getHours()*60 + dt.getMinutes() + dt.getSeconds()/60;
+  var goal = hm(arriveT());
+  var go = now < goal + 30;              /* 登校の時間を過ぎたら帰りに切りかわる */
+  var list = ttSet(go);
+  if(!list || !list.length) return;
+
+  if(go){
+    var limit = goal - walkMin();        /* 前後にいなければならない時刻 */
+    var best = null;
+    for(var i=0;i<list.length;i++){ if(hm(list[i][1]) <= limit) best = list[i]; }
+    renderHy(best ? best[0] : null);
+    if(!best) return;
+    var left = hm(best[0]) - now;
+    box.style.display = "";
+    box.classList.toggle("gone", left < 0);
+    box.appendChild(el("span","left", left >= 0 ? mmss(left) : "発車ずみ"));
+    box.appendChild(el("span","k","名鉄名古屋で乗るのはこれ"));
+    box.appendChild(el("b", null, best[0] + "　" + best[2] + " " + best[3] + "行"));
+    box.appendChild(el("div","sub",
+      "前後 " + best[1] + "着 → 歩いて" + walkMin() + "分 → " + hhmm(hm(best[1]) + walkMin()) +
+      "に学校（" + arriveT() + "までに着けばよい）"));
+    var up = list.filter(function(r){ return hm(r[0]) >= now - 1; }).slice(0, 4);
+    up.forEach(function(r){
+      var li = el("li");
+      li.appendChild(el("span","d", r[0]));
+      li.appendChild(el("span","k", r[2] + " " + r[3] + "行"));
+      li.appendChild(el("span","a", "前後 " + r[1]));
+      var ok = hm(r[1]) <= limit;
+      li.appendChild(el("span","ok " + (ok ? "y" : "n"), ok ? "間に合う" : "遅刻"));
+      ul.appendChild(li);
+    });
+    return;
+  }
+
+  /* ---- 帰り ---- */
+  var d = dayOf(keyOf(dt));
+  var leave = now;
+  if(d.dis && hm(d.dis) > now) leave = hm(d.dis);   /* まだ下校時刻前なら、そこから数える */
+  var atZengo = leave + walkMin();
+  var first = null;
+  for(var j=0;j<list.length;j++){ if(hm(list[j][0]) >= atZengo){ first = list[j]; break; } }
+  if(!first) return;
+  var wait = hm(first[0]) - now;
+  box.style.display = "";
+  box.appendChild(el("span","left", wait >= 0 ? mmss(wait) : "—"));
+  box.appendChild(el("span","k","帰りに乗れるのはこれ"));
+  box.appendChild(el("b", null, first[0] + "　" + first[2] + " " + first[3] + "行"));
+  box.appendChild(el("div","sub",
+    (d.dis && hm(d.dis) > now ? ("下校 " + d.dis) : "いま学校を出ると") +
+    " → 歩いて" + walkMin() + "分 → 前後 " + hhmm(atZengo) + "着 → 名鉄名古屋 " + first[1] + "着"));
+  var up2 = list.filter(function(r){ return hm(r[0]) >= atZengo; }).slice(0, 4);
+  up2.forEach(function(r){
+    var li = el("li");
+    li.appendChild(el("span","d", r[0]));
+    li.appendChild(el("span","k", r[2] + " " + r[3] + "行"));
+    li.appendChild(el("span","a", "名古屋 " + r[1]));
+    li.appendChild(el("span","ok y", (hm(r[1]) - hm(r[0])) + "分"));
+    ul.appendChild(li);
+  });
+}
+
+/* ============ 東山線 東山公園（栄・名古屋・高畑方面） ============ */
+var HY={w:["00:00","05:31","05:39","05:50","06:00","06:10","06:17","06:25","06:30","06:34","06:38","06:42","06:46","06:50","06:54","06:58","07:03","07:07","07:11","07:15","07:18","07:21","07:25","07:28","07:30","07:32","07:34","07:36","07:38","07:40","07:42","07:44","07:46","07:48","07:50","07:53","07:55","07:57","07:59","08:01","08:03","08:05","08:07","08:09","08:11","08:13","08:15","08:18","08:20","08:22","08:24","08:26","08:28","08:30","08:32","08:34","08:36","08:38","08:40","08:43","08:45","08:47","08:49","08:51","08:53","08:56","08:59","09:01","09:05","09:08","09:11","09:15","09:18","09:22","09:25","09:29","09:33","09:37","09:41","09:45","09:50","09:54","09:59","10:03","10:08","10:13","10:18","10:23","10:28","10:33","10:38","10:43","10:48","10:53","10:58","11:03","11:08","11:13","11:18","11:23","11:28","11:33","11:38","11:43","11:48","11:53","11:58","12:03","12:08","12:13","12:18","12:23","12:28","12:33","12:38","12:43","12:48","12:53","12:58","13:03","13:08","13:13","13:18","13:23","13:28","13:33","13:38","13:43","13:48","13:53","13:58","14:03","14:08","14:13","14:18","14:23","14:28","14:33","14:38","14:43","14:48","14:53","14:58","15:03","15:08","15:12","15:15","15:18","15:21","15:24","15:27","15:30","15:33","15:36","15:39","15:42","15:45","15:48","15:51","15:54","15:57","16:00","16:03","16:06","16:09","16:12","16:15","16:18","16:21","16:24","16:27","16:30","16:33","16:36","16:39","16:42","16:45","16:48","16:51","16:54","16:57","17:00","17:03","17:06","17:09","17:12","17:15","17:18","17:21","17:24","17:27","17:30","17:33","17:36","17:39","17:42","17:45","17:48","17:51","17:54","17:57","18:00","18:03","18:06","18:09","18:12","18:15","18:18","18:21","18:24","18:27","18:30","18:33","18:36","18:39","18:42","18:46","18:49","18:52","18:56","19:00","19:04","19:08","19:12","19:16","19:20","19:24","19:28","19:32","19:36","19:40","19:44","19:48","19:52","19:56","20:00","20:05","20:10","20:15","20:20","20:25","20:30","20:35","20:40","20:45","20:50","20:55","21:00","21:05","21:10","21:16","21:21","21:27","21:33","21:39","21:45","21:52","21:59","22:06","22:14","22:22","22:31","22:40","22:49","22:59","23:08","23:18","23:29","23:39","23:49"],h:["00:00","05:31","05:39","05:50","06:00","06:10","06:18","06:27","06:35","06:43","06:50","06:57","07:04","07:10","07:16","07:22","07:28","07:34","07:39","07:45","07:50","07:54","07:58","08:02","08:06","08:10","08:14","08:18","08:22","08:26","08:30","08:34","08:38","08:42","08:46","08:50","08:54","08:59","09:03","09:08","09:12","09:17","09:21","09:26","09:30","09:35","09:39","09:44","09:48","09:53","09:57","10:02","10:06","10:11","10:15","10:20","10:24","10:29","10:33","10:38","10:42","10:47","10:51","10:56","11:00","11:05","11:09","11:14","11:18","11:23","11:27","11:32","11:36","11:41","11:45","11:50","11:54","11:59","12:03","12:08","12:12","12:17","12:21","12:26","12:30","12:35","12:39","12:44","12:48","12:53","12:57","13:02","13:06","13:11","13:15","13:20","13:24","13:29","13:33","13:38","13:42","13:47","13:51","13:56","14:00","14:05","14:09","14:14","14:18","14:23","14:27","14:32","14:36","14:41","14:45","14:50","14:54","14:59","15:03","15:08","15:12","15:17","15:21","15:25","15:29","15:33","15:37","15:41","15:45","15:49","15:53","15:57","16:01","16:05","16:09","16:13","16:17","16:21","16:25","16:28","16:32","16:35","16:39","16:42","16:46","16:49","16:53","16:56","17:00","17:03","17:07","17:10","17:14","17:17","17:21","17:24","17:28","17:31","17:35","17:38","17:42","17:45","17:49","17:53","17:57","18:01","18:05","18:09","18:13","18:17","18:21","18:25","18:29","18:33","18:38","18:42","18:47","18:52","18:57","19:02","19:07","19:12","19:17","19:22","19:27","19:32","19:38","19:43","19:49","19:54","20:00","20:05","20:11","20:17","20:23","20:29","20:35","20:41","20:48","20:55","21:02","21:09","21:17","21:25","21:33","21:41","21:49","21:57","22:05","22:13","22:22","22:31","22:40","22:49","22:59","23:09","23:19","23:29","23:39","23:49"]};
+function hyRide(){ return (S.hyRide == null) ? 19 : S.hyRide; }
+function hyTrans(){ return (S.hyTrans == null) ? 5 : S.hyTrans; }
+$("#hyRide").addEventListener("input", function(){
+  var v = parseInt(this.value,10); S.hyRide = (isFinite(v) && v>0) ? v : 19; save(); renderTrain();
+});
+$("#hyTrans").addEventListener("input", function(){
+  var v = parseInt(this.value,10); S.hyTrans = (isFinite(v) && v>=0) ? v : 5; save(); renderTrain();
+});
+function isHoliday(k){
+  var d = parseKey(k), w = d.getDay();
+  if(w === 0 || w === 6) return true;
+  return !schoolDay(k);
+}
+function renderHy(mtDep){
+  var box = $("#hyBest"); box.style.display = "none"; box.innerHTML = "";
+  if(!mtDep) return;
+  var k = keyOf(new Date());
+  var list = isHoliday(k) ? HY.h : HY.w;
+  var need = hm(mtDep) - hyRide() - hyTrans();   /* 東山公園を出ていないといけない時刻 */
+  var best = null;
+  for(var i=0;i<list.length;i++){ if(hm(list[i]) <= need) best = list[i]; }
+  if(!best) return;
+
+  var dt = new Date();
+  var now = dt.getHours()*60 + dt.getMinutes() + dt.getSeconds()/60;
+  var left = hm(best) - now;
+  box.style.display = "";
+  box.classList.toggle("gone", left < 0);
+  box.appendChild(el("span","left", left >= 0 ? mmss(left) : "発車ずみ"));
+  box.appendChild(el("span","k","東山公園で乗るのはこれ"));
+  box.appendChild(el("b", null, best + "　東山線 名古屋方面"));
+  var t = hm(best) + hyRide();
+  box.appendChild(el("div","sub",
+    "名古屋 " + pad(Math.floor(t/60)) + ":" + pad(t%60) + "着 → 乗り換え" + hyTrans() + "分 → 名鉄 " + mtDep + "発に接続" +
+    (isHoliday(k) ? "（土日・休日ダイヤ）" : "")));
 }
 
 /* ============ boot ============ */
