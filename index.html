@@ -160,7 +160,7 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 .btn.mark{color:var(--red)}
 .btn.bare{background:none; box-shadow:none; -webkit-backdrop-filter:none; backdrop-filter:none; color:var(--accent); padding-left:0; font-weight:500}
 
-input[type=text],input[type=time],input[type=date],textarea,select{
+input[type=text],input[type=time],input[type=date],input[type=number],textarea,select{
   width:100%; background:var(--glass3); color:var(--label); border:none; border-radius:var(--rc);
   padding:12px 14px; font-size:calc(16px * var(--fs));
   box-shadow:inset 0 1px 0 var(--rim2), inset 0 0 0 1px var(--sep);
@@ -457,8 +457,41 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .bars{display:flex; gap:3px}
 .bar{display:inline-block; height:5px; width:5px; border-radius:50%; flex:0 0 auto}
 .b1{background:var(--accent)} .b2{background:var(--orange)} .b3{background:var(--label3)}
+.b4{background:var(--green)}
+.cal .c.sel{box-shadow:inset 0 0 0 2px var(--accent), 0 4px 14px var(--accent-soft)}
+.cal .c .tg{font-size:calc(9px * var(--fs)); line-height:1.2; color:var(--green); font-weight:700;
+  text-align:center; word-break:break-all; max-height:22px; overflow:hidden}
 .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:16px; padding:0 6px}
 .legend span{display:inline-flex; align-items:center; gap:7px; font-size:calc(13px * var(--fs)); color:var(--label2)}
+
+/* 行事予定テンプレート */
+.acts{display:flex; gap:9px; flex-wrap:wrap}
+.acts .btn{flex:0 0 auto}
+.tplrow{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:13px 0; border-top:1px solid var(--sep); background:none; border:none; color:inherit;
+  transition:padding-left .15s var(--ease)}
+.tplrow:first-child{border-top:none}
+.tplrow:active{padding-left:5px}
+.tplrow .tn{flex:1 1 auto; min-width:0}
+.tplrow .tn b{display:block; font-size:calc(16px * var(--fs)); font-weight:500; line-height:1.35}
+.tplrow .tn span{display:block; font-size:calc(12px * var(--fs)); color:var(--label3); margin-top:3px; line-height:1.45}
+.tplrow .arw{flex:0 0 auto; color:var(--label3)}
+.tplrow .on{flex:0 0 auto; font-size:calc(11px * var(--fs)); font-weight:700; color:var(--green);
+  border-radius:999px; padding:3px 9px; background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep)}
+.nrow{display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--sep)}
+.nrow:first-child{border-top:none}
+.nrow > span{flex:1 1 auto; min-width:0; font-size:calc(14.5px * var(--fs)); line-height:1.4}
+.nrow input,.nrow select{flex:0 0 auto; width:calc(142px * var(--fs)); padding:10px 12px}
+.prev{margin-top:12px; border-radius:var(--rc); overflow:hidden; box-shadow:inset 0 0 0 1px var(--sep)}
+.prev > div{display:flex; gap:10px; padding:8px 12px; font-size:calc(13.5px * var(--fs)); border-top:1px solid var(--sep)}
+.prev > div:first-child{border-top:none}
+.prev > div i{font-style:normal; flex:0 0 auto; min-width:calc(92px * var(--fs));
+  color:var(--label3); font-variant-numeric:tabular-nums}
+.assign{display:flex; align-items:center; gap:12px; margin:0 4px 12px; padding:13px 15px;
+  border-radius:var(--rc); background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep)}
+.assign p{flex:1 1 auto; margin:0; font-size:calc(13.5px * var(--fs)); line-height:1.5}
+.assign p b{display:block; font-weight:600; font-size:calc(15px * var(--fs)); margin-bottom:2px}
+.assign .btn{flex:0 0 auto; white-space:nowrap}
 
 /* settings */
 .acc{border-radius:var(--r); margin-top:12px; border-bottom:none}
@@ -751,10 +784,11 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </div>
 
     <div class="sect">
-      <p class="lab">この日の時刻<span class="r muted" id="inBellState"></span></p>
+      <p class="lab">この日の行事予定<span class="r muted" id="inBellState"></span></p>
       <p class="note" id="inBellNote" style="margin:-4px 0 12px">—</p>
+      <div class="acts" id="inTplBtns" style="margin-bottom:14px"></div>
       <div id="inBellList"></div>
-      <div class="actions" id="inBellBtns" style="margin-top:12px"></div>
+      <div class="acts" id="inBellBtns" style="margin-top:14px"></div>
     </div>
 
     <div class="sect">
@@ -824,13 +858,21 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <div class="m" id="calM">—</div>
       <button class="btn sm" id="calN">次の月</button>
     </div>
+    <div class="assign" id="calAsg" style="display:none">
+      <p><b id="calAsgN">—</b><span id="calAsgS">日付を押すと、その日に当てます。もう一度押すと外れます。</span></p>
+      <button class="btn sm" id="calAsgEnd">おわり</button>
+    </div>
     <div class="cal" id="calG"></div>
     <div class="legend">
       <span><i class="bar b1"></i>時程の変更</span>
       <span><i class="bar b2"></i>持ち物</span>
       <span><i class="bar b3"></i>行事</span>
+      <span><i class="bar b4"></i>行事予定テンプレート</span>
     </div>
-    <p class="note" style="margin-top:14px">日付を選ぶと、その日の記入画面がひらきます。</p>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn" style="flex:1" id="calTpl">行事予定を日付に当てる</button>
+    </div>
+    <p class="note" style="margin-top:14px">日付を選ぶと、その日の記入画面がひらきます。短縮授業のように何日も続くときは、上のボタンから、まとめて当てられます。</p>
   </section>
 
   <!-- ===== 設定 ===== -->
@@ -870,6 +912,25 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" style="margin:0 0 14px">短縮時程や行事時程など、まるごと入れ替わる日を登録しておけます。記入画面では選ぶだけ。</p>
         <div id="patList"></div>
         <button class="btn sm" id="patAdd" style="margin-top:14px">特別時程を追加</button>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>行事予定テンプレート</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">短縮45分授業、感謝祭、テスト時程のように「一日の流れがまるごと変わる日」を、名前をつけて作っておけます。日付に当てるだけで、その日の時計・時間割・下校時刻が入れかわります。</p>
+        <div id="tplList"></div>
+        <div class="acts" style="margin-top:16px">
+          <button class="btn sm" id="tplAdd">短縮授業を作る</button>
+          <button class="btn sm" id="tplAddFree">行事の日を作る</button>
+        </div>
+        <div class="acts" style="margin-top:10px">
+          <button class="btn sm bare" id="tplStd">よくある形をまとめて入れる</button>
+        </div>
+        <p class="lab" style="margin-top:22px">年間行事から当てる</p>
+        <p class="note" style="margin:0 0 12px">取り込んだ年間行事に「短縮45分授業」「短縮40分授業」「午前3限」と書いてある日を探して、同じ名前のテンプレートを当てます。すでに手で直した日はそのままにします。</p>
+        <button class="btn sm" id="tplScan">短縮の日を探して当てる</button>
+        <p class="note" id="tplMsg" style="margin-top:12px"></p>
       </div>
     </details>
 
@@ -1209,6 +1270,7 @@ function defaults(){
       {id:"p2", name:"行事時程", periods:["","","","","",""], dis:"15:00"},
       {id:"p3", name:"テスト時程", periods:["","","","","",""], dis:"12:30"}
     ],
+    tpl: TPL_STD(),
     todos:[], ui:{ga:56, blur:26, aurora:100, tint:"aurora", accent:"blue", fs:100},
     days:{}, notif:{night:"21:00", morning:"07:00", last:""}, theme:"auto"
   };
@@ -1243,6 +1305,19 @@ function readLocal(){
     (S.patterns||[]).forEach(function(p){ if(p.name==="短縮時程" && p.dis==="14:20") p.dis = "12:55"; });
     S.mig1 = true;
   }
+  /* 行事予定テンプレート。前のかたちで保存されたものに、名札と種類を付け足す */
+  if(!S.tpl) S.tpl = [];
+  if(!S.mig2){
+    if(!S.tpl.length) S.tpl = TPL_STD();
+    S.mig2 = true;
+  }
+  S.tpl.forEach(function(t, i){
+    if(!t.id) t.id = "T" + (Date.now() + i);
+    if(!t.kind) t.kind = t.sh ? "short" : "free";
+    if(!t.bell) t.bell = [];
+    if(!t.items) t.items = [];
+    if(!t.periods) t.periods = [];
+  });
   if(S.pfmt == null) S.pfmt = "校時";
   if(!S.theme) S.theme = "auto";
   if(!S.t) S.t = Date.now();
@@ -1314,9 +1389,9 @@ function keyOf(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getD
 function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
 function addDays(d,n){ var x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
 function plabel(i){
-  var c = S.plabels && S.plabels[i];
+  var c = S && S.plabels && S.plabels[i];
   if(c) return c;
-  return (i+1) + (S.pfmt || "");
+  return (i+1) + ((S && S.pfmt != null) ? S.pfmt : "校時");
 }
 var tT=null;
 function toast(m){ var t=$("#toast"); t.textContent=m; t.classList.add("on"); clearTimeout(tT); tT=setTimeout(function(){t.classList.remove("on");},2200); }
@@ -1329,14 +1404,16 @@ function baseFor(k){
 function patById(id){ for(var i=0;i<S.patterns.length;i++) if(S.patterns[i].id===id) return S.patterns[i]; return null; }
 function dayOf(k){
   var r = S.days[k] || {};
+  var t = r.tpl ? tplById(r.tpl) : null;      /* その日に当てた行事予定テンプレート */
   var p = r.pat ? patById(r.pat) : null;
   var base = p ? {periods:(p.periods||[]).slice(0,S.pn), dis:p.dis||""} : baseFor(k);
   var per = [];
   for(var i=0;i<S.pn;i++) per.push((r.periods && r.periods[i] != null) ? r.periods[i] : (base.periods[i] || ""));
   return {
-    key:k, periods:per, basePeriods:base.periods,
+    key:k, periods:per, basePeriods:base.periods, tpl:t,
     patName: p ? p.name : DOW[parseKey(k).getDay()]+"曜の通常時程",
-    items:(r.items||[]).slice(), dis:r.dis||base.dis||"",
+    label: t ? t.n : (p ? p.name : DOW[parseKey(k).getDay()]+"曜の通常時程"),
+    items:(r.items||[]).slice(), dis:r.dis || (t && t.dis) || base.dis || "",
     ev:r.ev||"", memo:r.memo||"", shots:(r.shots||[]).slice()
   };
 }
@@ -1557,6 +1634,7 @@ function pushShot(id, data){
 /* ============ navigation ============ */
 var view = "home";
 function go(v){
+  if(v !== "cal") asgTpl = null;     /* 「日付に当てる」の途中で画面を離れたら、やめたことにする */
   view = v;
   $$(".view").forEach(function(s){ s.classList.toggle("on", s.id==="v-"+v); });
   $$(".nav button").forEach(function(b){ if(b.dataset.v===v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
@@ -1635,7 +1713,7 @@ function renderHome(){
   $("#firstRun").style.display = S.demo ? "" : "none";
   $("#hRel").textContent = ["今日","明日","あさって"][off] || "";
   $("#hDate").innerHTML = (dt.getMonth()+1)+"月"+dt.getDate()+"日<em>"+DOW[dt.getDay()]+"曜日</em>";
-  $("#hPat").textContent = d.patName;
+  $("#hPat").textContent = d.label;
 
   var tt = $("#hTT"); tt.innerHTML = "";
   if(drawSchedule(k)) tt = null;      /* 行事予定で描いたので、時間割は飛ばす */
@@ -1672,8 +1750,13 @@ function renderHome(){
   var tl = $("#hTodo"); tl.innerHTML = "";
   pend.slice(0,8).forEach(function(t){ tl.appendChild(todoRow(t, null)); });
 
-  $("#hEvS").style.display = d.ev ? "" : "none";
-  $("#hEv").textContent = d.ev;
+  /* 日付の横にテンプレート名が出ているので、同じ文字をここで繰り返さない */
+  var evT = d.ev || "";
+  if(d.tpl && evT.indexOf(d.tpl.n) === 0) evT = evT.slice(d.tpl.n.length).replace(/^[／\/・\s]+/, "");
+  if(d.tpl && d.tpl.ev && d.tpl.ev !== d.tpl.n && evT.indexOf(d.tpl.ev) < 0)
+    evT = evT ? (d.tpl.ev + "／" + evT) : d.tpl.ev;
+  $("#hEvS").style.display = evT ? "" : "none";
+  $("#hEv").textContent = evT;
   var showM = !!(d.memo || d.shots.length);
   $("#hMemoS").style.display = showM ? "" : "none";
   $("#hMemo").textContent = d.memo;
@@ -1819,8 +1902,15 @@ $("#inTodo").addEventListener("keydown", function(e){ if(e.key==="Enter") $("#in
 $("#inEv").addEventListener("input", function(){ rec(inKey).ev=this.value; save(); });
 $("#inMemo").addEventListener("input", function(){ rec(inKey).memo=this.value; save(); });
 $("#inReset").addEventListener("click", function(){
-  var r = rec(inKey); delete r.periods; delete r.pat; delete r.dis;
-  save(); renderIn(); toast("通常時程にもどしました");
+  var r = rec(inKey), t = r.tpl ? tplById(r.tpl) : null;
+  function reset(){
+    delete r.periods; delete r.pat; delete r.dis; delete r.tpl; delete r.bell;
+    save(); renderIn(); renderClock(); toast("通常時程にもどしました");
+  }
+  if(t) askConfirm("もどしますか",
+    "「" + t.n + "」も外して、この日をふつうの日にもどします。持ち物と連絡はそのまま残ります。",
+    "もどす", reset);
+  else reset();
 });
 $("#inPat").addEventListener("click", function(){
   openSheet("時程を選ぶ", function(bx){
@@ -1916,9 +2006,15 @@ $("#inCam").addEventListener("change", function(){
 
 /* ============ CALENDAR ============ */
 var cur = new Date();
+var asgTpl = null;          /* 「日付に当てる」の途中かどうか */
 function renderCal(){
   var y=cur.getFullYear(), m=cur.getMonth();
   $("#calM").textContent = y+"年 "+(m+1)+"月";
+  var ab = $("#calAsg");
+  if(ab){
+    ab.style.display = asgTpl ? "" : "none";
+    if(asgTpl) $("#calAsgN").textContent = asgTpl.n;
+  }
   var g=$("#calG"); g.innerHTML="";
   DOW.forEach(function(d){ g.appendChild(el("div","h",d)); });
   var st = new Date(y,m,1).getDay(), last = new Date(y,m+1,0).getDate(), tk = keyOf(new Date());
@@ -1926,30 +2022,65 @@ function renderCal(){
   for(var dd=1; dd<=last; dd++){
     (function(n){
       var k = y+"-"+pad(m+1)+"-"+pad(n), w = new Date(y,m,n).getDay();
-      var c = el("div","c"+(w===0?" sun":w===6?" sat":"")+(k===tk?" today":""));
-      var num = el("div"); num.appendChild(el("span","n",String(n))); c.appendChild(num);
       var r = S.days[k];
+      var tp = (r && r.tpl) ? tplById(r.tpl) : null;
+      var on = !!(asgTpl && tp && tp.id === asgTpl.id);
+      var c = el("div","c"+(w===0?" sun":w===6?" sat":"")+(k===tk?" today":"")+(on?" sel":""));
+      var num = el("div"); num.appendChild(el("span","n",String(n))); c.appendChild(num);
       if(r){
         var d = dayOf(k), bars = el("div","bars");
         var changed = !!r.pat || (r.periods && d.periods.some(function(p,i){ return (p||"")!==(d.basePeriods[i]||""); }));
         if(changed) bars.appendChild(el("i","bar b1"));
         if(r.items && r.items.length) bars.appendChild(el("i","bar b2"));
         if(r.ev) bars.appendChild(el("i","bar b3"));
+        if(tp) bars.appendChild(el("i","bar b4"));
         c.appendChild(bars);
-        if(r.ev) c.appendChild(el("div","e", r.ev.slice(0,8)));
+        if(tp) c.appendChild(el("div","tg", tp.n.slice(0,7)));
+        /* テンプレート名と同じ文字が下にもう一度出ないようにする */
+        var evT = r.ev || "";
+        if(tp && evT.indexOf(tp.n) === 0) evT = evT.slice(tp.n.length).replace(/^[／\/・\s]+/, "");
+        if(evT) c.appendChild(el("div","e", evT.slice(0, tp ? 6 : 8)));
       }
-      c.addEventListener("click", function(){ inKey=k; go("in"); });
+      c.addEventListener("click", function(){
+        if(asgTpl){
+          if(tp && tp.id === asgTpl.id) tplRemove(k);
+          else tplAssign(k, asgTpl);
+          renderCal();
+          return;
+        }
+        inKey=k; go("in");
+      });
       g.appendChild(c);
     })(dd);
   }
 }
+$("#calTpl").addEventListener("click", function(){
+  var list = tpls();
+  if(!list.length){ toast("先に設定でテンプレートを作ってください"); openTplAcc(); return; }
+  openSheet("どの行事予定を当てますか", function(bx){
+    var g = el("div","pick");
+    list.forEach(function(t){
+      var b = el("button", null, "");
+      b.appendChild(el("div", null, t.n));
+      var s = el("div", null, tplSum(t));
+      s.style.cssText = "font-size:12px; color:var(--label3); margin-top:3px; line-height:1.4";
+      b.appendChild(s);
+      b.addEventListener("click", function(){ closeSheet(); asgTpl = t; renderCal(); });
+      g.appendChild(b);
+    });
+    bx.appendChild(g);
+    var n = el("p","note","選んだあと、日付を押すと当たります。短縮授業が何日も続くときは、続けて押してください。");
+    n.style.marginTop = "14px"; bx.appendChild(n);
+  });
+});
+$("#calAsgEnd").addEventListener("click", function(){ asgTpl = null; renderCal(); toast("おわりました"); });
 $("#calP").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),cur.getMonth()-1,1); renderCal(); });
 $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),cur.getMonth()+1,1); renderCal(); });
 
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell(); renderTrEdit(); renderRtEdit();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList();
   $("#trWalk").value = walkMin();
   $("#hyRide").value = hyRide();
   $("#hyTrans").value = hyTrans();
@@ -2057,10 +2188,10 @@ function renderSet(){
     + "KB／写真：" + pc + "枚・約" + pmb.toFixed(1) + "MB（入るのは約4MBまで）" + warn;
 }
 $("#setDis").addEventListener("change", function(){ S.base[wk].dis=this.value; save(); });
-$("#setPn").addEventListener("change", function(){ S.pn=+this.value; save(); renderSet(); });
+$("#setPn").addEventListener("change", function(){ S.pn=+this.value; tplResync(); save(); renderSet(); });
 $("#fmtPick").addEventListener("click", function(e){
   var b = e.target.closest("button"); if(!b) return;
-  S.pfmt = b.dataset.f; save(); renderSet();
+  S.pfmt = b.dataset.f; tplResync(); save(); renderSet();
 });
 $("#subAdd").addEventListener("click", function(){
   var v = $("#subNew").value.trim(); if(!v) return;
@@ -3703,17 +3834,50 @@ var EVENT_BELL = {
 };
 function bellFor(k){
   var r = S.days[k];
-  return (r && r.bell && r.bell.length) ? r.bell : bells();
+  if(r && r.bell && r.bell.length) return r.bell;          /* この日だけ手で直した時刻 */
+  var t = (r && r.tpl) ? tplById(r.tpl) : null;
+  if(t && t.bell && t.bell.length) return t.bell;          /* 当てたテンプレートの時刻 */
+  return bells();                                          /* ふだんの校時の時刻 */
 }
 function renderInBell(){
   var k = inKey, r = S.days[k] || {}, own = !!(r.bell && r.bell.length);
+  var t = r.tpl ? tplById(r.tpl) : null;
   var ev = EVENT_BELL[k];
-  $("#inBellState").textContent = own ? "この日だけの時刻" : "通常の時刻";
-  $("#inBellNote").textContent = own
-    ? "この日は下の時刻で動きます。今日の画面の時計もこれに合わせます。"
-    : "いまは設定の「校時の時刻」をそのまま使っています。行事の日など、この日だけ変えたいときは下のボタンから。";
 
-  bellEditor($("#inBellList"), own ? r.bell : [], renderInBell, "");
+  $("#inBellState").textContent = own ? "この日だけの時刻" : t ? t.n : "通常の時刻";
+  $("#inBellNote").textContent = own
+    ? (t ? ("「" + t.n + "」をもとに、この日だけ手で直しています。ここで直した時刻は、この日にしか効きません。")
+         : "この日は下の時刻で動きます。今日の画面の時計もこれに合わせます。")
+    : t
+    ? ("「" + t.n + "」を当てています。テンプレートを直せば、当ててあるすべての日がいっしょに変わります。")
+    : "ふだんは設定の「校時の時刻」で動きます。短縮授業や行事の日は、テンプレートを当てると一日ぶんまるごと入れかわります。";
+
+  /* ---- テンプレートのボタン ---- */
+  var tb = $("#inTplBtns"); tb.innerHTML = "";
+  function tbtn(cls, label, fn){
+    var b = el("button", cls, label); b.addEventListener("click", fn); tb.appendChild(b);
+  }
+  tbtn("btn sm", t ? "ほかの行事予定に変える" : "行事予定を当てる", function(){ tplPick(k); });
+  if(t){
+    tbtn("btn sm bare", "この日から外す", function(){
+      tplRemove(k); renderIn(); renderClock(); toast("外しました");
+    });
+    tbtn("btn sm bare", "この行事予定を直す", function(){
+      editTpl(t, function(){ renderIn(); renderClock(); });
+    });
+  }else{
+    tbtn("btn sm bare", "この日をテンプレートにする", function(){ tplSaveFromDay(k); });
+  }
+
+  /* ---- 時刻の中身 ---- */
+  var box = $("#inBellList"); box.innerHTML = "";
+  if(own){
+    bellEditor(box, r.bell, renderInBell, "");
+  }else{
+    var rows = bellFor(k);
+    if(!rows.length) box.appendChild(el("p","note","時刻がまだ入っていません。設定の「校時の時刻」から入れられます。"));
+    else box.appendChild(bellPrev(rows));
+  }
 
   var bx = $("#inBellBtns"); bx.innerHTML = "";
   function btn(cls, label, fn){
@@ -3727,37 +3891,49 @@ function renderInBell(){
       l.push({l:"", s: last ? last.e : "08:40", e:"", p:null});
       save(); renderInBell();
     });
-    btn("btn sm bare", "通常の時刻にもどす", function(){
-      askConfirm("もどしますか", "この日だけの時刻を消して、設定の通常の時刻に戻します。", "もどす", function(){
-        delete rec(k).bell; save(); renderInBell(); renderClock();
-      });
+    btn("btn sm bare", t ? "手直しをやめる" : "通常の時刻にもどす", function(){
+      askConfirm("もどしますか",
+        t ? ("この日だけの手直しを消して、「" + t.n + "」の時刻にもどします。")
+          : "この日だけの時刻を消して、設定の通常の時刻に戻します。",
+        "もどす", function(){
+          delete rec(k).bell; save(); renderIn(); renderClock();
+        });
     });
   }else{
-    btn("btn sm", "この日だけ変える", function(){
-      rec(k).bell = bells().map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+    btn("btn sm bare", "この日だけ手で直す", function(){
+      rec(k).bell = bellFor(k).map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
       if(!rec(k).bell.length) rec(k).bell = [{l:"", s:"08:40", e:"", p:null}];
       save(); renderInBell();
     });
-    if(ev) btn("btn sm", ev.name + "の時刻を入れる", function(){
+    if(ev) btn("btn sm bare", ev.name + "の時刻を入れる", function(){
       rec(k).bell = ev.rows.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
       save(); renderInBell(); renderClock();
       toast("入れました");
     });
+    if(!t){
+      btn("btn sm bare", "通常の時刻を直す", function(){
+        go("set");
+        setTimeout(function(){
+          var d = $("#bellList"); if(!d) return;
+          var acc = d.closest("details"); if(acc) acc.open = true;
+          acc.scrollIntoView({behavior:"smooth", block:"start"});
+        }, 120);
+      });
+    }
   }
-  btn("btn sm bare", "テンプレートに保存", function(){ tplSave(k); });
-  btn("btn sm bare", "テンプレートから入れる", function(){ tplPick(k); });
-  if(!own){
-    var g = el("button","btn sm bare","通常の時刻を直す");
-    g.addEventListener("click", function(){
-      go("set");
-      setTimeout(function(){
-        var d = $("#bellList"); if(!d) return;
-        var acc = d.closest("details"); if(acc) acc.open = true;
-        acc.scrollIntoView({behavior:"smooth", block:"start"});
-      }, 120);
-    });
-    bx.appendChild(g);
-  }
+}
+/* 読むだけの時刻表。テンプレートの中身を、うっかり書きかえずに見せるため */
+function bellPrev(rows){
+  var box = el("div","prev");
+  rows.slice().filter(function(b){ return b.s || b.l; })
+      .sort(function(a,b){ return hm(a.s) - hm(b.s); })
+      .forEach(function(b){
+    var d = el("div");
+    d.appendChild(el("i", null, (b.s || "") + (b.e ? "–" + b.e : "")));
+    d.appendChild(el("span", null, b.l || "—"));
+    box.appendChild(d);
+  });
+  return box;
 }
 
 /* ============ 時間割／行事予定の切り替え ============ */
@@ -3766,7 +3942,9 @@ var ttView = null;   /* null = その日に合わせて自動 */
 function ttModeFor(k){
   if(ttView) return ttView;
   var r = S.days[k];
-  return (r && r.bell && r.bell.length) ? "ev" : "tt";   /* その日だけの時刻があれば行事予定 */
+  if(r && r.bell && r.bell.length) return "ev";          /* その日だけの時刻がある */
+  if(r && r.tpl && tplById(r.tpl)) return "ev";          /* 行事予定を当てている */
+  return "tt";
 }
 function drawSchedule(k){
   var mode = ttModeFor(k);
@@ -3802,77 +3980,500 @@ $("#ttSw").addEventListener("click", function(e){
   rerender();
 });
 
-/* ============ テンプレート ============ */
-/* その日に書いた内容をまるごと保存して、別の日に貼れるようにする */
+/* ============ 行事予定テンプレート ============ */
+/* 一日の流れ（時刻・下校・持ち物・教科）を名前で作っておいて、日付に当てる。
+   当てた日はテンプレートを見に行くので、あとからテンプレートを直せば、
+   当ててあるすべての日がいっしょに変わる。
+   短縮授業は「1コマ何分」から時刻を組み立てるので、45分・40分の切りかえだけで済む。 */
+
 function tpls(){ if(!S.tpl) S.tpl = []; return S.tpl; }
-function tplSave(k){
-  var r = S.days[k] || {}, d = dayOf(k);
-  var name = prompt("テンプレートの名前", d.patName || "行事の日");
-  if(name === null) return;
-  name = (name || "名前なし").trim();
-  var t = {
-    n: name,
-    periods: (r.periods || []).slice(),
-    items: (r.items || []).slice(),
-    dis: r.dis || "",
-    bell: (r.bell || []).map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; }),
-    ev: r.ev || ""
-  };
-  var old = tpls().filter(function(x){ return x.n === name; })[0];
-  if(old){ tpls()[tpls().indexOf(old)] = t; } else tpls().push(t);
-  save(); renderInBell();
-  toast("「" + name + "」として保存しました");
+function tplById(id){
+  if(!id || !S.tpl) return null;
+  for(var i=0;i<S.tpl.length;i++) if(S.tpl[i].id === id) return S.tpl[i];
+  return null;
 }
+function newTplId(){ return "T" + Date.now() + Math.floor(Math.random()*90 + 10); }
+function addMin(t, n){
+  var v = hm(t) + n, h = Math.floor(v/60) % 24, m = ((v % 60) + 60) % 60;
+  return pad(h) + ":" + pad(m);
+}
+
+/* ---- 短縮授業のもとになる設定 ---- */
+function shortDef(){
+  return {start:"08:40", len:45, brk:10, pn:6, lunchAfter:4, lunch:40, hr:15, am:0, amLabel:"朝の活動"};
+}
+/* 「1コマ何分・休み何分・何校時・昼休みはどこ」から一日ぶんの時刻を組み立てる */
+function shortBell(c){
+  c = c || shortDef();
+  var rows = [], t = c.start || "08:40";
+  if(c.am > 0){
+    rows.push({l: c.amLabel || "朝の活動", s:t, e:addMin(t, c.am), p:null});
+    t = addMin(t, c.am);
+  }
+  var n = Math.max(1, Math.min(9, c.pn || 6));
+  for(var i=0;i<n;i++){
+    var e = addMin(t, c.len || 45);
+    rows.push({l: plabel(i), s:t, e:e, p:i});
+    t = e;
+    if(i === n-1) break;
+    if(c.lunchAfter && (i+1) === c.lunchAfter && c.lunch > 0){
+      rows.push({l:"昼休み", s:t, e:addMin(t, c.lunch), p:null});
+      t = addMin(t, c.lunch);
+    }else if(c.brk > 0){
+      rows.push({l:"休み", s:t, e:addMin(t, c.brk), p:null});
+      t = addMin(t, c.brk);
+    }
+  }
+  if(c.hr > 0){
+    rows.push({l:"終学活", s:t, e:addMin(t, c.hr), p:null});
+    t = addMin(t, c.hr);
+  }
+  return {rows:rows, end:t};
+}
+/* 短縮の設定から時刻を作り直す。下校時刻も、手で決めていなければ終わりに合わせる */
+function tplSync(t){
+  if(t.kind !== "short") return t;
+  if(!t.sh) t.sh = shortDef();
+  var r = shortBell(t.sh);
+  t.bell = r.rows;
+  if(t.autoDis !== false) t.dis = r.end;
+  return t;
+}
+function tplResync(){                 /* 校時数や呼び方を変えたときに呼ぶ */
+  tpls().forEach(function(t){ if(t.kind === "short") tplSync(t); });
+}
+/* ---- はじめから入れておく形 ---- */
+function TPL_STD(){
+  function mk(id, name, o){
+    var c = shortDef();
+    for(var q in o) c[q] = o[q];
+    return tplSync({id:id, n:name, kind:"short", sh:c, bell:[], dis:"", autoDis:true,
+                    items:[], periods:[], ev:""});
+  }
+  return [
+    mk("Tshort45", "短縮45分授業", {len:45}),
+    mk("Tshort40", "短縮40分授業", {len:40}),
+    mk("Tam3",     "午前3限",      {len:50, pn:3, lunchAfter:0, lunch:0, hr:10}),
+    mk("Ttest",    "テスト時程",   {len:45, brk:15, pn:4, lunchAfter:0, lunch:0, hr:10}),
+    {id:"Tevent", n:"行事の日", kind:"free", sh:null, bell:[], dis:"", autoDis:false,
+     items:[], periods:[], ev:""}
+  ];
+}
+function tplSum(t){
+  var a = [];
+  if(t.kind === "short" && t.sh) a.push(t.sh.len + "分授業・" + t.sh.pn + "校時");
+  else a.push(t.bell && t.bell.length ? ("時刻 " + t.bell.length + "つ") : "時刻はまだ空");
+  if(t.dis) a.push("下校 " + t.dis);
+  if(t.items && t.items.length) a.push("持ち物 " + t.items.length);
+  return a.join("・");
+}
+function tplDays(id){
+  var a = [];
+  for(var k in S.days) if(S.days[k] && S.days[k].tpl === id) a.push(k);
+  return a.sort();
+}
+
+/* ---- 日付に当てる・外す ---- */
+function tplAssign(k, t){
+  var r = rec(k);
+  r.tpl = t.id;
+  delete r.bell;                            /* 手直しはテンプレートにゆずる */
+  if(t.periods && t.periods.length && t.periods.some(function(x){ return x; })){
+    r.periods = t.periods.slice();
+  }
+  if(t.items && t.items.length){
+    r.items = r.items || [];
+    t.items.forEach(function(n){ if(r.items.indexOf(n) < 0) r.items.push(n); });
+  }
+  save();
+}
+function tplRemove(k){
+  var r = S.days[k]; if(!r) return;
+  delete r.tpl; delete r.bell;
+  save();
+}
+function tplClearAll(t){
+  var a = tplDays(t.id);
+  a.forEach(function(k){ delete S.days[k].tpl; delete S.days[k].bell; });
+  save();
+  return a.length;
+}
+
+/* ---- 当てる（記入画面・月間予定から） ---- */
 function tplPick(k){
   var list = tpls();
-  if(!list.length){ toast("まだテンプレートがありません"); return; }
-  openSheet("テンプレートから入れる", function(bx){
-    var g = el("div","pick");
-    list.forEach(function(t){
-      var b = el("button", null, "");
-      b.appendChild(el("div", null, t.n));
-      var cnt = [];
-      if(t.bell && t.bell.length) cnt.push("時刻" + t.bell.length);
-      if(t.items && t.items.length) cnt.push("持ち物" + t.items.length);
-      if(t.dis) cnt.push("下校" + t.dis);
-      b.appendChild(el("div", null, cnt.join("・") || "　")).style.cssText =
-        "font-size:12px; color:var(--label3); margin-top:3px";
-      b.addEventListener("click", function(){ closeSheet(); tplApply(k, t); });
-      g.appendChild(b);
-    });
-    bx.appendChild(g);
-    var rm = el("button","btn bare sm","テンプレートを消す");
-    rm.style.marginTop = "14px";
-    rm.addEventListener("click", function(){ closeSheet(); tplDel(); });
-    bx.appendChild(rm);
+  openSheet("行事予定を当てる", function(bx){
+    if(!list.length){
+      var n0 = el("p","note","まだテンプレートがありません。設定の「行事予定テンプレート」で作れます。");
+      n0.style.margin = "0 0 14px"; bx.appendChild(n0);
+    }else{
+      var now = S.days[k] && S.days[k].tpl;
+      var g = el("div","pick");
+      list.forEach(function(t){
+        var b = el("button", null, "");
+        if(t.id === now) b.style.boxShadow = "inset 0 0 0 2px var(--accent)";
+        b.appendChild(el("div", null, t.n));
+        var s = el("div", null, tplSum(t));
+        s.style.cssText = "font-size:12px; color:var(--label3); margin-top:3px; line-height:1.4";
+        b.appendChild(s);
+        b.addEventListener("click", function(){
+          closeSheet(); tplAssign(k, t);
+          if(view === "in") renderIn(); else rerender();
+          renderClock(); toast("「" + t.n + "」を当てました");
+        });
+        g.appendChild(b);
+      });
+      bx.appendChild(g);
+    }
+    var mk = el("button","btn sm","テンプレートを作る・直す");
+    mk.style.marginTop = "14px";
+    mk.addEventListener("click", function(){ closeSheet(); openTplAcc(); });
+    bx.appendChild(mk);
   });
 }
-function tplApply(k, t){
-  var r = rec(k);
-  if(t.periods && t.periods.length) r.periods = t.periods.slice();
-  if(t.items && t.items.length)     r.items   = t.items.slice();
-  if(t.dis)                          r.dis     = t.dis;
-  if(t.ev)                           r.ev      = r.ev ? (r.ev + "／" + t.ev) : t.ev;
-  if(t.bell && t.bell.length) r.bell = t.bell.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
-  save(); renderIn(); renderInBell(); renderClock();
-  toast("「" + t.n + "」を入れました");
+function openTplAcc(){
+  go("set");
+  setTimeout(function(){
+    var d = $("#tplList"); if(!d) return;
+    var acc = d.closest("details"); if(!acc) return;
+    acc.open = true;
+    acc.scrollIntoView({behavior:"smooth", block:"start"});
+  }, 120);
 }
-function tplDel(){
-  openSheet("消すテンプレート", function(bx){
-    var g = el("div","pick");
-    tpls().forEach(function(t, i){
-      var b = el("button", null, t.n);
+/* いま書いてある一日を、そのままテンプレートにする */
+function tplSaveFromDay(k){
+  askText("テンプレートの名前", "感謝祭、体育祭、健脚会 など", function(name){
+    var r = S.days[k] || {}, d = dayOf(k);
+    var t = {
+      id: newTplId(), n: name, kind:"free", sh:null, autoDis:false,
+      bell: bellFor(k).map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; }),
+      dis: d.dis || "", items:(r.items||[]).slice(),
+      periods:(r.periods||[]).slice(), ev: r.ev || ""
+    };
+    var old = tpls().filter(function(x){ return x.n === name; })[0];
+    if(old){ t.id = old.id; tpls()[tpls().indexOf(old)] = t; } else tpls().push(t);
+    var rr = rec(k); rr.tpl = t.id; delete rr.bell;
+    save(); renderIn(); renderClock();
+    toast("「" + name + "」として保存しました");
+  });
+}
+
+/* ---- 設定画面の一覧 ---- */
+function renderTplList(){
+  var box = $("#tplList"); if(!box) return;
+  box.innerHTML = "";
+  var list = tpls();
+  if(!list.length){
+    box.appendChild(el("p","note","まだありません。下のボタンから作れます。"));
+    return;
+  }
+  list.forEach(function(t){
+    var b = el("button","tplrow"); b.type = "button";
+    var tn = el("div","tn");
+    tn.appendChild(el("b", null, t.n));
+    tn.appendChild(el("span", null, tplSum(t)));
+    b.appendChild(tn);
+    var cnt = tplDays(t.id).length;
+    if(cnt) b.appendChild(el("span","on", cnt + "日"));
+    b.appendChild(el("span","arw","›"));
+    b.addEventListener("click", function(){ editTpl(t, function(){ renderTplList(); }); });
+    box.appendChild(b);
+  });
+}
+
+/* ---- テンプレートを直す ---- */
+function editTpl(t, done){
+  done = done || function(){};
+  openSheet(t.n, function(bx){
+    /* 種類 */
+    var sw = el("div","segs"); sw.style.margin = "0 0 16px";
+    [["short","短縮授業"],["free","行事の日"]].forEach(function(p){
+      var b = el("button", null, p[1]); b.type = "button";
+      b.setAttribute("aria-pressed", t.kind === p[0] ? "true" : "false");
       b.addEventListener("click", function(){
-        closeSheet();
-        askConfirm("消しますか", "「" + t.n + "」を消します。", "消す", function(){
-          tpls().splice(i,1); save(); toast("消しました");
+        if(t.kind === p[0]) return;
+        t.kind = p[0];
+        if(p[0] === "short"){ if(!t.sh) t.sh = shortDef(); t.autoDis = true; tplSync(t); }
+        save(); done(); editTpl(t, done);
+      });
+      sw.appendChild(b);
+    });
+    bx.appendChild(sw);
+
+    var prev = el("div");                      /* 時刻の見本。数字を変えるたびにここだけ描き直す */
+    function drawPrev(){
+      prev.innerHTML = "";
+      var rows = t.bell || [];
+      if(!rows.length) prev.appendChild(el("p","note","時刻がまだありません。"));
+      else prev.appendChild(bellPrev(rows));
+    }
+
+    if(t.kind === "short"){
+      if(!t.sh) t.sh = shortDef();
+      var c = t.sh;
+      var p0 = el("p","note","1コマの長さを変えるだけで、一日ぶんの時刻をこちらで組み立てます。短縮45分授業なら「45分」にするだけです。");
+      p0.style.margin = "0 0 6px"; bx.appendChild(p0);
+
+      var w = el("div"); w.style.marginTop = "10px";
+      function row(label, node){
+        var r = el("div","nrow"); r.appendChild(el("span", null, label)); r.appendChild(node); w.appendChild(r);
+      }
+      function numIn(key, min, max){
+        var i = document.createElement("input");
+        i.type = "number"; i.min = min; i.max = max; i.inputMode = "numeric"; i.value = c[key];
+        i.addEventListener("change", function(){
+          var v = Math.max(min, Math.min(max, Math.round(+this.value) || 0));
+          c[key] = v; this.value = v; tplSync(t); save(); drawPrev(); done();
+        });
+        return i;
+      }
+      var st = document.createElement("input");
+      st.type = "time"; st.value = c.start || "08:40";
+      st.addEventListener("change", function(){
+        c.start = this.value || "08:40"; tplSync(t); save(); drawPrev(); done();
+      });
+      row("1校時のはじまり", st);
+      row("1コマの長さ（分）", numIn("len", 15, 90));
+      row("休み時間（分）",    numIn("brk", 0, 30));
+
+      var pn = document.createElement("select");
+      for(var q=1;q<=9;q++){
+        var o = document.createElement("option"); o.value = String(q); o.textContent = q + "校時まで";
+        pn.appendChild(o);
+      }
+      pn.value = String(c.pn || 6);
+      pn.addEventListener("change", function(){ c.pn = +this.value; tplSync(t); save(); drawPrev(); done(); });
+      row("授業の数", pn);
+
+      var la = document.createElement("select");
+      var o0 = document.createElement("option"); o0.value = "0"; o0.textContent = "昼休みなし";
+      la.appendChild(o0);
+      for(var q2=1;q2<(c.pn||6);q2++){
+        var o2 = document.createElement("option"); o2.value = String(q2); o2.textContent = q2 + "校時のあと";
+        la.appendChild(o2);
+      }
+      la.value = String(c.lunchAfter || 0);
+      la.addEventListener("change", function(){
+        c.lunchAfter = +this.value; tplSync(t); save(); drawPrev(); done(); editTpl(t, done);
+      });
+      row("昼休みの場所", la);
+      if(c.lunchAfter) row("昼休みの長さ（分）", numIn("lunch", 10, 90));
+      row("終学活の長さ（分）", numIn("hr", 0, 60));
+      row("朝の活動（分）",     numIn("am", 0, 60));
+      if(c.am > 0){
+        var al = document.createElement("input");
+        al.type = "text"; al.value = c.amLabel || "朝の活動"; al.placeholder = "朝読書、LT など";
+        al.addEventListener("input", function(){ c.amLabel = this.value; tplSync(t); save(); drawPrev(); done(); });
+        row("朝の活動の名前", al);
+      }
+      bx.appendChild(w);
+    }else{
+      var p1 = el("p","note","開場・出演・終演のように、決まった時刻を並べます。校時にしばられないので、行事の日はこちらが早いです。");
+      p1.style.margin = "0 0 12px"; bx.appendChild(p1);
+      var ed = el("div");
+      bellEditor(ed, t.bell, function(){ editTpl(t, done); }, "まだ空です。下のボタンから足してください。");
+      bx.appendChild(ed);
+      var eb = el("div","acts"); eb.style.marginTop = "12px";
+      var ba = el("button","btn sm","区切りを足す");
+      ba.addEventListener("click", function(){
+        var last = t.bell[t.bell.length-1];
+        t.bell.push({l:"", s: last ? last.e : "08:40", e:"", p:null});
+        save(); done(); editTpl(t, done);
+      });
+      eb.appendChild(ba);
+      var bc = el("button","btn sm bare","ふつうの時刻から作る");
+      bc.addEventListener("click", function(){
+        var src = bells();
+        if(!src.length) src = BELL_STD;      /* 校時の時刻がまだ空なら、よくある形から */
+        t.bell = src.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+        save(); done(); editTpl(t, done);
+      });
+      eb.appendChild(bc);
+      bx.appendChild(eb);
+    }
+
+    /* 時刻の見本（短縮のときだけ。行事の日は上で直に編集している） */
+    if(t.kind === "short"){
+      var pl = el("p","lab","できあがる時刻"); pl.style.margin = "20px 0 0";
+      bx.appendChild(pl); drawPrev(); bx.appendChild(prev);
+    }
+
+    /* 下校時刻 */
+    var dl = el("p","lab","下校時刻"); dl.style.margin = "20px 0 0"; bx.appendChild(dl);
+    var dr = el("div","nrow");
+    dr.appendChild(el("span", null, t.autoDis !== false && t.kind === "short"
+      ? "授業の終わりに合わせています" : "この時刻にします"));
+    var di = document.createElement("input");
+    di.type = "time"; di.value = t.dis || "";
+    di.addEventListener("change", function(){ t.dis = this.value; t.autoDis = false; save(); done(); editTpl(t, done); });
+    dr.appendChild(di); bx.appendChild(dr);
+    if(t.kind === "short" && t.autoDis === false){
+      var ab = el("button","btn sm bare","終わりに合わせる");
+      ab.addEventListener("click", function(){ t.autoDis = true; tplSync(t); save(); done(); editTpl(t, done); });
+      bx.appendChild(ab);
+    }
+
+    /* 行事名 */
+    var el1 = el("p","lab","行事の名前（あれば）"); el1.style.margin = "20px 0 8px"; bx.appendChild(el1);
+    var ei = document.createElement("input");
+    ei.type = "text"; ei.value = t.ev || ""; ei.placeholder = "感謝祭、体育祭 など";
+    ei.addEventListener("input", function(){ t.ev = this.value; save(); done(); });
+    bx.appendChild(ei);
+
+    /* 持ち物 */
+    var il = el("p","lab","いつも持っていくもの"); il.style.margin = "20px 0 10px"; bx.appendChild(il);
+    var ic = el("div","chips");
+    S.items.slice().sort(function(a,b){ return (b.c||0)-(a.c||0); }).forEach(function(it){
+      var ch = el("button","chip", it.n); ch.type = "button";
+      ch.setAttribute("aria-pressed", t.items.indexOf(it.n) >= 0 ? "true" : "false");
+      ch.addEventListener("click", function(){
+        var i = t.items.indexOf(it.n);
+        if(i >= 0) t.items.splice(i,1); else t.items.push(it.n);
+        save(); done(); editTpl(t, done);
+      });
+      ic.appendChild(ch);
+    });
+    bx.appendChild(ic);
+
+    /* 教科 */
+    var sl = el("p","lab","校時の教科（決まっていれば）"); sl.style.margin = "20px 0 8px"; bx.appendChild(sl);
+    var sn = el("p","note", t.periods.some(function(x){ return x; })
+      ? t.periods.slice(0, S.pn).map(function(x,i){ return x || "—"; }).join("・")
+      : "空のままなら、その日の時間割はそのままにします。");
+    sn.style.margin = "0 0 10px"; bx.appendChild(sn);
+    var sb = el("button","btn sm","教科をきめる");
+    sb.addEventListener("click", function(){ editTplSubs(t, done); });
+    bx.appendChild(sb);
+
+    /* 当てた日 */
+    var days = tplDays(t.id);
+    var ul = el("p","lab","当てている日"); ul.style.margin = "20px 0 8px"; bx.appendChild(ul);
+    var un = el("p","note", days.length
+      ? (days.length + "日（" + days.slice(0,6).map(function(k){
+          var x = parseKey(k); return (x.getMonth()+1) + "/" + x.getDate();
+        }).join("・") + (days.length > 6 ? " ほか" : "") + "）")
+      : "まだどの日にも当てていません。月間予定の「行事予定を日付に当てる」から、まとめて当てられます。");
+    un.style.margin = "0 0 10px"; bx.appendChild(un);
+    if(days.length){
+      var cb = el("button","btn sm bare","当てた日を全部はずす");
+      cb.addEventListener("click", function(){
+        askConfirm("はずしますか", "「" + t.n + "」を当てた " + days.length + "日ぶんを、ふつうの日にもどします。テンプレートは残ります。", "はずす", function(){
+          var n = tplClearAll(t); done(); rerender(); toast(n + "日ぶんはずしました");
         });
       });
-      g.appendChild(b);
+      bx.appendChild(cb);
+    }
+
+    /* 下のボタン */
+    var fb = el("div","acts"); fb.style.marginTop = "22px";
+    var nb = el("button","btn sm","名前を変える");
+    nb.addEventListener("click", function(){
+      askText("テンプレートの名前", t.n, function(v){ t.n = v; save(); done(); editTpl(t, done); });
     });
-    bx.appendChild(g);
+    fb.appendChild(nb);
+    var db = el("button","btn sm mark","このテンプレートを消す");
+    db.addEventListener("click", function(){
+      askConfirm("消しますか",
+        "「" + t.n + "」を消します。" + (days.length ? "当ててある " + days.length + "日は、ふつうの日にもどります。" : ""),
+        "消す", function(){
+          tplClearAll(t);
+          S.tpl = tpls().filter(function(x){ return x.id !== t.id; });
+          save(); done(); rerender(); toast("消しました");
+        });
+    });
+    fb.appendChild(db);
+    bx.appendChild(fb);
+
+    var ok = el("button","btn primary","閉じる");
+    ok.style.cssText = "margin-top:14px; width:100%";
+    ok.addEventListener("click", function(){ closeSheet(); done(); rerender(); });
+    bx.appendChild(ok);
   });
 }
+function editTplSubs(t, done){
+  openSheet(t.n + "　教科", function(bx){
+    var w = el("div");
+    for(var i=0;i<S.pn;i++){
+      (function(x){
+        while(t.periods.length < S.pn) t.periods.push("");
+        var r = el("button","trow"); r.type = "button";
+        r.appendChild(el("span","pn", plabel(x)));
+        r.appendChild(el("span","ps" + (t.periods[x] ? "" : " none"), t.periods[x] || "えらぶ"));
+        r.appendChild(el("span","arw","▸"));
+        r.addEventListener("click", function(){
+          openSheet(plabel(x), function(b2){
+            var g = el("div","pick");
+            S.subjects.forEach(function(s){
+              var sb = el("button", null, s);
+              sb.addEventListener("click", function(){ t.periods[x] = s; save(); done(); editTplSubs(t, done); });
+              g.appendChild(sb);
+            });
+            var nb = el("button", null, "なし"); nb.style.color = "var(--label3)";
+            nb.addEventListener("click", function(){ t.periods[x] = ""; save(); done(); editTplSubs(t, done); });
+            g.appendChild(nb);
+            b2.appendChild(g);
+          });
+        });
+        w.appendChild(r);
+      })(i);
+    }
+    bx.appendChild(w);
+    var ok = el("button","btn primary","もどる");
+    ok.style.cssText = "margin-top:16px; width:100%";
+    ok.addEventListener("click", function(){ editTpl(t, done); });
+    bx.appendChild(ok);
+  });
+}
+
+/* ---- 設定画面のボタン ---- */
+$("#tplAdd").addEventListener("click", function(){
+  askText("短縮授業の名前", "短縮45分授業 など", function(n){
+    var t = tplSync({id:newTplId(), n:n, kind:"short", sh:shortDef(), bell:[], dis:"",
+                     autoDis:true, items:[], periods:[], ev:""});
+    tpls().push(t); save(); renderTplList(); editTpl(t, renderTplList);
+  });
+});
+$("#tplAddFree").addEventListener("click", function(){
+  askText("行事の名前", "感謝祭、体育祭 など", function(n){
+    var t = {id:newTplId(), n:n, kind:"free", sh:null, bell:[], dis:"", autoDis:false,
+             items:[], periods:[], ev:n};
+    tpls().push(t); save(); renderTplList(); editTpl(t, renderTplList);
+  });
+});
+$("#tplStd").addEventListener("click", function(){
+  var add = TPL_STD().filter(function(t){ return !tplById(t.id); });
+  if(!add.length){ $("#tplMsg").textContent = "よくある形は、もう全部入っています。"; return; }
+  add.forEach(function(t){ tpls().push(t); });
+  save(); renderTplList();
+  $("#tplMsg").textContent = add.map(function(t){ return "「"+t.n+"」"; }).join("") + "を入れました。";
+});
+$("#tplScan").addEventListener("click", function(){
+  var map = [
+    {re:/短縮\s*45\s*分/, id:"Tshort45"},
+    {re:/短縮\s*40\s*分/, id:"Tshort40"},
+    {re:/午前\s*3\s*限/,  id:"Tam3"}
+  ];
+  var n = 0, miss = 0, already = 0;
+  for(var k in S.days){
+    var r = S.days[k];
+    if(!r || !r.ev) continue;
+    var id = null;
+    for(var i=0;i<map.length;i++) if(map[i].re.test(r.ev)){ id = map[i].id; break; }
+    if(!id) continue;
+    /* すでに当ててある日、手で直した日はさわらない */
+    if(r.tpl || (r.bell && r.bell.length)){ already++; continue; }
+    var t = tplById(id);
+    if(t){ tplAssign(k, t); n++; } else miss++;
+  }
+  save(); renderTplList(); renderCal();
+  $("#tplMsg").textContent = n
+    ? (n + "日に当てました。月間予定に緑の印がつきます。")
+    : miss
+    ? "合う日は見つかりましたが、テンプレートがありません。「よくある形をまとめて入れる」を先に押してください。"
+    : already
+    ? ("合う日 " + already + "日は、もう当ててあります。")
+    : "見つかりませんでした。先に「学校の年間行事」を取り込んでください。";
+});
 
 /* ============ 電車 ============ */
 var TRAIN_DEF = [
