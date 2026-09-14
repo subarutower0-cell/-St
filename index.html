@@ -1015,10 +1015,11 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <summary>校時の時刻</summary>
       <div class="in">
         <p class="note" style="margin:0 0 8px">授業の始まりと終わりを、好きなだけ作れます。校時にしばられないので、朝読書・昼休み・GKタイムなども足せます。ここを入れると、今日の画面に「いま何をしていて、あと何分か」が出ます。</p>
+        <p class="note" style="margin:0 0 8px">「星城中学校の時刻を入れる」を押すと、学校のサイトに出ている登校8:40・朝礼8:55・1限9:05・3限11:05・昼休み12:55・5限13:30・放課後15:50 をもとにした、1コマ50分・休み10分の時刻が入ります。</p>
         <div id="bellList"></div>
         <div class="actions" style="margin-top:14px">
           <button class="btn sm" id="bellAdd">区切りを足す</button>
-          <button class="btn sm bare" id="bellStd">よくある形を入れる</button>
+          <button class="btn sm bare" id="bellStd">星城中学校の時刻を入れる</button>
         </div>
       </div>
     </details>
@@ -1044,6 +1045,41 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" style="margin:0 0 10px">ファイルを作ってスマホのカレンダーに取り込むと、テスト・入試・行事などの前日20時に通知が来ます。アプリを閉じていても鳴ります。</p>
         <button class="btn sm" id="evIcs">カレンダー用ファイルを作る</button>
         <p class="note" id="evMsg" style="margin-top:14px"></p>
+
+        <p class="lab" style="margin-top:22px">月ごとの主な行事</p>
+        <p class="note" style="margin:0 0 10px">学校のサイトに出ている、その月の大きな行事です。日付は上の「年間行事を取り込む」で入ります。</p>
+        <div id="evYear"></div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>警報・緊急時の対応</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 16px">学校のサイト「在校生・保護者の方へ → 緊急時の対応」に書いてあることを入れてあります。実際の判断は、学校からの連絡（Classi・ホームページ）が優先です。</p>
+
+        <p class="lab">台風（暴風警報）</p>
+        <p class="note" style="margin:0 0 10px">登校する前に、愛知県のどこかに暴風警報が出ているとき。解除された時刻で、何限から始めるかが決まります。</p>
+        <div id="stormTbl"></div>
+        <p class="note" style="margin:12px 0 0">10時30分を過ぎても解除されないときは休校です。解除されても、交通機関や道路の状況で登校が危険なときは登校しなくてかまいません。そのときは何らかの方法で学校へ連絡します。</p>
+        <button class="btn sm" id="tplStorm" style="margin-top:16px">警報の日のテンプレートを作る</button>
+        <p class="note" id="stormMsg" style="margin-top:10px"></p>
+
+        <p class="lab" style="margin-top:24px">登校したあとに暴風警報が出たとき</p>
+        <p class="note" style="margin:0">安全に帰せると学校が判断したら、授業を中止して下校します。すでに帰るのが難しい状況のときは、安全な場所に集まって待機し、帰れるようになりしだい下校します。</p>
+
+        <p class="lab" style="margin-top:24px">交通スト・交通災害</p>
+        <p class="note" style="margin:0">登校できないときは、上の暴風警報と同じあつかいです。ただしJRだけのときは、平常通り授業があります。</p>
+
+        <p class="lab" style="margin-top:24px">地震（南海トラフ臨時情報）</p>
+        <p class="note" style="margin:0 0 10px">「巨大地震警戒」「巨大地震注意」が出たときの動きです。</p>
+        <div id="quakeList"></div>
+        <p class="note" style="margin:12px 0 0">解除情報が出たら、翌日から再開します。交通や通信が途絶えていて登校できないときは、安全が確認できるまで登校しなくてかまいません。「調査中」の段階では、平常通りです。</p>
+
+        <p class="lab" style="margin-top:18px">災害のあとの連絡</p>
+        <p class="note" style="margin:0">①Googleフォーム「星城中・高等学校安否情報送信フォーム」→②保護者のClassiメッセージ→③学校へ電話、の順に試します。どれもできないときは、通信が戻りしだい連絡します。学校からの連絡は、Classiと星城中学校ホームページのお知らせに出ます。</p>
+
+        <p class="lab" style="margin-top:24px">インフルエンザ・新型コロナ</p>
+        <p class="note" style="margin:0">診断されたら、その時点で学校に連絡します。休む期間は、インフルエンザが「発症した後5日を過ぎ、かつ熱が下がった後2日を過ぎるまで」、新型コロナが「発症した後5日を過ぎ、かつ症状が軽くなった後1日を過ぎるまで」。治癒証明書ではなく、保護者が書く「罹患証明書」を、原則として登校した日に出します。用紙は学校ホームページの「在校生・保護者の方へ → 各種届出表」からダウンロードできます。裏に調剤説明書のコピーなど、かかったことがわかる書類をつけてください。ほかの感染症は、原則として治癒証明書が必要です。</p>
       </div>
     </details>
 
@@ -1318,6 +1354,19 @@ function readLocal(){
     if(!t.items) t.items = [];
     if(!t.periods) t.periods = [];
   });
+  /* 学校のサイトで朝と昼の時刻がわかったので、まだ手を入れていないひな型だけ直す */
+  if(!S.mig3){
+    var d0 = shortDef();
+    S.tpl.forEach(function(t){
+      if(t.kind !== "short" || !t.sh) return;
+      var c = t.sh;
+      if(c.am || c.start !== "08:40") return;      /* 自分で直したものはさわらない */
+      c.start = d0.start; c.am = d0.am; c.amLabel = d0.amLabel;
+      if(c.lunchAfter && c.lunch === 40) c.lunch = d0.lunch;
+      tplSync(t);
+    });
+    S.mig3 = true;
+  }
   if(S.pfmt == null) S.pfmt = "校時";
   if(!S.theme) S.theme = "auto";
   if(!S.t) S.t = Date.now();
@@ -2080,7 +2129,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm();
   $("#trWalk").value = walkMin();
   $("#hyRide").value = hyRide();
   $("#hyTrans").value = hyTrans();
@@ -3260,6 +3309,126 @@ $("#rcMode").addEventListener("click", function(e){
 
 /* ============ 学校の年間行事 ============ */
 var SCHOOL_EV = {"2026-04-03":"1限:LT 2限:入学式予行 3限:式準備","2026-04-04":"第34回入学式","2026-04-06":"1限:LT 2限:クラス役員選出 3限:生徒指導集会","2026-04-07":"1限:LT 2限:始業式 3限:クラス写真・個人写真","2026-04-08":"1限:LT 2限:身体測定・聴力視力検査 3限:LT（学校案内撮影）","2026-04-09":"1限:LT 2・3限:標準学力検査 4限:情報モラル 5限:委員会／自転車点検(15:00)","2026-04-10":"1限:LT 2〜4限:標準学力検査 5限:防災訓練","2026-04-11":"家庭学習日","2026-04-13":"授業開始／第Ⅰ期GKテスト開始／GKタイム開始（英語講座なし）","2026-04-15":"6限:写生大会事前指導／GKタイム①英語講座開始","2026-04-16":"1〜4限:第1回学力推移調査","2026-04-18":"家庭学習日","2026-04-21":"検尿","2026-04-22":"6限:前期役員任命式","2026-04-23":"検尿（予備日）","2026-04-24":"検尿（予備日）","2026-04-25":"家庭学習日","2026-04-29":"昭和の日","2026-04-30":"新入生歓迎アクティビティ","2026-05-01":"写生大会（鶴舞公園）／女子合服衣替","2026-05-02":"家庭学習日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-05-07":"確定時間割実施","2026-05-08":"写生大会予備日","2026-05-09":"家庭学習日","2026-05-11":"第Ⅰ期GKテスト本日まで","2026-05-13":"中間テスト時間割発表","2026-05-16":"家庭学習日","2026-05-20":"中間テスト①","2026-05-21":"中間テスト②","2026-05-22":"中間テスト③","2026-05-23":"家庭学習日","2026-05-25":"第1回保護者会①","2026-05-26":"第1回保護者会②","2026-05-27":"第1回保護者会③","2026-05-28":"短縮45分授業","2026-05-29":"短縮45分授業／1〜3限:第1回英検一次試験／第1回いじめアンケート配信","2026-05-30":"家庭学習日","2026-06-01":"夏服衣替え／第Ⅱ期GKテスト開始","2026-06-06":"学年保護者会（保護者のみ）／後援会総会・懇親会","2026-06-11":"歯科検診","2026-06-12":"内科検診","2026-06-13":"家庭学習日","2026-06-15":"第Ⅱ期GKテスト本日まで","2026-06-16":"期末テスト時間割発表","2026-06-18":"6限:授業参観","2026-06-19":"オープンスクール用特別清掃（GK①）","2026-06-20":"家庭学習日","2026-06-22":"第1回英検一次発表","2026-06-23":"期末テスト①","2026-06-24":"期末テスト②","2026-06-25":"期末テスト③","2026-06-26":"期末テスト④／器楽講習会","2026-06-27":"第1回オープンスクール（午前・午後）","2026-07-04":"家庭学習日","2026-07-05":"第1回英検二次試験（校外）","2026-07-11":"家庭学習日","2026-07-13":"1〜3限:平常授業／昼食・弁論大会・大掃除","2026-07-14":"第2回保護者会①／第1回英検二次発表","2026-07-15":"第2回保護者会②","2026-07-16":"第2回保護者会③","2026-07-17":"1限:LT 2限:終業式・表彰式 3限:LT","2026-07-18":"家庭学習日","2026-07-20":"海の日","2026-07-21":"家庭学習日","2026-07-22":"家庭学習日","2026-07-23":"家庭学習日","2026-07-24":"第1回ミニマムエッセンシャルズ確認テスト","2026-07-25":"家庭学習日","2026-07-27":"不合格者GKタイム①（午前3限）","2026-07-28":"不合格者GKタイム②（午前3限）","2026-07-29":"第2回ミニマムエッセンシャルズ確認テスト","2026-07-30":"不合格者GKタイム③（午前3限）","2026-07-31":"不合格者GKタイム④（午前3限）","2026-08-01":"家庭学習日","2026-08-03":"第3回ミニマムエッセンシャルズ確認テスト／オープンスクール用特別清掃（午後）","2026-08-04":"不合格者GKタイム⑤（午前3限）","2026-08-05":"不合格者GKタイム⑥（午前3限）","2026-08-06":"不合格者GKタイム⑦（午前3限）","2026-08-07":"不合格者GKタイム⑧（午前3限）","2026-08-08":"第2回オープンスクール（午前）","2026-08-11":"山の日","2026-08-12":"夏期休暇","2026-08-13":"夏期休暇","2026-08-14":"夏期休暇","2026-08-15":"夏期休暇","2026-08-16":"夏期休暇","2026-08-17":"1限:出校日 2・3限:夏期講座①","2026-08-18":"1〜3限:夏期講座②","2026-08-19":"1〜3限:夏期講座③","2026-08-20":"1〜3限:夏期講座④","2026-08-21":"1〜3限:夏期講座⑤","2026-08-22":"数学検定（希望者）／家庭学習日","2026-08-24":"1〜3限:夏期講座⑥","2026-08-25":"1〜3限:夏期講座⑦","2026-08-26":"1〜4限:第2回学力推移調査","2026-08-27":"家庭学習日","2026-08-28":"家庭学習日","2026-08-29":"家庭学習日","2026-08-31":"家庭学習日","2026-09-01":"1限:防災学習 2限:始業式 3限:LT","2026-09-02":"第Ⅲ期GKテスト開始／感謝祭準備活動開始","2026-09-04":"オープンスクール用特別清掃（GK①）","2026-09-05":"第3回オープンスクール（午前・午後）","2026-09-12":"家庭学習日／アジア競技大会 聖火リレー 13:00〜13:30（セレモニー12:30・12:00から入場可・入場許可証が必要・スタート高校正門→ゴール第2グラウンド・当日は駐輪場と駐車場は使えません）","2026-09-13":"舘区 音楽の集い（豊明市立舘小学校 体育館）現地集合8:30・現地解散12:00／開場9:30 開演10:00 終演11:40／3年生の出演10:00〜10:20／バイオリン・ビオラ・譜面台は持参（チェロとコントラバスは先生が運搬）／保護者用駐車場は体育館の北側・最大80台／振替休日なし","2026-09-16":"短縮40分授業","2026-09-17":"短縮40分授業","2026-09-18":"感謝祭準備（終日）","2026-09-19":"感謝祭","2026-09-21":"敬老の日","2026-09-22":"国民の休日","2026-09-23":"秋分の日","2026-09-24":"4・5限:プレハイスクールライフ","2026-09-25":"5・6限:体育祭練習","2026-09-26":"家庭学習日","2026-09-28":"第Ⅲ期GKテスト本日まで","2026-09-29":"中間テスト時間割発表","2026-10-01":"技術・家庭科 入れ替え","2026-10-02":"1〜3限:第2回英検一次試験／オープンスクール用特別清掃（GK①）","2026-10-03":"第4回オープンスクール（午前）","2026-10-06":"中間テスト①","2026-10-07":"中間テスト②","2026-10-08":"中間テスト③／第2回いじめアンケート配信","2026-10-09":"5・6限:体育祭練習","2026-10-10":"家庭学習日","2026-10-12":"スポーツの日","2026-10-13":"短縮45分授業","2026-10-14":"短縮45分授業／第Ⅳ期GKテスト開始","2026-10-15":"短縮45分授業","2026-10-16":"短縮45分授業／5・6限:体育祭練習・準備","2026-10-17":"体育祭","2026-10-19":"体育祭予備日","2026-10-21":"6限:後期クラス役員選出","2026-10-24":"家庭学習日","2026-10-26":"第2回英検一次発表","2026-10-28":"6限:後期委員会活動","2026-10-31":"家庭学習日","2026-11-03":"文化の日","2026-11-04":"6限:後期役員任命式","2026-11-07":"学年保護者会（保護者のみ）／後期学年保護者会（校内）","2026-11-08":"第2回英検二次試験（校外）","2026-11-09":"第Ⅳ期GKテスト本日まで","2026-11-10":"期末テスト時間割発表","2026-11-11":"6限:防災訓練","2026-11-14":"家庭学習日","2026-11-17":"期末テスト①／第2回英検二次発表","2026-11-18":"期末テスト②","2026-11-19":"期末テスト③","2026-11-20":"期末テスト④／器楽講習会","2026-11-21":"家庭学習日","2026-11-23":"勤労感謝の日","2026-11-24":"県民の日学校ホリデー","2026-11-28":"家庭学習日","2026-12-04":"入試説明会特別清掃（GK①）","2026-12-05":"入試説明会","2026-12-06":"家庭学習日","2026-12-09":"4〜6限:百人一首大会","2026-12-11":"入試説明会特別清掃（GK①）","2026-12-12":"入試説明会","2026-12-17":"1〜3限:平常授業／昼食・大掃除","2026-12-18":"第3回保護者会①","2026-12-19":"語学研修説明会（親子で参加）","2026-12-21":"第3回保護者会②","2026-12-22":"第3回保護者会③","2026-12-23":"1限:LT 2限:終業式・表彰式","2026-12-24":"第1回ミニマムエッセンシャルズ確認テスト／Ⅰ期入試A日程 清掃・準備","2026-12-25":"不合格者GKタイム（午前3限）","2026-12-26":"冬期休暇","2026-12-27":"冬期休暇","2026-12-28":"冬期休暇","2026-12-29":"冬期休暇","2026-12-30":"冬期休暇","2026-12-31":"冬期休暇","2027-01-01":"冬期休暇","2027-01-02":"冬期休暇","2027-01-03":"冬期休暇","2027-01-04":"冬期休暇","2027-01-05":"冬期休暇","2027-01-06":"Ⅰ期入試A日程","2027-01-07":"1限:LT 2限:始業式 3限:LT／第3回いじめアンケート配信","2027-01-08":"第Ⅴ期GKテスト開始","2027-01-09":"家庭学習日","2027-01-11":"成人の日","2027-01-15":"Ⅰ期入試B日程 清掃・準備","2027-01-16":"Ⅰ期入試B日程／家庭学習日・数学検定（希望者）","2027-01-19":"1〜3限:平常授業／午後:家庭学習","2027-01-20":"星城高校一般入試（受験）","2027-01-22":"1〜3限:第3回英検一次試験","2027-01-23":"家庭学習日","2027-01-27":"1〜4限:第3回学力推移調査","2027-01-29":"健脚会","2027-01-30":"家庭学習日","2027-02-02":"語学研修準備（終日）","2027-02-05":"第Ⅴ期GKテスト本日まで／5・6限:語学研修結団式","2027-02-06":"星城高校入学者ガイダンス（推薦入学者ガイダンスに参加）","2027-02-07":"Ⅱ期入試","2027-02-08":"語学研修①","2027-02-09":"語学研修②","2027-02-10":"語学研修③","2027-02-11":"建国記念の日／語学研修④","2027-02-12":"語学研修⑤","2027-02-13":"語学研修⑥","2027-02-14":"語学研修⑦","2027-02-15":"語学研修⑧／第3回英検一次発表","2027-02-16":"語学研修⑨","2027-02-17":"語学研修⑩","2027-02-18":"語学研修振替休日","2027-02-19":"語学研修振替休日","2027-02-20":"語学研修振替休日","2027-02-22":"特別学級活動（終日）","2027-02-23":"天皇誕生日","2027-02-24":"特別学級活動（午前3限）","2027-02-25":"特別学級活動（午前3限）","2027-02-26":"特別学級活動（午前3限）","2027-02-27":"星城高校入学者ガイダンス（推薦入学者ガイダンスに参加）","2027-02-28":"第3回英検二次試験（校外）","2027-03-01":"特別学級活動（午前3限）","2027-03-02":"特別学級活動（短縮40分6限）","2027-03-03":"特別学級活動（短縮40分6限）","2027-03-04":"卒業式予行・年度末表彰式","2027-03-05":"第32回卒業式","2027-03-06":"家庭学習日","2027-03-08":"学習室開放","2027-03-09":"学習室開放／第3回英検二次発表","2027-03-10":"学習室開放","2027-03-11":"学習室開放","2027-03-12":"学習室開放","2027-03-13":"家庭学習日","2027-03-15":"学習室開放","2027-03-16":"学習室開放","2027-03-17":"学習室開放","2027-03-18":"学習室開放","2027-03-19":"春期休暇","2027-03-20":"春期休暇","2027-03-21":"春期休暇","2027-03-22":"春期休暇","2027-03-23":"春期休暇","2027-03-24":"春期休暇","2027-03-25":"春期休暇","2027-03-26":"春期休暇","2027-03-27":"春期休暇","2027-03-28":"春期休暇","2027-03-29":"春期休暇","2027-03-30":"春期休暇","2027-03-31":"春期休暇"};
+/* ============ 警報・緊急時の対応 ============ */
+/* 学校のサイト「緊急時の対応」より。
+   登校前に暴風警報が出ていたら、解除された時刻で何限から始めるかが決まる。 */
+var STORM_RULE = [
+  {by:"06:30", from:0, t:"平常通り"},
+  {by:"07:30", from:1, t:"第2限から開始"},
+  {by:"08:30", from:2, t:"第3限から開始"},
+  {by:"09:30", from:3, t:"第4限から開始"},
+  {by:"10:30", from:4, t:"第5限から開始"}
+];
+var QUAKE_RULE = [
+  "家にいるときは、登校しない。",
+  "登下校の途中で出たときは、原則として家に帰る。状況によっては、いちばん近い避難地へ。",
+  "登校したあとは、学校の指示に従ってすみやかに下校する。"
+];
+/* いま解除されたら何限からか。10時30分を過ぎていたら null（＝休校） */
+function stormNow(at){
+  var n = at || new Date(), m = n.getHours()*60 + n.getMinutes();
+  for(var i=0;i<STORM_RULE.length;i++) if(m <= hm(STORM_RULE[i].by)) return STORM_RULE[i];
+  return null;
+}
+function stormTable(mark){
+  var w = el("div","prev");
+  STORM_RULE.forEach(function(r){
+    var d = el("div");
+    if(mark && mark === r) d.style.cssText = "background:var(--accent-soft); font-weight:600";
+    d.appendChild(el("i", null, r.by + "までに解除"));
+    d.appendChild(el("span", null, r.t));
+    w.appendChild(d);
+  });
+  var d2 = el("div");
+  if(mark === null) d2.style.cssText = "background:var(--accent-soft); font-weight:600";
+  d2.appendChild(el("i", null, "解除されない"));
+  d2.appendChild(el("span", null, "休校"));
+  w.appendChild(d2);
+  return w;
+}
+function renderStorm(){
+  var t = $("#stormTbl");
+  if(t){ t.innerHTML = ""; t.appendChild(stormTable()); }
+  var q = $("#quakeList");
+  if(q){
+    q.innerHTML = "";
+    var w = el("div","prev");
+    QUAKE_RULE.forEach(function(x, i){
+      var d = el("div");
+      d.appendChild(el("i", null, "①②③".charAt(i)));
+      d.appendChild(el("span", null, x));
+      w.appendChild(d);
+    });
+    q.appendChild(w);
+  }
+}
+/* 「第2限から開始」などを、ふだんの校時の時刻から作る。
+   その校時より早い区切りを落とすだけなので、時刻を勝手に作らずに済む */
+function tplStormMake(){
+  var base = bells();
+  if(!base.length) base = BELL_STD_ROWS();
+  var made = [], have = 0;
+  STORM_RULE.forEach(function(r){
+    if(!r.from) return;                       /* 平常通りの日はテンプレートがいらない */
+    var id = "Tstorm" + (r.from + 1);
+    if(tplById(id)){ have++; return; }
+    var st = null;
+    base.forEach(function(b){ if(b.p === r.from && st === null) st = b.s; });
+    if(st === null) return;
+    var rows = base.filter(function(b){ return b.s && hm(b.s) >= hm(st); })
+                   .map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+    var last = "";
+    rows.forEach(function(b){ if(b.e) last = b.e; });
+    tpls().push({id:id, n:r.t, kind:"free", sh:null, bell:rows, dis:last, autoDis:false,
+                 items:[], periods:[], ev:"暴風警報のため " + r.t});
+    made.push(r.t);
+  });
+  if(!tplById("Tstorm0")){
+    tpls().push({id:"Tstorm0", n:"休校", kind:"free", sh:null, bell:[], dis:"", autoDis:false,
+                 items:[], periods:[], ev:"暴風警報のため休校"});
+    made.push("休校");
+  }else have++;
+  save(); renderTplList();
+  $("#stormMsg").textContent = made.length
+    ? (made.join("・") + " を作りました。警報の日は、記入画面か月間予定から当ててください。")
+    : "もう全部あります。";
+}
+
+/* 学校のサイト「年間行事」に出ている、月ごとの主な行事 */
+var SCHOOL_YEAR = [
+  {m:4,  e:["入学式","決意表明発表会"]},
+  {m:5,  e:["内観研修","新入生歓迎アクティビティ","写生大会"]},
+  {m:6,  e:["英語検定","器楽講習会"]},
+  {m:7,  e:["夏期講座","ミニマムエッセンシャルズテスト","English Camp"]},
+  {m:8,  e:["夏期講座"]},
+  {m:9,  e:["感謝祭","弁論大会","プレハイスクールライフ"]},
+  {m:10, e:["体育祭","英語検定","器楽講習会"]},
+  {m:11, e:["器楽講習会"]},
+  {m:12, e:["冬期講座","明徳忌","百人一首大会","ミニマムエッセンシャルズテスト"]},
+  {m:1,  e:["英語検定","健脚会"]},
+  {m:2,  e:["オーストラリア語学研修","校外探究活動","器楽講習会"]},
+  {m:3,  e:["卒業式"]}
+];
+/* そのうち、一日の流れがまるごと変わる日。行事予定テンプレートの候補に出す */
+var SCHOOL_BIG = [
+  "入学式","決意表明発表会","内観研修","新入生歓迎アクティビティ","写生大会",
+  "弁論大会","English Camp","夏期講座","感謝祭","プレハイスクールライフ",
+  "体育祭","器楽講習会","冬期講座","明徳忌","百人一首大会",
+  "健脚会","オーストラリア語学研修","校外探究活動","卒業式"
+];
+function renderEvYear(){
+  var box = $("#evYear"); if(!box) return;
+  box.innerHTML = "";
+  var w = el("div","prev");
+  SCHOOL_YEAR.forEach(function(x){
+    var d = el("div");
+    d.appendChild(el("i", null, x.m + "月"));
+    d.appendChild(el("span", null, x.e.join("・")));
+    w.appendChild(d);
+  });
+  box.appendChild(w);
+}
+
 /* 通知を鳴らす価値のある行事だけを選ぶ。毎日鳴ると誰も見なくなる */
 var EV_ALERT = /(テスト|入試|検診|検尿|大会|体育祭|感謝祭|卒業式|入学式|始業式|終業式|保護者会|授業参観|オープンスクール|訓練|検定|英検|調査|説明会|講習|点検|ガイダンス|結団式|任命式|アンケート)/;
 
@@ -3472,13 +3641,13 @@ function drawWarn(list, when){
   var keiho     = list.filter(function(n){ return n.indexOf("警報") >= 0 && n.indexOf("特別") < 0; });
   var chui      = list.filter(function(n){ return n.indexOf("注意報") >= 0; });
 
-  var cls = "calm", head = "豊明市に警報は出ていません", body = "ふだんどおりの登下校です。";
+  var cls = "calm", head = "豊明市に警報は出ていません", body = "ふだんどおりの登下校です。", storm = false;
   if(tokubetsu.length){
     cls = "bad"; head = tokubetsu.join("・");
-    body = "命を守る行動が最優先です。学校は休校か、activityを中止して早く帰す判断になる可能性が非常に高い状態です。学校からの連絡を必ず確認してください。";
+    body = "命を守る行動が最優先です。学校からの連絡（Classi・ホームページ）を必ず確認してください。";
   }else if(keiho.some(function(n){ return n.indexOf("暴風") >= 0; })){
-    cls = "bad"; head = keiho.join("・");
-    body = "暴風警報が出ています。多くの学校で休校、または業後の活動を中止して最終下校を早める判断になります。学校からの連絡を確認してください。";
+    cls = "bad"; head = keiho.join("・"); storm = true;
+    body = "星城中学校では、暴風警報が解除された時刻で、何限から始めるかが決まります。";
   }else if(keiho.length){
     cls = "warn"; head = keiho.join("・");
     body = "警報が出ています。授業はある場合が多いですが、業後の活動を中止して下校を早めることがあります。学校からの連絡を確認してください。";
@@ -3489,6 +3658,28 @@ function drawWarn(list, when){
   var a = el("div", "alert " + cls);
   a.appendChild(el("b", null, head));
   a.appendChild(document.createTextNode(body));
+  /* 暴風警報のときは、学校の決まりをその場で出す。
+     いま解除されたら何限からになるのかも、時計を見て出す */
+  if(storm){
+    var nw = new Date(), mm = nw.getHours()*60 + nw.getMinutes();
+    var r = stormNow(nw);
+    if(mm <= hm("10:30")){
+      var p = el("div");
+      p.style.cssText = "margin-top:9px; font-weight:600";
+      p.textContent = r
+        ? ("いま解除されれば　" + r.t)
+        : "この時間に解除されても、休校です";
+      a.appendChild(p);
+    }
+    a.appendChild(stormTable(mm <= hm("10:30") ? r : undefined));
+    var go2 = el("button","btn sm bare","警報の日のテンプレートを当てる");
+    go2.style.marginTop = "8px";
+    go2.addEventListener("click", function(){
+      inKey = keyOf(new Date()); go("in");
+      setTimeout(function(){ tplPick(inKey); }, 260);
+    });
+    a.appendChild(go2);
+  }
   var nowT = new Date();
   var got = pad(nowT.getHours()) + ":" + pad(nowT.getMinutes());
   var src = el("span","src", got + "に気象庁から取りました" +
@@ -3634,20 +3825,30 @@ function drawRisk(mw, aw, mornKey, aftKey){
 /* ============ 校時の時刻と時計 ============ */
 /* S.bell = [{l:"1校時", s:"08:40", e:"09:30", p:0}]
    p は時間割の何コマ目とつなぐかの番号。null なら教科とつながない自由な区切り。 */
-var BELL_STD = [
-  {l:"朝の時間", s:"08:20", e:"08:35", p:null},
-  {l:"1校時",   s:"08:40", e:"09:30", p:0},
-  {l:"休み",    s:"09:30", e:"09:40", p:null},
-  {l:"2校時",   s:"09:40", e:"10:30", p:1},
-  {l:"休み",    s:"10:30", e:"10:40", p:null},
-  {l:"3校時",   s:"10:40", e:"11:30", p:2},
-  {l:"休み",    s:"11:30", e:"11:40", p:null},
-  {l:"4校時",   s:"11:40", e:"12:30", p:3},
-  {l:"昼休み",  s:"12:30", e:"13:15", p:null},
-  {l:"5校時",   s:"13:15", e:"14:05", p:4},
-  {l:"休み",    s:"14:05", e:"14:15", p:null},
-  {l:"6校時",   s:"14:15", e:"15:05", p:5}
-];
+/* 星城中学校の1日（学校のサイト「星城中生の1日」より）
+   ページに出ている時刻は 8:40 登校・GKテスト／8:55 朝礼／9:05 1限／11:05 3限／
+   12:55 昼休み／13:30 5限／15:50 放課後・GKタイム の7つ。
+   そこから 1コマ50分・休み10分・昼休み35分 とわかるので、
+   あいだの2・4・6限と清掃・終礼は、その計算で埋めてある。 */
+function BELL_STD_ROWS(){
+  return [
+    {l:"登校・GKテスト", s:"08:40", e:"08:55", p:null},
+    {l:"朝礼（ST）",     s:"08:55", e:"09:05", p:null},
+    {l:plabel(0),        s:"09:05", e:"09:55", p:0},
+    {l:"休み",           s:"09:55", e:"10:05", p:null},
+    {l:plabel(1),        s:"10:05", e:"10:55", p:1},
+    {l:"休み",           s:"10:55", e:"11:05", p:null},
+    {l:plabel(2),        s:"11:05", e:"11:55", p:2},
+    {l:"休み",           s:"11:55", e:"12:05", p:null},
+    {l:plabel(3),        s:"12:05", e:"12:55", p:3},
+    {l:"昼休み",         s:"12:55", e:"13:30", p:null},
+    {l:plabel(4),        s:"13:30", e:"14:20", p:4},
+    {l:"休み",           s:"14:20", e:"14:30", p:null},
+    {l:plabel(5),        s:"14:30", e:"15:20", p:5},
+    {l:"清掃・終礼",     s:"15:20", e:"15:50", p:null},
+    {l:"放課後・GKタイム", s:"15:50", e:"", p:null}
+  ];
+}
 function bells(){ if(!S.bell) S.bell = []; return S.bell; }
 function hm(t){ var p = String(t||"").split(":"); return (+p[0]||0)*60 + (+p[1]||0); }
 function mmss(min){
@@ -3657,7 +3858,7 @@ function mmss(min){
 }
 
 function renderBell(){ bellEditor($("#bellList"), bells(), renderBell,
-  "まだ何もありません。「よくある形を入れる」から始めて、自分の学校に合わせて直すのが早いです。"); }
+  "まだ何もありません。「星城中学校の時刻を入れる」から始めて、自分のクラスに合わせて直すのが早いです。"); }
 
 function bellEditor(box, list, again, empty){
   if(!box) return;
@@ -3711,8 +3912,8 @@ $("#bellAdd").addEventListener("click", function(){
   save(); renderBell();
 });
 $("#bellStd").addEventListener("click", function(){
-  askConfirm("よくある形を入れますか", "いまの時刻表は置きかわります。だいたいの形なので、入れたあとで学校に合わせて直してください。", "入れる", function(){
-    S.bell = BELL_STD.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
+  askConfirm("星城中学校の時刻を入れますか", "いまの時刻表は置きかわります。学校のサイトに出ている時刻をもとにしています。あとから自由に直せます。", "入れる", function(){
+    S.bell = BELL_STD_ROWS();
     save(); renderBell(); renderClock();
   });
 });
@@ -3999,8 +4200,11 @@ function addMin(t, n){
 }
 
 /* ---- 短縮授業のもとになる設定 ---- */
+/* 星城中学校の一日に合わせた初期値。
+   8:40 登校・GKテスト → 8:55 朝礼 → 9:05 1限、休み10分、昼休み35分。 */
 function shortDef(){
-  return {start:"08:40", len:45, brk:10, pn:6, lunchAfter:4, lunch:40, hr:15, am:0, amLabel:"朝の活動"};
+  return {start:"08:40", len:45, brk:10, pn:6, lunchAfter:4, lunch:35, hr:15,
+          am:25, amLabel:"登校・朝礼"};
 }
 /* 「1コマ何分・休み何分・何校時・昼休みはどこ」から一日ぶんの時刻を組み立てる */
 function shortBell(c){
@@ -4062,7 +4266,7 @@ function TPL_STD(){
 function tplSum(t){
   var a = [];
   if(t.kind === "short" && t.sh) a.push(t.sh.len + "分授業・" + t.sh.pn + "校時");
-  else a.push(t.bell && t.bell.length ? ("時刻 " + t.bell.length + "つ") : "時刻はまだ空");
+  else a.push(t.bell && t.bell.length ? ("区切り " + t.bell.length + "か所") : "時刻はまだ空");
   if(t.dis) a.push("下校 " + t.dis);
   if(t.items && t.items.length) a.push("持ち物 " + t.items.length);
   return a.join("・");
@@ -4232,7 +4436,7 @@ function editTpl(t, done){
       st.addEventListener("change", function(){
         c.start = this.value || "08:40"; tplSync(t); save(); drawPrev(); done();
       });
-      row("1校時のはじまり", st);
+      row(c.am > 0 ? "登校の時刻" : (plabel(0) + "のはじまり"), st);
       row("1コマの長さ（分）", numIn("len", 15, 90));
       row("休み時間（分）",    numIn("brk", 0, 30));
 
@@ -4267,6 +4471,15 @@ function editTpl(t, done){
         row("朝の活動の名前", al);
       }
       bx.appendChild(w);
+      var sb0 = el("button","btn sm bare","星城中学校の朝と昼に合わせる");
+      sb0.style.marginTop = "10px";
+      sb0.addEventListener("click", function(){
+        var d0 = shortDef();
+        c.start = d0.start; c.am = d0.am; c.amLabel = d0.amLabel; c.brk = d0.brk;
+        if(c.lunchAfter) c.lunch = d0.lunch;
+        tplSync(t); save(); done(); editTpl(t, done);
+      });
+      bx.appendChild(sb0);
     }else{
       var p1 = el("p","note","開場・出演・終演のように、決まった時刻を並べます。校時にしばられないので、行事の日はこちらが早いです。");
       p1.style.margin = "0 0 12px"; bx.appendChild(p1);
@@ -4284,7 +4497,7 @@ function editTpl(t, done){
       var bc = el("button","btn sm bare","ふつうの時刻から作る");
       bc.addEventListener("click", function(){
         var src = bells();
-        if(!src.length) src = BELL_STD;      /* 校時の時刻がまだ空なら、よくある形から */
+        if(!src.length) src = BELL_STD_ROWS();   /* 校時の時刻がまだ空なら、星城の時刻から */
         t.bell = src.map(function(b){ return {l:b.l, s:b.s, e:b.e, p:b.p}; });
         save(); done(); editTpl(t, done);
       });
@@ -4362,6 +4575,12 @@ function editTpl(t, done){
         });
       });
       bx.appendChild(cb);
+    }else{
+      var fb0 = el("button","btn sm bare","年間行事から日を選ぶ");
+      fb0.addEventListener("click", function(){
+        if(!tplAskDate(t, t.n)) toast("年間行事に「" + t.n + "」は見つかりませんでした");
+      });
+      bx.appendChild(fb0);
     }
 
     /* 下のボタン */
@@ -4434,12 +4653,65 @@ $("#tplAdd").addEventListener("click", function(){
   });
 });
 $("#tplAddFree").addEventListener("click", function(){
-  askText("行事の名前", "感謝祭、体育祭 など", function(n){
-    var t = {id:newTplId(), n:n, kind:"free", sh:null, bell:[], dis:"", autoDis:false,
-             items:[], periods:[], ev:n};
-    tpls().push(t); save(); renderTplList(); editTpl(t, renderTplList);
+  openSheet("どの行事ですか", function(bx){
+    var n0 = el("p","note","星城中学校の主な行事です。ここにないものは下の「自分で入力」から。");
+    n0.style.margin = "0 0 14px"; bx.appendChild(n0);
+    var g = el("div","pick");
+    SCHOOL_BIG.forEach(function(n){
+      var b = el("button", null, n);
+      b.style.fontSize = "14px";
+      b.addEventListener("click", function(){ closeSheet(); tplNewFree(n); });
+      g.appendChild(b);
+    });
+    bx.appendChild(g);
+    var o = el("button","btn sm","自分で入力"); o.style.marginTop = "16px";
+    o.addEventListener("click", function(){
+      closeSheet();
+      askText("行事の名前", "合唱祭、避難訓練 など", tplNewFree);
+    });
+    bx.appendChild(o);
   });
 });
+function tplNewFree(n){
+  var t = {id:newTplId(), n:n, kind:"free", sh:null, bell:[], dis:"", autoDis:false,
+           items:[], periods:[], ev:n};
+  tpls().push(t); save(); renderTplList();
+  if(!tplAskDate(t, n)) editTpl(t, renderTplList);
+}
+/* 取り込んだ年間行事の中から、その名前が出てくる日をならべて選ばせる。
+   「感謝祭」なら準備の日も引っかかるので、どれが本番かは自分で選んでもらう */
+function tplAskDate(t, name){
+  var days = [];
+  for(var k in S.days){
+    var r = S.days[k];
+    if(r && r.ev && r.ev.indexOf(name) >= 0 && !r.tpl) days.push(k);
+  }
+  days.sort();
+  if(!days.length) return false;
+  openSheet(t.n + "　いつの日ですか", function(bx){
+    var n0 = el("p","note","年間行事の中で、この名前が出てくる日です。押すと、その日に当てます。");
+    n0.style.margin = "0 0 14px"; bx.appendChild(n0);
+    var w = el("div");
+    days.forEach(function(k){
+      var x = parseKey(k);
+      var b = el("button","tplrow"); b.type = "button";
+      var tn = el("div","tn");
+      tn.appendChild(el("b", null, (x.getMonth()+1) + "月" + x.getDate() + "日（" + DOW[x.getDay()] + "）"));
+      tn.appendChild(el("span", null, S.days[k].ev));
+      b.appendChild(tn); b.appendChild(el("span","arw","›"));
+      b.addEventListener("click", function(){
+        tplAssign(k, t); closeSheet(); renderTplList(); renderCal();
+        toast((x.getMonth()+1) + "/" + x.getDate() + " に当てました");
+      });
+      w.appendChild(b);
+    });
+    bx.appendChild(w);
+    var sk = el("button","btn sm bare","あとで決める"); sk.style.marginTop = "16px";
+    sk.addEventListener("click", function(){ closeSheet(); editTpl(t, renderTplList); });
+    bx.appendChild(sk);
+  });
+  return true;
+}
 $("#tplStd").addEventListener("click", function(){
   var add = TPL_STD().filter(function(t){ return !tplById(t.id); });
   if(!add.length){ $("#tplMsg").textContent = "よくある形は、もう全部入っています。"; return; }
@@ -4447,6 +4719,7 @@ $("#tplStd").addEventListener("click", function(){
   save(); renderTplList();
   $("#tplMsg").textContent = add.map(function(t){ return "「"+t.n+"」"; }).join("") + "を入れました。";
 });
+$("#tplStorm").addEventListener("click", tplStormMake);
 $("#tplScan").addEventListener("click", function(){
   var map = [
     {re:/短縮\s*45\s*分/, id:"Tshort45"},
