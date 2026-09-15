@@ -362,7 +362,9 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .tt li.nowline .ps{font-weight:700}
 
 /* ===== 時計 ===== */
-.clock .ctop{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
+/* 右上には時計モードのボタンがあるので、その分だけ場所をあける */
+.clock .ctop{display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
+  padding-right:38px}
 .clock .cnow{font-size:calc(46px * var(--fs)); font-weight:700; line-height:.95;
   font-variant-numeric:tabular-nums; letter-spacing:-.03em}
 .clock .cnow small{font-size:calc(20px * var(--fs)); font-weight:600; color:var(--label3); margin-left:3px}
@@ -637,7 +639,9 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 /* ===== タブレット・PC =====
    スマホ向けの1列をそのまま引き伸ばすと、両側が余って中央が細長くなる。
    幅があるときはカードを2〜3列に流し、さらに広ければタブバーを左の柱に置きかえる。 */
-@media (min-width:760px){
+/* ここから上はスマホ、ここから下はタブレット。681px で切りかえる。
+   iPad mini のたて（744px）も、こちら側に入れて左右のあきを詰める。 */
+@media (min-width:681px){
   .app{max-width:880px; padding-inline:24px}
   .cal .c{min-height:78px; padding:7px 5px; gap:4px}
   .cal .c .e,.cal .c .tg{font-size:calc(10.5px * var(--fs)); max-height:32px}
@@ -652,14 +656,17 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
      カードの高さが変わらず、ただ「ながめる」画面だから列が組み変わらない。
      設定は開くと高さが変わり、そのたびに列が入れかわってしまうので1列。
      記入・課題・録音は上から順に進む画面なので、これも1列。 */
-  #v-home{column-count:2; column-gap:20px}
-  #v-home > *{break-inside:avoid}
-  #v-home > .sect{margin-top:0; margin-bottom:20px}
+  /* 新聞のような段組（column-count）はやめた。
+     iPad の Safari だと「横いっぱいに置く部品」がカードの上に重なってしまう。
+     かわりに、柱（.hcol）を自分で作って、背の低い柱から順にカードを入れる。
+     JS が動かなかったときは split が付かないので、ふつうの1列のまま。 */
+  .hcols.split{display:flex; align-items:flex-start; gap:20px}
+  .hcols.split > .hcol{flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:20px}
+  .hcols.split > .hcol > .sect{margin:0}
   #v-in,#v-todo,#v-rec,#v-set{max-width:680px; margin-inline:auto}
   #v-seat{max-width:820px; margin-inline:auto}
   .gset > .glab{margin:22px 8px 6px}
   .gset:first-child > .glab{margin-top:2px}
-  #v-home > .segs,#v-home > .dateline,#v-home > #firstRun,#v-home > .actions{column-span:all}
   #v-home > .segs{margin-bottom:18px; max-width:470px}
   #v-home > .dateline{margin-top:6px}
   #v-cal{max-width:860px}
@@ -698,7 +705,7 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 @media (min-width:1480px){
   .app{max-width:1440px}
-  #v-home{column-count:3}
+
   #v-in,#v-todo,#v-rec,#v-set{max-width:740px}
   #v-seat{max-width:900px}
 }
@@ -1030,6 +1037,7 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       </div>
     </div>
 
+    <div class="hcols" id="hColsA">
     <div class="sect route" id="hRoute" style="display:none">
       <p class="lab">登校<span class="r"><button class="btn sm" id="rtWhere">いまどこ？</button></span></p>
       <div class="rtgoal" id="rtGoal">—</div>
@@ -1096,6 +1104,8 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <ul class="cdlist" id="restMore"></ul>
     </div>
 
+    </div>
+
     <div class="dateline">
       <div>
         <p class="rel" id="hRel">今日</p>
@@ -1103,6 +1113,8 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       </div>
       <div class="k" id="hPat">—</div>
     </div>
+
+    <div class="hcols" id="hColsB">
 
     <div class="sect">
       <p class="lab">時間割<span class="r">
@@ -1151,7 +1163,9 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <ul class="tt" id="hNote"></ul>
     </div>
 
-    <div class="actions">
+        </div>
+
+<div class="actions">
       <button class="btn primary" style="flex:1" id="hEdit">この日を記入する</button>
       <button class="btn" id="hShot">板書をとる</button>
     </div>
@@ -2416,6 +2430,7 @@ function renderHome(){
   var pend = S.todos.filter(function(t){ return !t.k && (!t.d || t.d <= k); }).sort(sortTodos);
   $("#hTodoS").style.display = (pend.length && showOn("todo")) ? "" : "none";
   renderHomeAtt(k);
+  layoutHome();
   var tl = $("#hTodo"); tl.innerHTML = "";
   pend.slice(0,8).forEach(function(t){ tl.appendChild(todoRow(t, null)); });
 
@@ -2948,6 +2963,44 @@ function renderInAtt(){
 /* ---- 出席率のシート ---- */
 var rateSpan = "month";
 function openRate(){ seatOpen("rate"); }
+
+/* ---- 今日の画面を、柱に振り分ける ----
+   カードは背の高さがバラバラなので、そのまま2列にすると
+   短いカードの下に大きなすき間ができる。
+   本棚に本をならべるように、そのつど「いちばん低い柱」に積んでいく。 */
+var hCardsA = null, hCardsB = null, hLayT = null;
+function homeColN(){
+  var w = window.innerWidth;
+  return w >= 1480 ? 3 : (w >= 800 ? 2 : 1);
+}
+function fillCols(wrap, cards, n){
+  if(!wrap) return;
+  wrap.className = "hcols" + (n > 1 ? " split" : "");
+  while(wrap.firstChild) wrap.removeChild(wrap.firstChild);
+  if(n === 1){ cards.forEach(function(c){ wrap.appendChild(c); }); return; }
+  var cols = [], i;
+  for(i=0;i<n;i++) cols.push(wrap.appendChild(el("div","hcol")));
+  cards.forEach(function(c){
+    if(c.style.display === "none"){ cols[0].appendChild(c); return; }  /* 隠れている分は数えない */
+    var b = 0;
+    for(var j=1;j<n;j++) if(cols[j].offsetHeight < cols[b].offsetHeight) b = j;
+    cols[b].appendChild(c);
+  });
+}
+function layoutHome(){
+  var A = $("#hColsA"), B = $("#hColsB"); if(!A || !B) return;
+  if(!hCardsA){ hCardsA = $$(":scope > .sect", A); hCardsB = $$(":scope > .sect", B); }
+  var n = homeColN();
+  fillCols(A, hCardsA, n);
+  fillCols(B, hCardsB, n);
+}
+/* 電車の時刻が後から届いたときなど、高さが変わったら組み直す */
+function relayoutSoon(){
+  clearTimeout(hLayT);
+  hLayT = setTimeout(function(){ if(view === "home") layoutHome(); }, 180);
+}
+window.addEventListener("resize", relayoutSoon);
+window.addEventListener("orientationchange", relayoutSoon);
 
 /* ---- 1ページにまとめたところ ---- */
 var pgTab = "att", pgKey = null;
@@ -7025,6 +7078,7 @@ function renderTrain(){
     n.textContent = "運行情報を取りにいっています…";
   }
   $("#trStatus").textContent = "";
+  relayoutSoon();
 }
 
 /* ============ 登校ルート ============ */
