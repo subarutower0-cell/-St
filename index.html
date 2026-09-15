@@ -154,6 +154,13 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 .sync #syncT{overflow:hidden; text-overflow:ellipsis}
 .sync i{width:7px; height:7px; border-radius:50%; background:var(--label3); display:inline-block}
 .sync.live i{background:var(--green); box-shadow:0 0 8px var(--green)}
+.fsb{flex:0 0 auto; width:34px; height:34px; border-radius:11px; display:inline-flex;
+  align-items:center; justify-content:center; color:var(--label3);
+  background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep); transition:color .18s, background .18s}
+.fsb svg{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.fsb:hover{color:var(--accent)}
+.fsb:active{transform:scale(.93)}
+:root.fs .fsb{color:var(--accent)}
 
 /* cards */
 .sect{border-radius:var(--r); padding:17px; margin-top:14px}
@@ -167,7 +174,7 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 
 /* controls */
 .btn{
-  display:inline-flex; align-items:center; justify-content:center;
+  display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
   border:none; border-radius:999px; padding:11px 17px; font-size:calc(15px * var(--fs)); font-weight:600; color:var(--accent);
   background:var(--glass2); -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
   box-shadow:inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--rim2), 0 2px 8px rgba(9,20,40,.06);
@@ -418,6 +425,215 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .cal .c.today{box-shadow:inset 0 1px 0 var(--rim), inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent)}
 .cal .c.today .n{box-shadow:0 2px 8px var(--accent-soft), 0 1px 2px rgba(9,20,40,.18)}
 
+/* ===== 出欠・座席表 =====
+   黒板を上にして、教室を上から見たかたちにならべる。
+   マスをおすたびに 出席→欠→遅→早→停 と変わる。 */
+/* --- 教室の図 ---
+   黒板を上、うしろを下に置いて、左右に窓側・廊下側をそえる。
+   まん中のマスだけが席で、席のない場所は何も置かない。 */
+/* 窓側・廊下側は横1行に置く。たての帯にすると、せまい画面で席がつぶれる */
+.room{display:block}
+.room .sides{display:flex; justify-content:space-between; margin:7px 2px 9px;
+  font-size:calc(10.5px * var(--fs)); font-weight:700; color:var(--label3); letter-spacing:.14em}
+.board{height:30px; border-radius:8px; display:flex; align-items:center;
+  justify-content:center; font-size:calc(11.5px * var(--fs)); font-weight:700; letter-spacing:.34em;
+  color:var(--label2); background:linear-gradient(180deg, var(--glass2), var(--glass3));
+  box-shadow:inset 0 0 0 1px var(--sep2), inset 0 -2px 0 var(--hair); margin:0 0 4px}
+.colno{display:grid; gap:7px; margin:0 0 8px; grid-template-columns:repeat(var(--sc,6), minmax(0,1fr))}
+.colno span{text-align:center; font-size:calc(10px * var(--fs)); color:var(--label3);
+  font-family:var(--disp); font-variant-numeric:tabular-nums}
+.backline{margin:10px 0 0; display:flex; align-items:center; gap:10px; color:var(--label3);
+  font-size:calc(10.5px * var(--fs)); font-weight:700; letter-spacing:.24em}
+.backline::before,.backline::after{content:""; flex:1 1 auto; height:1px; background:var(--hair)}
+.seats{display:grid; gap:7px; grid-template-columns:repeat(var(--sc,6), minmax(0,1fr))}
+.seats button{aspect-ratio:1/.94; border-radius:12px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1px; padding:3px 2px; min-width:0; overflow:hidden;
+  background:var(--glass2); box-shadow:inset 0 0 0 1px var(--sep); color:var(--label);
+  transition:background .16s, box-shadow .16s, color .16s}
+.seats button:active{transform:scale(.94)}
+.seats button.non{background:none; box-shadow:inset 0 0 0 1px var(--hair)}
+.seats b{font-family:var(--disp); font-weight:700; font-size:calc(16px * var(--fs));
+  font-variant-numeric:tabular-nums lining-nums; line-height:1.05}
+.seats i{font-style:normal; font-size:calc(10px * var(--fs)); color:var(--label3); line-height:1.15;
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.seats em{font-style:normal; font-size:calc(10.5px * var(--fs)); font-weight:800; line-height:1.05}
+.seats button.s1{background:color-mix(in srgb, var(--red) 15%, transparent);
+  box-shadow:inset 0 0 0 1.5px var(--red); color:var(--red)}
+.seats button.s2,.seats button.s3{background:color-mix(in srgb, var(--orange) 15%, transparent);
+  box-shadow:inset 0 0 0 1.5px var(--orange); color:var(--orange)}
+.seats button.s4{background:color-mix(in srgb, var(--label) 8%, transparent);
+  box-shadow:inset 0 0 0 1.5px var(--label3); color:var(--label2)}
+.seats button.s1 i,.seats button.s2 i,.seats button.s3 i,.seats button.s4 i{color:currentColor; opacity:.72}
+.seats button.pickon{box-shadow:inset 0 0 0 2px var(--accent)}
+.seats .gap{display:block; aspect-ratio:1/.94}            /* そこに席がない場所 */
+.seatdir{margin:10px 0 0; text-align:center; font-size:calc(11.5px * var(--fs));
+  color:var(--label3); letter-spacing:.04em}
+/* 出欠のまとめ */
+.pghead{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:18px 0 6px}
+.pgttl{font-size:calc(17px * var(--fs)); font-weight:700; letter-spacing:-.01em}
+.attsum{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 18px; margin:0 0 14px}
+.attsum span{font-size:calc(13.5px * var(--fs)); color:var(--label2)}
+.attsum span b{font-family:var(--disp); font-weight:700; color:var(--label); margin-left:7px;
+  font-variant-numeric:tabular-nums; font-size:calc(16px * var(--fs))}
+.attsum span.warn b{color:var(--red)}
+/* 名簿 */
+.rost{display:flex; flex-direction:column}
+.rost li{display:flex; align-items:center; gap:11px; padding:9px 0; border-top:1px solid var(--hair)}
+.rost li:first-child{border-top:none}
+.rost li i{font-style:normal; flex:0 0 auto; min-width:2.6em; color:var(--label3);
+  font-family:var(--disp); font-variant-numeric:tabular-nums; font-size:calc(13px * var(--fs))}
+.rost li span{flex:1 1 auto; min-width:0; font-size:calc(15px * var(--fs));
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.rost li span.none{color:var(--label3)}
+.rost li button{flex:0 0 auto; font-size:calc(12.5px * var(--fs)); color:var(--label3); padding:6px 9px}
+/* 出席率の一覧 */
+.rate{display:flex; flex-direction:column}
+.rate li{display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--hair)}
+.rate li:first-child{border-top:none}
+.rate li i{font-style:normal; flex:0 0 auto; min-width:2.6em; color:var(--label3);
+  font-family:var(--disp); font-variant-numeric:tabular-nums; font-size:calc(12.5px * var(--fs))}
+.rate li span{flex:1 1 auto; min-width:0; font-size:calc(14.5px * var(--fs));
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.rate li u{text-decoration:none; flex:0 0 auto; font-size:calc(11.5px * var(--fs)); color:var(--label3)}
+.rate li b{flex:0 0 auto; font-family:var(--disp); font-weight:700; font-variant-numeric:tabular-nums;
+  font-size:calc(15px * var(--fs)); min-width:3.4em; text-align:right}
+.rate li.low b{color:var(--red)}
+
+/* ===== 紙に出すとき =====
+   座席表の図だけをきれいに1枚に収める。色が出ないプリンタでも、
+   欠席・遅刻などが線の太さと文字で分かるようにしてある。 */
+@media print{
+  @page{ size:A4 portrait; margin:12mm; }
+  body{background:#fff !important; padding:0 !important}
+  .aurora,.nav,.mast,.segs,.pghead,.actions,.acts,.bg,.kiosk,.kopen,#pgRest,#pgHint,
+  #pgRate,#pgEdit,#pgDate,.view:not(#v-seat){display:none !important}
+  .app{max-width:none !important; padding:0 !important}
+  .sect{background:none !important; box-shadow:none !important; padding:0 !important;
+    margin:0 0 10mm !important; border-radius:0 !important}
+  .lab,.note,.attsum span,.attsum span b,.attsum span.warn b{color:#000 !important}
+  .board{background:#fff !important; box-shadow:inset 0 0 0 1.2pt #000 !important; color:#000 !important}
+  .seats button{background:#fff !important; box-shadow:inset 0 0 0 .8pt #666 !important;
+    color:#000 !important}
+  .seats button.s1{box-shadow:inset 0 0 0 2pt #000 !important}
+  .seats button.s2,.seats button.s3,.seats button.s4{box-shadow:inset 0 0 0 1.6pt #000 !important}
+  .seats b,.seats i,.seats em{color:#000 !important}
+  .room .sides,.backline,.colno span,.seatdir{color:#000 !important}
+  #pgWhoS{break-inside:avoid}
+}
+
+/* ===== 時計モード =====
+   机に置いて遠くから見るための画面。時刻・いま何の授業か・今日の並び、それだけ。 */
+.kiosk{position:fixed; inset:0; z-index:90; background:var(--bg);
+  display:flex; flex-direction:column; gap:0; padding:
+  calc(18px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right))
+  calc(18px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+  overflow:hidden; color:var(--label); isolation:isolate}
+/* 動く光は置かない。ずっと眺めるものなので、静かな地にする */
+.kiosk::before{content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(88% 68% at 16% 18%, color-mix(in srgb, var(--tint1) 24%, transparent), transparent 68%),
+    radial-gradient(72% 58% at 90% 86%, color-mix(in srgb, var(--tint3) 20%, transparent), transparent 70%)}
+.kiosk[hidden]{display:none}
+.ktop{display:flex; align-items:center; justify-content:space-between; gap:14px; flex:0 0 auto}
+.kday{font-size:calc(17px * var(--fs)); font-weight:600; color:var(--label2); letter-spacing:.02em}
+.kx{flex:0 0 auto; font-size:calc(13.5px * var(--fs)); font-weight:700; color:var(--accent);
+  border-radius:999px; padding:9px 17px; background:var(--glass2);
+  box-shadow:inset 0 0 0 1px var(--sep); white-space:nowrap}
+.kx:active{transform:scale(.95)}
+.kwrap{flex:1 1 auto; min-height:0; display:flex; gap:26px; align-items:center; padding:10px 0}
+.kmain{flex:1 1 auto; min-width:0}
+.kclock{font-family:var(--disp); font-weight:700; font-variant-numeric:tabular-nums lining-nums;
+  font-size:clamp(68px, 19vw, 190px); line-height:.9; letter-spacing:-.05em}
+.kclock small{font-size:.34em; font-weight:600; color:var(--label3); margin-left:.1em; letter-spacing:-.02em}
+.kclock.plain{font-size:clamp(86px, 26vw, 250px); letter-spacing:-.055em}
+/* 見た目を選ぶところ */
+.kx.ghost{background:none; box-shadow:inset 0 0 0 1px var(--sep); color:var(--label2)}
+.kpick{display:flex; flex-wrap:wrap; gap:8px; padding:12px 0 2px; flex:0 0 auto}
+.kpick[hidden]{display:none}
+.kpick button{font-size:calc(13.5px * var(--fs)); border-radius:999px; padding:8px 15px;
+  color:var(--label2); background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep)}
+.kpick button[aria-pressed="true"]{background:var(--accent); color:var(--accent-on); font-weight:700;
+  box-shadow:0 4px 12px var(--accent-soft)}
+/* 針の時計・輪の時計 */
+.kdial{width:min(46vh, 74vw, 460px); aspect-ratio:1; max-width:100%; display:block; margin-inline:auto}
+.kdial .fc{fill:var(--glass); stroke:var(--sep); stroke-width:1}
+.kdial .tk{stroke:var(--label3); stroke-width:2; stroke-linecap:round}
+.kdial .tk.t5{stroke:var(--label2); stroke-width:3.4}
+.kdial .arc{fill:none; stroke:color-mix(in srgb, var(--accent) 24%, transparent); stroke-width:5; stroke-linecap:round}
+.kdial .arc.done{stroke:var(--accent)}
+.kiosk.rest .kdial .arc{stroke:color-mix(in srgb, var(--green) 24%, transparent)}
+.kiosk.rest .kdial .arc.done{stroke:var(--green)}
+.kiosk.rest .kdial .sh{stroke:var(--green)}
+.kdial .hh,.kdial .mh{stroke:var(--label); stroke-linecap:round; fill:none}
+.kdial .hh{stroke-width:7.5} .kdial .mh{stroke-width:5}
+.kdial .sh{stroke:var(--accent); stroke-width:2; stroke-linecap:round}
+.kdial .pin{fill:var(--label)}
+/* 腕時計の日付の窓 */
+.kdial .dwin rect{fill:color-mix(in srgb, var(--label) 5.5%, transparent); stroke:var(--sep); stroke-width:.8}
+.kdial .dwin text{fill:var(--label); font-family:var(--disp); font-weight:700; font-size:12px;
+  letter-spacing:-.02em; text-anchor:middle; dominant-baseline:central;
+  font-variant-numeric:tabular-nums lining-nums}
+.kdial .num{fill:var(--label2); font-family:var(--disp); font-weight:700; font-size:11px;
+  text-anchor:middle; dominant-baseline:central}
+.kring{position:relative; width:min(46vh, 74vw, 440px); aspect-ratio:1; max-width:100%; margin-inline:auto}
+.kring svg{width:100%; height:100%; display:block; transform:rotate(-90deg)}
+/* うしろの薄い輪は trk。bg という名前はアプリのシートの幕が使っているので避ける */
+.kring .trk{fill:none; stroke:color-mix(in srgb, var(--accent) 15%, transparent); stroke-width:13}
+.kiosk.rest .kring .trk{stroke:color-mix(in srgb, var(--green) 15%, transparent)}
+.kring .fg{fill:none; stroke:var(--accent); stroke-width:13; stroke-linecap:round;
+  transition:stroke-dashoffset .9s linear}
+.kiosk.rest .kring .fg{stroke:var(--green)}
+.kring .mid{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px; text-align:center}
+.kring .mid b{font-family:var(--disp); font-weight:700; font-variant-numeric:tabular-nums;
+  font-size:clamp(38px, 11vw, 82px); letter-spacing:-.04em; line-height:1}
+.kring .mid span{font-size:clamp(12px, 2.4vw, 17px); color:var(--label3); letter-spacing:.06em; font-weight:700}
+@media (max-width:680px){
+  .kdial,.kring{width:min(56vw, 300px)}
+}
+/* 画面が広いとき、丸い時計は「駅の時計」のように真ん中ぞろえにする。
+   デジタルは大きな数字を左にそろえたほうが落ちつくので、そのまま。 */
+@media (min-width:681px){
+  .kmain.round{text-align:center}
+  .kmain.round .kdial,.kmain.round .kring{width:min(50vh, 56vw, 430px)}
+  .kmain.round .kmeta{max-width:min(78%, 640px); margin-inline:auto}
+}
+.kbar{height:10px; border-radius:99px; background:var(--glass3); margin:20px 0 0;
+  box-shadow:inset 0 0 0 1px var(--sep); overflow:hidden}
+.kbar i{display:block; height:100%; border-radius:99px; background:var(--accent); transition:width .9s linear}
+.kiosk.rest .kbar i{background:var(--green)}
+.know{margin-top:20px; font-size:clamp(24px, 5.2vw, 46px); font-weight:700; line-height:1.25; letter-spacing:-.02em}
+.knext{margin-top:9px; font-size:clamp(14px, 2.4vw, 21px); color:var(--label3)}
+.kside{flex:0 0 auto; width:min(40%, 380px); max-height:100%; overflow-y:auto;
+  -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
+.ktt{display:flex; flex-direction:column}
+.ktt li{display:flex; align-items:baseline; gap:12px; padding:9px 0; border-top:1px solid var(--hair);
+  font-size:clamp(14px, 2.1vw, 19px)}
+.ktt li:first-child{border-top:none}
+.ktt li i{font-style:normal; flex:0 0 auto; min-width:4.4em; color:var(--label3);
+  font-family:var(--disp); font-variant-numeric:tabular-nums; font-size:.84em}
+.ktt li b{font-weight:600}
+.ktt li.on{color:var(--accent)}
+.ktt li.on b{font-weight:700}
+.ktt li.past{opacity:.42}
+.kfoot{flex:0 0 auto; display:flex; flex-wrap:wrap; gap:10px 26px; padding-top:14px;
+  border-top:1px solid var(--sep)}
+.kfoot span{font-size:clamp(13px, 2vw, 17px); color:var(--label2)}
+.kfoot span b{font-family:var(--disp); font-weight:700; color:var(--label);
+  font-variant-numeric:tabular-nums; margin-left:7px}
+.kopen{position:absolute; top:12px; right:12px; z-index:2; width:32px; height:32px; border-radius:10px;
+  display:inline-flex; align-items:center; justify-content:center; color:var(--label3);
+  background:var(--glass3); box-shadow:inset 0 0 0 1px var(--sep); transition:color .18s}
+.kopen svg{width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.kopen:hover{color:var(--accent)}
+.kopen:active{transform:scale(.92)}
+@media (max-width:680px){
+  .kwrap{flex-direction:column; align-items:stretch; gap:16px; overflow-y:auto}
+  .kside{width:auto; max-height:none}
+  .kclock{font-size:clamp(64px, 24vw, 120px)}
+}
+
 /* ===== タブレット・PC =====
    スマホ向けの1列をそのまま引き伸ばすと、両側が余って中央が細長くなる。
    幅があるときはカードを2〜3列に流し、さらに広ければタブバーを左の柱に置きかえる。 */
@@ -432,20 +648,24 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 
 /* カードを2列に。上下に通したいものだけ全幅で割りこませる */
 @media (min-width:800px){
-  #v-home,#v-in,#v-set,#v-todo{column-count:2; column-gap:20px}
-  #v-home > *,#v-in > *,#v-todo > *{break-inside:avoid}
-  #v-home > .sect,#v-in > .sect,#v-todo > .sect{margin-top:0; margin-bottom:20px}
-  #v-set > .gset{break-inside:avoid; margin:0 0 4px}
-  .gset > .glab{margin:14px 8px 6px}
-  .gset:first-child > .glab{margin-top:0}
-  .gset > .acc{margin-top:10px}
+  /* 2列にしてよいのは、今日の画面だけ。
+     カードの高さが変わらず、ただ「ながめる」画面だから列が組み変わらない。
+     設定は開くと高さが変わり、そのたびに列が入れかわってしまうので1列。
+     記入・課題・録音は上から順に進む画面なので、これも1列。 */
+  #v-home{column-count:2; column-gap:20px}
+  #v-home > *{break-inside:avoid}
+  #v-home > .sect{margin-top:0; margin-bottom:20px}
+  #v-in,#v-todo,#v-rec,#v-set{max-width:680px; margin-inline:auto}
+  #v-seat{max-width:820px; margin-inline:auto}
+  .gset > .glab{margin:22px 8px 6px}
+  .gset:first-child > .glab{margin-top:2px}
   #v-home > .segs,#v-home > .dateline,#v-home > #firstRun,#v-home > .actions{column-span:all}
   #v-home > .segs{margin-bottom:18px; max-width:470px}
   #v-home > .dateline{margin-top:6px}
   #v-cal{max-width:860px}
-  #v-cal > .actions{max-width:420px}
-  #v-cal > .note{max-width:62ch}
-  #v-rec{max-width:820px}
+  #v-cal > .actions{max-width:420px; margin-inline:auto}
+  #v-cal > .note{max-width:62ch; text-align:center; margin-inline:auto}
+  #v-cal > .legend{justify-content:center}
 }
 
 /* タブバー → 左の柱 */
@@ -478,7 +698,9 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 @media (min-width:1480px){
   .app{max-width:1440px}
-  #v-home,#v-set{column-count:3}
+  #v-home{column-count:3}
+  #v-in,#v-todo,#v-rec,#v-set{max-width:740px}
+  #v-seat{max-width:900px}
 }
 /* 指ではなくマウスのとき、押せるところをわかりやすく */
 @media (hover:hover) and (pointer:fine){
@@ -787,6 +1009,9 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
   <header class="mast">
     <div class="brand"><h1>終学活ノート</h1></div>
     <span class="sync" id="sync"><i></i><span id="syncT">この端末のみ</span></span>
+    <button class="fsb" id="fsBtn" type="button" title="全画面" aria-label="全画面にする" style="display:none">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fs-in" d="M9 3.6H5.4A1.8 1.8 0 0 0 3.6 5.4V9M15 3.6h3.6A1.8 1.8 0 0 1 20.4 5.4V9M9 20.4H5.4A1.8 1.8 0 0 1 3.6 18.6V15M15 20.4h3.6a1.8 1.8 0 0 0 1.8-1.8V15"/><path class="fs-out" d="M3.6 8.4h3.6A1.2 1.2 0 0 0 8.4 7.2V3.6M20.4 8.4h-3.6a1.2 1.2 0 0 1-1.2-1.2V3.6M3.6 15.6h3.6a1.2 1.2 0 0 1 1.2 1.2v3.6M20.4 15.6h-3.6a1.2 1.2 0 0 0-1.2 1.2v3.6" style="display:none"/></svg>
+    </button>
   </header>
 
   <!-- ===== 今日・明日 ===== -->
@@ -822,6 +1047,9 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </div>
 
     <div class="sect clock" id="hClock" style="display:none">
+      <button class="kopen" id="kOpen" type="button" aria-label="時計モードにする" title="大きく出す">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.6H5.4A1.8 1.8 0 0 0 3.6 5.4V9M15 3.6h3.6A1.8 1.8 0 0 1 20.4 5.4V9M9 20.4H5.4A1.8 1.8 0 0 1 3.6 18.6V15M15 20.4h3.6a1.8 1.8 0 0 0 1.8-1.8V15"/></svg>
+      </button>
       <div class="ctop">
         <div class="cnow" id="clkNow">--:--</div>
         <div class="cleft"><em id="clkLeft">—</em><span id="clkLeftL">のこり</span></div>
@@ -884,6 +1112,12 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         </span></span></p>
       <ul class="tt" id="hTT"></ul>
       <dl class="facts" id="hFacts"></dl>
+    </div>
+
+    <div class="sect" id="hAttS" style="display:none">
+      <p class="lab">出欠<span class="r"><button class="btn sm" id="hAttSeat">座席表</button></span></p>
+      <div class="attsum" id="hAttSum"></div>
+      <div id="hAttWho"></div>
     </div>
 
     <div class="sect" id="hPrepS" style="display:none">
@@ -963,6 +1197,13 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <div class="acts" id="inTplBtns" style="margin-bottom:14px"></div>
       <div id="inBellList"></div>
       <div class="acts" id="inBellBtns" style="margin-top:14px"></div>
+    </div>
+
+    <div class="sect" id="inAttS">
+      <p class="lab">出欠<span class="r muted" id="inAttState"></span></p>
+      <p class="note" id="inAttNote" style="margin:-4px 0 12px">—</p>
+      <div class="attsum" id="inAttSum"></div>
+      <div class="acts" id="inAttBtns"></div>
     </div>
 
     <div class="sect">
@@ -1175,6 +1416,13 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     <div class="gset">
 <p class="glab">学校のこと</p>
 <details class="acc">
+      <summary>クラスと座席</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">名簿・座席のならび・出欠・出席率は、ひとつの画面にまとめてあります。</p>
+        <button class="btn sm" id="setSeatOpen">出欠・座席表をひらく</button>
+      </div>
+    </details>
+<details class="acc">
       <summary>学校の年間行事</summary>
       <div class="in">
         <p class="note" style="margin:0 0 14px">令和8年度 星城中学校 第3学年の年間行事予定（4月〜3月）を、月間予定に流し込みます。すでに書いてある予定は消さず、後ろに足します。</p>
@@ -1273,6 +1521,20 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
 
     <div class="gset">
 <p class="glab">アプリのこと</p>
+    <details class="acc">
+      <summary>全画面</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">ブラウザの枠を消して、画面いっぱいに出します。机に置いて時計として使うときや、パソコンで見るときに。上のバーの右にあるボタンからも切りかえられます。</p>
+        <button class="btn sm" id="fsToggle">全画面にする</button>
+        <p class="note" id="fsMsg" style="margin-top:12px"></p>
+        <p class="lab" style="margin-top:22px">時計モード</p>
+        <p class="note" style="margin:0 0 12px">時刻・いま何の授業か・今日の並びだけを大きく出します。机に置いて眺めるとき用です。開いているあいだは画面が消えないようにします（対応している端末のみ）。今日の画面の時計の右上からも開けます。</p>
+        <button class="btn sm" id="kOpen2">時計モードにする</button>
+        <p class="note" style="margin:14px 0 10px">時計の見た目</p>
+        <div class="chips" id="kPick2"></div>
+      </div>
+    </details>
+
     <details class="acc">
       <summary>今日の画面に出すもの</summary>
       <div class="in">
@@ -1460,7 +1722,116 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </div>
   </section>
 
-  <nav class="nav">
+  <!-- ===== 出欠・座席表（1ページにまとめたところ） ===== -->
+  <section class="view" id="v-seat">
+    <div class="pghead">
+      <button class="btn sm bare" id="pgBack">‹ もどる</button>
+      <span class="pgttl" id="pgTtl">出欠・座席表</span>
+      <button class="btn sm bare" id="pgPrint">印刷</button>
+    </div>
+    <div class="segs" id="pgTabs">
+      <button data-t="att" aria-pressed="true">出欠</button>
+      <button data-t="rate" aria-pressed="false">出席率</button>
+      <button data-t="edit" aria-pressed="false">名簿と席</button>
+    </div>
+
+    <!-- 出欠 -->
+    <div id="pgAtt">
+      <div class="sect">
+        <p class="lab">この日<span class="r muted" id="pgDay"></span></p>
+        <input type="date" id="pgDate">
+        <div class="attsum" id="pgSum" style="margin:16px 0 0"></div>
+      </div>
+      <div class="sect">
+        <div id="pgRoom"></div>
+        <p class="note" id="pgHint" style="margin:14px 0 0"></p>
+        <div id="pgRest" style="margin-top:14px"></div>
+        <div class="acts" id="pgBtns" style="margin-top:16px"></div>
+      </div>
+      <div class="sect" id="pgWhoS">
+        <p class="lab">この日のようす</p>
+        <div id="pgWho"></div>
+      </div>
+    </div>
+
+    <!-- 出席率 -->
+    <div id="pgRate" hidden>
+      <div class="sect">
+        <p class="lab">どこまで<span class="r muted" id="pgSpanN"></span></p>
+        <div class="chips" id="pgSpan"></div>
+        <div class="attsum" id="pgRateSum" style="margin:16px 0 0"></div>
+        <p class="note" style="margin:10px 0 0">遅刻と早退は出席にかぞえています。出席停止は、欠席とは分けていますが出席日数には入りません。母数は「出欠をとった日」だけです。</p>
+      </div>
+      <div class="sect">
+        <p class="lab">一人ずつ</p>
+        <ul class="rate" id="pgRateList"></ul>
+      </div>
+    </div>
+
+    <!-- 名簿と席 -->
+    <div id="pgEdit" hidden>
+      <div class="sect">
+        <p class="lab">クラス名</p>
+        <input type="text" id="clsName" placeholder="3年A組">
+      </div>
+      <div class="sect">
+        <p class="lab">名簿<span class="r muted" id="rosN"></span></p>
+        <p class="note" style="margin:0 0 12px">出席番号と名前を入れます。名前は空のままでもかまいません（番号だけで出欠は取れます）。</p>
+        <div class="acts" style="margin-bottom:14px">
+          <button class="btn sm" id="rosPaste">まとめて入れる</button>
+          <button class="btn sm bare" id="rosAdd">1人ずつ足す</button>
+          <button class="btn sm bare" id="rosClr">名簿を消す</button>
+        </div>
+        <ul class="rost" id="rosList"></ul>
+      </div>
+      <div class="sect">
+        <p class="lab">列ごとの人数<span class="r muted" id="seatTot"></span></p>
+        <p class="note" style="margin:0 0 10px">右の列から順に、人数をならべて書きます。「3-5-6-6-5-4」なら、いちばん右の列が3人、いちばん左の列が4人です。</p>
+        <input type="text" id="seatShape" inputmode="numeric" placeholder="3-5-6-6-5-4">
+        <p class="lab" style="margin-top:22px">窓と廊下</p>
+        <p class="note" style="margin:0 0 12px">図の左右に出す名前です。おすと入れかわります。</p>
+        <button class="btn sm" id="seatSide">左が窓側 ／ 右が廊下側</button>
+        <p class="lab" style="margin-top:22px">番号順にならべる</p>
+        <p class="note" style="margin:0 0 12px">すきま（後ろの空き）は飛ばして、前からうめていきます。</p>
+        <div class="acts">
+          <button class="btn sm" id="seatAutoR">右の列から</button>
+          <button class="btn sm" id="seatAutoL">左の列から</button>
+          <button class="btn sm bare" id="seatAutoW">前の列から（右→左）</button>
+          <button class="btn sm bare" id="seatClr">席を空にする</button>
+        </div>
+      </div>
+      <div class="sect">
+        <p class="lab">席を入れかえる</p>
+        <p class="note" id="seatMsg" style="margin:0 0 14px">マスを2つおすと、その席が入れかわります。</p>
+        <div id="seatEdit"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="kiosk" id="kiosk" hidden>
+  <div class="ktop">
+    <span class="kday" id="kDay">—</span>
+    <button class="kx ghost" id="kFaceBtn" type="button">見た目</button>
+    <button class="kx" id="kClose" type="button">とじる</button>
+  </div>
+  <div class="kpick" id="kPick" hidden></div>
+  <div class="kwrap">
+    <div class="kmain" id="kMain">
+      <div class="kface" id="kFace"></div>
+      <div class="kmeta">
+        <div class="kbar"><i id="kBar" style="width:0%"></i></div>
+        <div class="know" id="kNow">—</div>
+        <div class="knext" id="kNext"></div>
+      </div>
+    </div>
+    <div class="kside">
+      <ul class="ktt" id="kTT"></ul>
+    </div>
+  </div>
+  <div class="kfoot" id="kFoot"></div>
+</div>
+
+<nav class="nav">
     <button data-v="home" aria-current="page">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.6" width="17.6" height="15.8" rx="4.2"/><path d="M3.2 9.4h17.6"/><circle cx="8.2" cy="14.4" r="1.35" fill="currentColor" stroke="none"/></svg>今日・明日
     </button>
@@ -1511,7 +1882,7 @@ function defaults(){
     ],
     base:{},
     amWk: AMWK_DEF(), subItems: SUBITEM_DEF(), tpl: TPL_STD(), show: SHOW_DEF(),
-    grade: 3, study: {},
+    grade: 3, study: {}, cls: CLS_DEF(),
     todos:[], ui:{ga:56, blur:26, aurora:100, tint:"aurora", accent:"blue", fs:100},
     days:{}, notif:{night:"21:00", morning:"07:00", last:""}, theme:"auto"
   };
@@ -1587,6 +1958,8 @@ function readLocal(){
   if(!S.subItems) S.subItems = SUBITEM_DEF();
   if(!S.show) S.show = SHOW_DEF();
   if(!S.grade) S.grade = 3;
+  if(!S.cls) S.cls = CLS_DEF();
+  if(!S.show.att) S.show.att = 1;
   if(!S.study) S.study = {};
   if(!S.mig4){
     (S.bell || []).forEach(function(b){ if(/GKテスト|読書/.test(b.l || "")) b.am = 1; });
@@ -1935,6 +2308,7 @@ function rerender(){
   else if(view==="rec") renderRec();
   else if(view==="cal") renderCal();
   else if(view==="set") renderSet();
+  else if(view==="seat") renderSeatPg();
 }
 
 /* ============ 課題 ============ */
@@ -2041,6 +2415,7 @@ function renderHome(){
 
   var pend = S.todos.filter(function(t){ return !t.k && (!t.d || t.d <= k); }).sort(sortTodos);
   $("#hTodoS").style.display = (pend.length && showOn("todo")) ? "" : "none";
+  renderHomeAtt(k);
   var tl = $("#hTodo"); tl.innerHTML = "";
   pend.slice(0,8).forEach(function(t){ tl.appendChild(todoRow(t, null)); });
 
@@ -2135,6 +2510,7 @@ function renderIn(){
   }
 
   renderInGk();
+  renderInAtt();
   renderSug();
   var ic = $("#inItems"); ic.innerHTML = "";
   S.items.slice().sort(function(a,b){ return (b.c||0)-(a.c||0); }).forEach(function(it){
@@ -2263,7 +2639,7 @@ function SHOW_LIST(){
   return [
     ["clock","時計"], ["wx","天気・警報"], ["cd","もうすぐ"],
     ["train","電車"], ["route","登校ルート"],
-    ["rest","つぎの休み"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
+    ["rest","つぎの休み"], ["att","出欠"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
     ["memo","連絡・写真"], ["note","授業のノート"]
   ];
 }
@@ -2286,6 +2662,494 @@ function renderShow(){
     });
     box.appendChild(c);
   });
+}
+
+/* ============ クラス・座席表・出欠 ============ */
+/* 名簿は「出席番号と名前」だけ。座席は、マス目に出席番号を置いた入れもの。
+   出欠は「ふつうは出席」なので、出席でない人だけを書きとめる。
+   誰も休んでいない日と、まだ取っていない日は別のものなので、attOn で分けておく。 */
+/* colsN は「右の列から」数えた、列ごとの人数。教室の形がそのまま入る */
+function CLS_DEF(){ return {n:"", roster:[], colsN:[3,5,6,6,5,4], seat:[]}; }
+function cls(){
+  if(!S.cls) S.cls = CLS_DEF();
+  var c = S.cls;
+  if(!c.roster) c.roster = [];
+  if(!c.seat) c.seat = [];
+  if(!c.colsN || !c.colsN.length){
+    /* 前の形（たて×よこがそろった四角）から移す */
+    var w = c.cols || 6, h = c.rows || 6, a = [];
+    for(var i=0;i<w;i++) a.push(h);
+    c.colsN = a;
+  }
+  delete c.cols; delete c.rows;
+  return c;
+}
+/* 画面は左から右へならぶので、右から数えた colsN をひっくり返して使う */
+function colsScr(){ return cls().colsN.slice().reverse(); }
+function seatCols(){ return cls().colsN.length; }
+function seatRows(){ return Math.max.apply(null, cls().colsN.concat([1])); }
+function seatHas(x, y){ return y < (colsScr()[x] || 0); }      /* x は画面の左から */
+function seatTotal(){ return cls().colsN.reduce(function(a,b){ return a + b; }, 0); }
+var ATT_CY = ["", "欠", "遅", "早", "停"];                       /* おすたびにこの順で変わる */
+var ATT_NM = {"欠":"欠席", "遅":"遅刻", "早":"早退", "停":"出席停止"};
+var ATT_CL = {"欠":"s1", "遅":"s2", "早":"s3", "停":"s4"};
+function attOf(k){ var r = S.days[k]; return (r && r.att) || {}; }
+function attTook(k){ var r = S.days[k]; return !!(r && r.attOn); }
+function attSet(k, no, v){
+  var r = rec(k);
+  if(!r.att) r.att = {};
+  if(v) r.att[String(no)] = v; else delete r.att[String(no)];
+  r.attOn = 1;
+}
+/* 遅刻・早退は出席にかぞえる。出席停止は欠席とは別だが、出席日数には入らない */
+function attPresent(v){ return v !== "欠" && v !== "停"; }
+function rosterBy(no){
+  var rs = cls().roster;
+  for(var i=0;i<rs.length;i++) if(rs[i].no === no) return rs[i];
+  return null;
+}
+function rosterName(no){ var p = rosterBy(no); return (p && p.n) || ""; }
+function whoTxt(p){ return p.no + "番" + (p.n ? "　" + p.n : ""); }
+/* その日のまとめ */
+function attDay(k){
+  var rs = cls().roster, a = attOf(k);
+  var out = {all:rs.length, abs:[], late:[], early:[], stop:[], ok:0};
+  rs.forEach(function(p){
+    var v = a[String(p.no)] || "";
+    if(v === "欠") out.abs.push(p);
+    else if(v === "停") out.stop.push(p);
+    else if(v === "遅") out.late.push(p);
+    else if(v === "早") out.early.push(p);
+    if(attPresent(v)) out.ok++;
+  });
+  out.rate = rs.length ? out.ok / rs.length : 0;
+  return out;
+}
+/* 出欠をとった日だけを母数にする。学校がある日でも、取っていない日は数えない */
+function attDays(from, to){
+  var out = [];
+  for(var k in S.days){
+    if(!attTook(k)) continue;
+    if(from && k < from) continue;
+    if(to && k > to) continue;
+    out.push(k);
+  }
+  return out.sort();
+}
+function attStats(from, to){
+  var days = attDays(from, to), rs = cls().roster, idx = {};
+  var per = rs.map(function(p, i){
+    idx[p.no] = i;
+    return {no:p.no, n:p.n, ok:0, abs:0, late:0, early:0, stop:0, rate:0};
+  });
+  var sOk = 0, sAll = 0;
+  days.forEach(function(k){
+    var a = attOf(k);
+    rs.forEach(function(p){
+      var v = a[String(p.no)] || "", x = per[idx[p.no]];
+      if(v === "欠") x.abs++; else if(v === "停") x.stop++;
+      else if(v === "遅") x.late++; else if(v === "早") x.early++;
+      if(attPresent(v)){ x.ok++; sOk++; }
+      sAll++;
+    });
+  });
+  per.forEach(function(x){ x.rate = days.length ? x.ok / days.length : 0; });
+  return {days:days, per:per, n:days.length, rate: sAll ? sOk / sAll : 0};
+}
+/* 0.9714 → 97.1。あとのほうに別の pct があるので、名前を分けておく */
+function attPct(x){ return Math.round(x * 1000) / 10; }
+
+/* ---- 座席 ---- */
+function seatN(){ return seatCols() * seatRows(); }
+function seatGet(){
+  var n = seatN(), s = cls().seat.slice(0, n);
+  while(s.length < n) s.push(null);
+  return s;
+}
+/* 出席番号順にならべる。席のない場所（欠けている後ろ）は飛ばす */
+function seatAuto(way){
+  var c = cls(), rs = c.roster.slice().sort(function(a,b){ return a.no - b.no; });
+  var cols = seatCols(), rows = seatRows(), s = [], i, x, y, n = 0;
+  for(i=0;i<cols*rows;i++) s.push(null);
+  function put(x, y){ if(seatHas(x,y) && n < rs.length) s[y*cols + x] = rs[n++].no; }
+  if(way === "left"){                                   /* 左の列から、前→後ろ */
+    for(x=0; x<cols; x++) for(y=0; y<rows; y++) put(x,y);
+  }else if(way === "row"){                              /* 前の列から、右→左 */
+    for(y=0; y<rows; y++) for(x=cols-1; x>=0; x--) put(x,y);
+  }else{                                                /* 右の列から、前→後ろ（ふつうはこれ） */
+    for(x=cols-1; x>=0; x--) for(y=0; y<rows; y++) put(x,y);
+  }
+  c.seat = s;
+}
+/* 「3-5-6-6-5-4」のような書き方を、列ごとの人数として読む（右の列から） */
+function shapeParse(txt){
+  var a = String(txt).split(/[^0-9]+/).filter(function(z){ return z !== ""; })
+            .map(function(z){ return Math.max(0, Math.min(12, +z)); });
+  return a.slice(0, 12);
+}
+function shapeText(){ return cls().colsN.join("-"); }
+/* 形を変えても、いま座っている人はできるだけそのまま残す */
+function shapeSet(a){
+  if(!a.length) return;
+  var c = cls(), oldS = seatGet(), oldC = seatCols(), oldR = seatRows();
+  c.colsN = a;
+  var cols = seatCols(), rows = seatRows(), s = [], x, y, v;
+  /* 画面の右はしをそろえたいので、右から数えて同じ位置を引きつぐ */
+  for(y=0; y<rows; y++) for(x=0; x<cols; x++){
+    var ox = oldC - (cols - x);
+    v = (ox >= 0 && ox < oldC && y < oldR) ? oldS[y*oldC + ox] : null;
+    s.push(seatHas(x, y) ? v : null);
+  }
+  c.seat = s;
+  /* あふれた人は、席なしとして下に出る */
+  seatPick = null;
+}
+/* 席が用意されていない人。この人たちも出欠は取れないと困る */
+function seatLeft(){
+  var s = seatGet();
+  return cls().roster.filter(function(p){ return s.indexOf(p.no) < 0; });
+}
+/* 「1 山田太郎」「1,山田太郎」「山田太郎」など、書き方を選ばず読む */
+function rosterParse(txt){
+  var out = [], auto = 1;
+  String(txt).split(/\r?\n/).forEach(function(ln){
+    ln = ln.replace(/^[\s　]+|[\s　]+$/g, "");
+    if(!ln) return;
+    var m = ln.match(/^(\d{1,3})[\s　.,、:：)）]+(.*)$/), no, nm;
+    if(m){ no = +m[1]; nm = m[2].replace(/^[\s　]+/, ""); }
+    else if(/^\d{1,3}$/.test(ln)){ no = +ln; nm = ""; }
+    else { no = auto; nm = ln; }
+    if(!no) return;
+    if(out.some(function(z){ return z.no === no; })) return;   /* 同じ番号は先勝ち */
+    out.push({no:no, n:nm});
+    auto = no + 1;
+  });
+  out.sort(function(a,b){ return a.no - b.no; });
+  return out;
+}
+
+/* ---- 座席表を描く ----
+   mode "att"  タップで 出席→欠→遅→早→停 と変える
+   mode "view" 見るだけ
+   mode "edit" タップで席を入れかえる（2回タップで交換） */
+var seatPick = null;
+function seatGrid(host, k, mode){
+  var s = seatGet(), a = (mode === "edit") ? {} : attOf(k), cols = seatCols();
+  host.innerHTML = "";
+  /* 教室のかたちに組む：上が黒板、下がうしろ、左右が窓側と廊下側 */
+  var room = el("div","room");
+  room.appendChild(el("div","board","黒 板"));
+  var sd = el("div","sides");
+  sd.appendChild(el("span", null, "← " + sideL()));
+  sd.appendChild(el("span", null, sideR() + " →"));
+  room.appendChild(sd);
+  var no = el("div","colno");
+  no.style.setProperty("--sc", cols);
+  for(var ci = cols; ci >= 1; ci--) no.appendChild(el("span", null, ci + "列"));
+  room.appendChild(no);
+  var mid = el("div","mid");
+  room.appendChild(mid);
+  room.appendChild(el("div","backline","うしろ"));
+  host.appendChild(room);
+  var g = el("div","seats");
+  g.style.setProperty("--sc", cols);
+  s.forEach(function(no, i){
+    var x = i % cols, y = (i - x) / cols;
+    if(!seatHas(x, y)){ g.appendChild(el("span","gap")); return; }   /* そこに席はない */
+    var b = el("button"); b.type = "button";
+    if(no == null){
+      b.className = "non";
+      b.appendChild(el("b", null, "・"));
+      b.setAttribute("aria-label", "空席");
+    }else{
+      var nm = rosterName(no);
+      b.appendChild(el("b", null, String(no)));
+      if(nm) b.appendChild(el("i", null, nm));
+      seatPaint(b, no, a[String(no)] || "");
+    }
+    if(mode === "edit" && seatPick === i) b.classList.add("pickon");
+    if(mode === "view") b.disabled = true;
+    else b.addEventListener("click", function(){
+      if(mode === "edit"){
+        if(seatPick == null){ seatPick = i; }
+        else if(seatPick === i){ seatPick = null; }
+        else{
+          var sq = seatGet(), t = sq[seatPick];
+          sq[seatPick] = sq[i]; sq[i] = t;
+          cls().seat = sq;
+          seatPick = null; save();
+        }
+        renderSeatEdit();
+        return;
+      }
+      if(no == null) return;
+      var cur = attOf(k)[String(no)] || "";
+      var nx = ATT_CY[(ATT_CY.indexOf(cur) + 1) % ATT_CY.length];
+      attSet(k, no, nx);
+      save();
+      /* おしたマスだけ塗りかえる。35人ぶん作り直すと、おすたびにカクつくため */
+      seatPaint(b, no, nx);
+      attSumDraw($("#inAttSum"), k);
+      $("#inAttState").textContent = "とった";
+      renderHome();
+    });
+    g.appendChild(b);
+  });
+  mid.appendChild(g);
+  host.appendChild(el("p","seatdir","生徒の席から見た向きです（画面の右が、自分の右）"));
+}
+/* 図の左右にそえる名前。おすと入れかわる */
+function sideL(){ return cls().swap ? "廊下側" : "窓側"; }
+function sideR(){ return cls().swap ? "窓側" : "廊下側"; }
+/* マス1つの色と字を、いまの状態に合わせる */
+function seatPaint(b, no, v){
+  b.className = ATT_CL[v] || "";
+  var old = b.querySelector("em"); if(old) b.removeChild(old);
+  if(v) b.appendChild(el("em", null, v));
+  b.setAttribute("aria-label", whoTxt({no:no, n:rosterName(no)}) + "　" + (ATT_NM[v] || "出席"));
+}
+/* 出席率などのまとめ行 */
+function attSumDraw(sum, k){
+  if(!sum) return;
+  var t = attDay(k), took = attTook(k);
+  sum.innerHTML = "";
+  function add(nm, val, warn){
+    var sp = el("span", warn ? "warn" : null, nm);
+    sp.appendChild(el("b", null, val)); sum.appendChild(sp);
+  }
+  add("出席率", took ? (attPct(t.rate) + "%") : "まだ");
+  if(took) add("出席", t.ok + "/" + t.all);
+  if(t.abs.length)   add("欠席", t.abs.length + "人", true);
+  if(t.stop.length)  add("出席停止", t.stop.length + "人", true);
+  if(t.late.length)  add("遅刻", t.late.length + "人");
+  if(t.early.length) add("早退", t.early.length + "人");
+}
+
+/* ---- 記入画面の出欠 ---- */
+function renderInAtt(){
+  var sect = $("#inAttS"); if(!sect) return;
+  sect.style.display = showOn("att") ? "" : "none";
+  var rs = cls().roster, k = inKey;
+  var bt = $("#inAttBtns"); bt.innerHTML = "";
+  if(!rs.length){
+    $("#inAttState").textContent = "";
+    $("#inAttNote").textContent = "出欠・座席表は、ひとつの画面にまとめてあります。まず名簿を入れてください。";
+    $("#inAttSum").innerHTML = "";
+  }else{
+    $("#inAttState").textContent = attTook(k) ? "とった" : "まだ";
+    $("#inAttNote").textContent = "座席表をおして記録します。";
+    attSumDraw($("#inAttSum"), k);
+  }
+  var op = el("button","btn sm","座席表をひらく"); op.type = "button";
+  op.addEventListener("click", function(){ seatOpen("att", k); });
+  bt.appendChild(op);
+}
+
+/* ---- 出席率のシート ---- */
+var rateSpan = "month";
+function openRate(){ seatOpen("rate"); }
+
+/* ---- 1ページにまとめたところ ---- */
+var pgTab = "att", pgKey = null;
+function pgK(){ return pgKey || keyOf(new Date()); }
+function seatOpen(tab, k){
+  pgTab = tab || "att";
+  pgKey = k || keyOf(new Date());
+  go("seat");
+}
+function renderSeatPg(){
+  if(!$("#v-seat")) return;
+  var c = cls(), k = pgK(), dt = parseKey(k);
+  $("#pgTtl").textContent = (c.n || "出欠・座席表");
+  $$("#pgTabs button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.dataset.t === pgTab ? "true" : "false");
+  });
+  $("#pgAtt").hidden  = pgTab !== "att";
+  $("#pgRate").hidden = pgTab !== "rate";
+  $("#pgEdit").hidden = pgTab !== "edit";
+  $("#pgPrint").style.display = (pgTab === "att") ? "" : "none";
+
+  if(pgTab === "att")  renderPgAtt(k, dt);
+  if(pgTab === "rate") renderPgRate();
+  if(pgTab === "edit"){ renderRoster(); renderSeatEdit(); }
+}
+function renderPgAtt(k, dt){
+  $("#pgDate").value = k;
+  $("#pgDay").textContent = (dt.getMonth()+1) + "月" + dt.getDate() + "日（" + DOW[dt.getDay()] + "）"
+    + (attTook(k) ? "　とった" : "　まだ");
+  var rs = cls().roster;
+  if(!rs.length){
+    $("#pgSum").innerHTML = "";
+    $("#pgRoom").innerHTML = "";
+    $("#pgHint").textContent = "まず「名簿と席」で、出席番号と名前を入れてください。";
+    $("#pgRest").innerHTML = ""; $("#pgBtns").innerHTML = "";
+    $("#pgWhoS").style.display = "none";
+    return;
+  }
+  attSumDraw($("#pgSum"), k);
+  seatGrid($("#pgRoom"), k, "att");
+  $("#pgHint").textContent = "マスをおすたびに、出席 → 欠席 → 遅刻 → 早退 → 出席停止 と変わります。";
+
+  var rest = $("#pgRest"); rest.innerHTML = "";
+  var left = seatLeft();
+  if(left.length){
+    rest.appendChild(el("p","lab","席がない人"));
+    var ul = el("ul","rost");
+    left.forEach(function(p){
+      var li = el("li");
+      li.appendChild(el("i", null, p.no));
+      li.appendChild(el("span", p.n ? null : "none", p.n || "（名前なし）"));
+      var v = attOf(k)[String(p.no)] || "";
+      var bt = el("button","btn sm", ATT_NM[v] || "出席"); bt.type = "button";
+      bt.addEventListener("click", function(){
+        attSet(k, p.no, ATT_CY[(ATT_CY.indexOf(v) + 1) % ATT_CY.length]);
+        save(); renderSeatPg(); renderHome();
+      });
+      li.appendChild(bt); ul.appendChild(li);
+    });
+    rest.appendChild(ul);
+  }
+
+  var bt2 = $("#pgBtns"); bt2.innerHTML = "";
+  var allIn = el("button","btn sm","全員出席にする"); allIn.type = "button";
+  allIn.addEventListener("click", function(){
+    var r = rec(k); r.att = {}; r.attOn = 1; save(); renderSeatPg(); renderHome();
+  });
+  bt2.appendChild(allIn);
+  if(attTook(k)){
+    var clr = el("button","btn sm bare","この日の出欠を消す"); clr.type = "button";
+    clr.addEventListener("click", function(){
+      var r = rec(k); delete r.att; delete r.attOn; save(); renderSeatPg(); renderHome();
+    });
+    bt2.appendChild(clr);
+  }
+
+  var t = attDay(k), who = $("#pgWho");
+  $("#pgWhoS").style.display = attTook(k) ? "" : "none";
+  who.innerHTML = "";
+  function line(nm, arr){
+    if(!arr.length) return;
+    var pp = el("p","note");
+    pp.style.cssText = "margin:0 0 7px; font-size:calc(15px * var(--fs)); color:var(--label)";
+    pp.appendChild(el("b", null, nm));
+    pp.appendChild(document.createTextNode("　" + arr.map(whoTxt).join("、")));
+    who.appendChild(pp);
+  }
+  line("欠席", t.abs); line("出席停止", t.stop); line("遅刻", t.late); line("早退", t.early);
+  if(!t.abs.length && !t.stop.length && !t.late.length && !t.early.length)
+    who.appendChild(el("p","note","全員そろっています。"));
+}
+function renderPgRate(){
+  var box = $("#pgSpan"); box.innerHTML = "";
+  [["month","今月"],["all","ぜんぶ"]].forEach(function(o){
+    var c = el("button","chip",o[1]); c.type = "button";
+    c.setAttribute("aria-pressed", rateSpan === o[0] ? "true" : "false");
+    c.addEventListener("click", function(){ rateSpan = o[0]; renderPgRate(); });
+    box.appendChild(c);
+  });
+  var from = null, to = null;
+  if(rateSpan === "month"){
+    var n = new Date();
+    from = keyOf(new Date(n.getFullYear(), n.getMonth(), 1));
+    to   = keyOf(new Date(n.getFullYear(), n.getMonth() + 1, 0));
+  }
+  var st = attStats(from, to);
+  $("#pgSpanN").textContent = st.n ? (st.n + "日ぶん") : "まだ0日";
+  attSumDraw($("#pgRateSum"), pgK());
+  var sum = $("#pgRateSum"); sum.innerHTML = "";
+  function add(nm, val){ var sp = el("span", null, nm); sp.appendChild(el("b", null, val)); sum.appendChild(sp); }
+  add("クラス全体", st.n ? (attPct(st.rate) + "%") : "—");
+  add("とった日数", st.n + "日");
+
+  var ul = $("#pgRateList"); ul.innerHTML = "";
+  if(!st.n){
+    ul.appendChild(el("p","note","この期間はまだ出欠をとっていません。「出欠」でマスをおすと、その日が数えられるようになります。"));
+    return;
+  }
+  st.per.slice().sort(function(a,b){ return a.rate - b.rate || a.no - b.no; }).forEach(function(x){
+    var li = el("li");
+    if(x.rate < 0.9) li.className = "low";
+    li.appendChild(el("i", null, x.no));
+    li.appendChild(el("span", x.n ? null : "none", x.n || "（名前なし）"));
+    var det = [];
+    if(x.abs)   det.push("欠" + x.abs);
+    if(x.stop)  det.push("停" + x.stop);
+    if(x.late)  det.push("遅" + x.late);
+    if(x.early) det.push("早" + x.early);
+    li.appendChild(el("u", null, det.join(" ")));
+    li.appendChild(el("b", null, attPct(x.rate) + "%"));
+    ul.appendChild(li);
+  });
+}
+
+/* ---- 設定：クラスと座席 ---- */
+function renderRoster(){
+  var box = $("#rosList"); if(!box) return;
+  var c = cls();
+  $("#clsName").value = c.n || "";
+  $("#rosN").textContent = c.roster.length ? (c.roster.length + "人") : "まだ空です";
+  box.innerHTML = "";
+  if(!c.roster.length){
+    box.appendChild(el("p","note","「まとめて入れる」に、1行ずつ「1 山田太郎」のように貼りつけるのが早いです。番号だけ、名前だけでも読み取れます。"));
+    return;
+  }
+  c.roster.slice().sort(function(a,b){ return a.no - b.no; }).forEach(function(p){
+    var li = el("li");
+    li.appendChild(el("i", null, p.no));
+    var nm = el("span", p.n ? null : "none", p.n || "（名前なし）");
+    li.appendChild(nm);
+    var ed = el("button", null, "直す"); ed.type = "button";
+    ed.addEventListener("click", function(){
+      askText(p.no + "番の名前", "山田太郎", function(v){ p.n = v; save(); renderRoster(); renderSeatEdit(); });
+    });
+    var rm = el("button", null, "消す"); rm.type = "button";
+    rm.addEventListener("click", function(){
+      c.roster = c.roster.filter(function(z){ return z.no !== p.no; });
+      c.seat = c.seat.map(function(z){ return z === p.no ? null : z; });
+      save(); renderRoster(); renderSeatEdit();
+    });
+    li.appendChild(ed); li.appendChild(rm);
+    box.appendChild(li);
+  });
+}
+function renderSeatEdit(){
+  var host = $("#seatEdit"); if(!host) return;
+  $("#seatSide").textContent = "左が" + sideL() + " ／ 右が" + sideR();
+  var sh = $("#seatShape");
+  if(document.activeElement !== sh) sh.value = shapeText();
+  $("#seatTot").textContent = "ぜんぶで" + seatTotal() + "席";
+  var left = seatLeft();
+  $("#seatMsg").textContent = left.length
+    ? ("マスを2つおすと、その席が入れかわります。席がない人が" + left.length + "人います（" + left.map(function(p){ return p.no + "番"; }).join("、") + "）。")
+    : "マスを2つおすと、その席が入れかわります。";
+  seatGrid(host, keyOf(new Date()), "edit");
+}
+
+/* ---- 今日の画面の出欠カード ---- */
+function renderHomeAtt(k){
+  var sect = $("#hAttS"); if(!sect) return;
+  var rs = cls().roster;
+  if(!rs.length || !showOn("att")){ sect.style.display = "none"; return; }
+  sect.style.display = "";
+  var t = attDay(k), took = attTook(k);
+  attSumDraw($("#hAttSum"), k);
+  var box = $("#hAttWho"); box.innerHTML = "";
+  if(!took){
+    box.appendChild(el("p","note","記入画面の「出欠」で、座席表をおして記録できます。"));
+  }else{
+    function line(nm, arr){
+      if(!arr.length) return;
+      var p = el("p","note");
+      p.style.cssText = "margin:0 0 6px; font-size:calc(14.5px * var(--fs)); color:var(--label)";
+      p.appendChild(el("b", null, nm));
+      p.appendChild(document.createTextNode("　" + arr.map(whoTxt).join("、")));
+      box.appendChild(p);
+    }
+    line("欠席", t.abs); line("出席停止", t.stop);
+    line("遅刻", t.late); line("早退", t.early);
+    if(!t.abs.length && !t.stop.length && !t.late.length && !t.early.length)
+      box.appendChild(el("p","note","全員そろっています。"));
+  }
 }
 
 /* ============ GKテストの記録 ============ */
@@ -2712,6 +3576,15 @@ function ocrApply(parts){
 /* ============ CALENDAR ============ */
 var cur = new Date();
 var asgTpl = null;          /* 「日付に当てる」の途中かどうか */
+/* カレンダーのマスに入る長さで切る。語の途中でぶつ切りにしない */
+function calCut(t, n){
+  t = String(t || "");
+  if(t.length <= n) return t;
+  var head = t.slice(0, n);
+  var m = head.match(/^[\s\S]*[／\/、・（(]/);
+  if(m && m[0].length >= Math.floor(n * 0.5)) head = m[0].replace(/[／\/、・（(]$/, "");
+  return head.replace(/\s+$/, "") + "…";
+}
 function renderCal(){
   var y=cur.getFullYear(), m=cur.getMonth();
   $("#calM").textContent = y+"年 "+(m+1)+"月";
@@ -2740,11 +3613,11 @@ function renderCal(){
         if(r.ev) bars.appendChild(el("i","bar b3"));
         if(tp) bars.appendChild(el("i","bar b4"));
         c.appendChild(bars);
-        if(tp) c.appendChild(el("div","tg", tp.n.slice(0,10)));
+        if(tp) c.appendChild(el("div","tg", calCut(tp.n, 10)));
         /* テンプレート名と同じ文字が下にもう一度出ないようにする */
         var evT = r.ev || "";
         if(tp && evT.indexOf(tp.n) === 0) evT = evT.slice(tp.n.length).replace(/^[／\/・\s]+/, "");
-        if(evT) c.appendChild(el("div","e", evT.slice(0, tp ? 14 : 22)));
+        if(evT) c.appendChild(el("div","e", calCut(evT, tp ? 14 : 24)));
       }
       c.addEventListener("click", function(){
         if(asgTpl){
@@ -2785,7 +3658,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow(); renderFs(); renderKPick();
   $("#trWalk").value = walkMin();
   $("#hyRide").value = hyRide();
   $("#hyTrans").value = hyTrans();
@@ -3137,6 +4010,22 @@ function askText(title, ph, cb){
     no.addEventListener("click", closeSheet);
     r.appendChild(ok); r.appendChild(no); bx.appendChild(r);
     setTimeout(function(){ i.focus(); },60);
+  });
+}
+/* 何行も貼りつけたいとき用 */
+function askArea(title, note, val, cb){
+  openSheet(title, function(bx){
+    if(note) bx.appendChild(el("p","note", note));
+    var i = document.createElement("textarea");
+    i.value = val || ""; i.style.minHeight = "190px"; i.style.marginTop = "12px";
+    bx.appendChild(i);
+    var r = el("div"); r.style.cssText = "display:flex; gap:8px; margin-top:14px";
+    var ok = el("button","btn primary","決定"); ok.style.flex = "1";
+    var no = el("button","btn","やめる");
+    ok.addEventListener("click", function(){ var v = i.value; closeSheet(); cb(v); });
+    no.addEventListener("click", closeSheet);
+    r.appendChild(ok); r.appendChild(no); bx.appendChild(r);
+    setTimeout(function(){ i.focus(); }, 60);
   });
 }
 function askTime(title, val, cb){
@@ -4474,6 +5363,378 @@ function drawWarn(list, when){
 
 var wxTimer = setInterval(function(){ if(!document.hidden) wxFetch(); }, 600000);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) wxFetch(); });
+
+/* ============ 時計モード ============ */
+/* 机に置いて眺めるための画面。今日の時刻まわりだけを大きく出す。
+   ふだんの画面はそのまま残して、上にかぶせるだけにしてある。 */
+var kOn = false, kTimer = null, kLock = null;
+
+/* ---- 時計の見た目 ---- */
+var FACES = [["digital","デジタル"], ["analog","針"], ["ring","輪"], ["plain","数字だけ"]];
+function kFace(){ return (S.ui && S.ui.face) || "digital"; }
+function kSetFace(v){
+  if(!S.ui) S.ui = defaultUI();
+  S.ui.face = v; save();
+  kBuilt = null;                 /* 作り直させる */
+  renderKiosk(); renderKPick();
+}
+function renderKPick(){
+  var box = $("#kPick"); if(!box) return;
+  box.innerHTML = "";
+  FACES.forEach(function(f){
+    var b = el("button", null, f[1]); b.type = "button";
+    b.setAttribute("aria-pressed", kFace() === f[0] ? "true" : "false");
+    b.addEventListener("click", function(){ kSetFace(f[0]); });
+    box.appendChild(b);
+  });
+  var box2 = $("#kPick2"); if(!box2) return;
+  box2.innerHTML = "";
+  FACES.forEach(function(f){
+    var c = el("button","chip", f[1]); c.type = "button";
+    c.setAttribute("aria-pressed", kFace() === f[0] ? "true" : "false");
+    c.addEventListener("click", function(){ kSetFace(f[0]); });
+    box2.appendChild(c);
+  });
+}
+/* 毎秒まるごと作り直すと重いので、形は一度だけ作って、動くところだけ差しかえる */
+var kBuilt = null, kRef = {};
+function kBuild(){
+  var host = $("#kFace"); if(!host) return;
+  var f = kFace();
+  if(kBuilt === f) return;
+  kBuilt = f; kRef = {}; host.innerHTML = "";
+  $("#kMain").classList.toggle("round", f === "analog" || f === "ring");
+
+  if(f === "digital" || f === "plain"){
+    var d = el("div","kclock" + (f === "plain" ? " plain" : ""));
+    kRef.hm = document.createTextNode("--:--");
+    d.appendChild(kRef.hm);
+    if(f === "digital"){ kRef.sec = el("small", null, "00"); d.appendChild(kRef.sec); }
+    host.appendChild(d);
+    return;
+  }
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(n, at){
+    var e = document.createElementNS(NS, n);
+    for(var k in at) e.setAttribute(k, at[k]);
+    return e;
+  }
+  if(f === "analog"){
+    var sv = mk("svg", {viewBox:"0 0 200 200", "class":"kdial"});
+    sv.appendChild(mk("circle", {cx:100, cy:100, r:95, "class":"fc"}));
+    for(var i=0;i<60;i++){
+      var big = (i % 5 === 0), a = i * 6 * Math.PI / 180;
+      var r1 = big ? 78 : 84, r2 = 88;
+      sv.appendChild(mk("line", {"class":"tk" + (big ? " t5" : ""),
+        x1:(100 + r1*Math.sin(a)).toFixed(2), y1:(100 - r1*Math.cos(a)).toFixed(2),
+        x2:(100 + r2*Math.sin(a)).toFixed(2), y2:(100 - r2*Math.cos(a)).toFixed(2)}));
+    }
+    /* 3の場所は、腕時計と同じように日付の窓にゆずる */
+    [12,6,9].forEach(function(n){
+      var a = (n % 12) * 30 * Math.PI / 180;
+      var t = mk("text", {"class":"num", x:(100 + 64*Math.sin(a)).toFixed(1), y:(100 - 64*Math.cos(a)).toFixed(1)});
+      t.textContent = String(n); sv.appendChild(t);
+    });
+    var dw = mk("g", {"class":"dwin"});
+    /* 右はしは目もりの内側で止める。外まで出すと、ふちの帯にぶつかる */
+    dw.appendChild(mk("rect", {x:125, y:89, width:52, height:22, rx:6}));
+    kRef.dt = mk("text", {x:151, y:100.4});
+    kRef.dt.textContent = "—";
+    dw.appendChild(kRef.dt);
+    sv.appendChild(dw);          /* 針より先に置いて、針が上を通るようにする */
+    kRef.arc  = mk("path", {"class":"arc"});
+    kRef.arcD = mk("path", {"class":"arc done"});
+    sv.appendChild(kRef.arc); sv.appendChild(kRef.arcD);
+    kRef.hh = mk("line", {"class":"hh", x1:100, y1:100, x2:100, y2:48});
+    kRef.mh = mk("line", {"class":"mh", x1:100, y1:100, x2:100, y2:28});
+    kRef.sh = mk("line", {"class":"sh", x1:100, y1:112, x2:100, y2:24});
+    sv.appendChild(kRef.hh); sv.appendChild(kRef.mh); sv.appendChild(kRef.sh);
+    sv.appendChild(mk("circle", {cx:100, cy:100, r:4.6, "class":"pin"}));
+    host.appendChild(sv);
+    return;
+  }
+  /* 輪 */
+  var w = el("div","kring");
+  var sv2 = mk("svg", {viewBox:"0 0 200 200"});
+  sv2.appendChild(mk("circle", {cx:100, cy:100, r:86, "class":"trk"}));
+  kRef.ring = mk("circle", {cx:100, cy:100, r:86, "class":"fg"});
+  var C = 2 * Math.PI * 86;
+  kRef.ring.setAttribute("stroke-dasharray", C.toFixed(1));
+  kRef.ring.setAttribute("stroke-dashoffset", C.toFixed(1));
+  kRef.C = C;
+  sv2.appendChild(kRef.ring);
+  var mid = el("div","mid");
+  kRef.hm = el("b", null, "--:--");
+  kRef.lbl = el("span", null, "");
+  mid.appendChild(kRef.hm); mid.appendChild(kRef.lbl);
+  w.appendChild(sv2); w.appendChild(mid);
+  host.appendChild(w);
+}
+/* 針の時計のふちに、いまの校時の帯を描く。
+   長針の目もり（1周＝60分）に合わせてあるので、
+   「長針がこの帯の端まで行ったら終わり」とそのまま読める。
+   1時間をこえる時間だけは1周を追いこしてしまうので、帯は出さない。 */
+function kArcPath(m0, m1){
+  var span = m1 - m0;
+  if(span <= 0 || span > 57) return "";
+  function pt(m){
+    var a = ((m % 60) / 60) * 2 * Math.PI;
+    return [(100 + 92*Math.sin(a)).toFixed(2), (100 - 92*Math.cos(a)).toFixed(2)];
+  }
+  var a = pt(m0), b = pt(m1);
+  return "M" + a[0] + " " + a[1] + " A92 92 0 " + (span > 30 ? 1 : 0) + " 1 " + b[0] + " " + b[1];
+}
+function kioskOpen(){
+  if(kOn) return;
+  kOn = true;
+  $("#kiosk").hidden = false;
+  document.body.style.overflow = "hidden";
+  if(fsCan() && !fsNow()) fsEnter();
+  kWake(true);
+  kBuilt = null;
+  renderKiosk();
+  renderKPick();
+  kTimer = setInterval(function(){ if(!document.hidden) renderKiosk(); }, 1000);
+}
+function kioskClose(){
+  if(!kOn) return;
+  kOn = false;
+  $("#kiosk").hidden = true;
+  document.body.style.overflow = "";
+  clearInterval(kTimer); kTimer = null;
+  kWake(false);
+  if(fsNow()) fsExit();
+  rerender();
+}
+/* 眺めているあいだ画面を消さない。できない端末では黙って何もしない */
+function kWake(on){
+  try{
+    if(on){
+      if(navigator.wakeLock && navigator.wakeLock.request)
+        navigator.wakeLock.request("screen").then(function(l){ kLock = l; }, function(){});
+    }else if(kLock){ kLock.release(); kLock = null; }
+  }catch(e){}
+}
+document.addEventListener("visibilitychange", function(){
+  if(kOn && !document.hidden && !kLock) kWake(true);
+});
+
+function renderKiosk(){
+  if(!kOn) return;
+  var now = new Date(), k = keyOf(now), d = dayOf(k);
+  var box = $("#kiosk");
+
+  $("#kDay").textContent = (now.getMonth()+1) + "月" + now.getDate() + "日（" + DOW[now.getDay()] + "）"
+    + (d.tpl ? "　" + d.tpl.n : "");
+  kBuild();
+
+  var mnow = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+  var list = bellOn(k).filter(function(b){ return b.s; })
+                      .sort(function(a,b){ return hm(a.s) - hm(b.s); });
+  function label(b){
+    var n = (b.p != null && d.periods[b.p]) ? d.periods[b.p] : "";
+    var lb = rowL(b, k);
+    return (lb && n && lb !== n) ? (lb + "　" + n) : (n || lb || "—");
+  }
+  var cur = null, nxt = null;
+  for(var i=0;i<list.length;i++){
+    var b = list[i];
+    if(b.e && mnow >= hm(b.s) && mnow < hm(b.e)){ cur = b; nxt = list[i+1] || null; break; }
+    if(mnow < hm(b.s)){ nxt = b; break; }
+  }
+  box.classList.remove("rest");
+  /* ---- 時計そのもの ---- */
+  var hhmm2 = pad(now.getHours()) + ":" + pad(now.getMinutes());
+  if(kRef.hm && kRef.hm.nodeType === 3) kRef.hm.textContent = hhmm2;
+  else if(kRef.hm) kRef.hm.textContent = hhmm2;
+  if(kRef.sec) kRef.sec.textContent = pad(now.getSeconds());
+  if(kRef.hh){
+    if(kRef.dt) kRef.dt.textContent = (now.getMonth()+1) + "/" + now.getDate() + " " + DOW[now.getDay()];
+    var sec = now.getSeconds(), mi = now.getMinutes() + sec/60, hr = (now.getHours() % 12) + mi/60;
+    kRef.hh.setAttribute("transform", "rotate(" + (hr*30).toFixed(2) + " 100 100)");
+    kRef.mh.setAttribute("transform", "rotate(" + (mi*6).toFixed(2) + " 100 100)");
+    kRef.sh.setAttribute("transform", "rotate(" + (sec*6).toFixed(2) + " 100 100)");
+    var p1 = cur ? kArcPath(hm(cur.s), hm(cur.e)) : "";
+    var p2 = cur ? kArcPath(hm(cur.s), mnow) : "";
+    kRef.arc.setAttribute("d", p1); kRef.arcD.setAttribute("d", p2);
+  }
+  if(cur){
+    var s0 = hm(cur.s), e0 = hm(cur.e);
+    var prog = Math.max(0, Math.min(1, (mnow - s0)/(e0 - s0)));
+    if(kRef.ring){
+      kRef.ring.setAttribute("stroke-dashoffset", (kRef.C * (1 - prog)).toFixed(1));
+      if(kRef.lbl) kRef.lbl.textContent = "のこり " + mmss(e0 - mnow);
+    }
+    $("#kBar").style.width = (prog * 100) + "%";
+    $("#kNow").textContent = label(cur) + "　のこり " + mmss(e0 - mnow);
+    $("#kNext").textContent = nxt ? ("つぎ　" + label(nxt) + "　" + nxt.s + "から") : "このあとの予定はありません";
+    if(/休み|昼/.test(rowL(cur, k))) box.classList.add("rest");
+  }else if(nxt){
+    box.classList.add("rest");
+    if(kRef.ring){ kRef.ring.setAttribute("stroke-dashoffset", kRef.C.toFixed(1)); if(kRef.lbl) kRef.lbl.textContent = nxt.s + "から"; }
+    $("#kBar").style.width = "0%";
+    $("#kNow").textContent = "まだ始まっていません";
+    $("#kNext").textContent = "つぎ　" + label(nxt) + "　" + nxt.s + "から";
+  }else{
+    box.classList.add("rest");
+    if(kRef.ring){ kRef.ring.setAttribute("stroke-dashoffset", "0"); if(kRef.lbl) kRef.lbl.textContent = "おつかれさま"; }
+    $("#kBar").style.width = "100%";
+    $("#kNow").textContent = list.length ? "今日はおしまいです" : "今日の時刻が入っていません";
+    $("#kNext").textContent = "";
+  }
+
+  var ul = $("#kTT"); ul.innerHTML = "";
+  list.forEach(function(b){
+    var li = el("li");
+    var past = b.e && mnow >= hm(b.e);
+    if(cur === b) li.className = "on"; else if(past) li.className = "past";
+    li.appendChild(el("i", null, b.s + (b.e ? "–" + b.e : "")));
+    li.appendChild(el("b", null, label(b)));
+    ul.appendChild(li);
+  });
+
+  var f = $("#kFoot"); f.innerHTML = "";
+  function foot(name, val){
+    if(!val) return;
+    var sp = el("span", null, name);
+    sp.appendChild(el("b", null, val));
+    f.appendChild(sp);
+  }
+  foot("下校", d.dis || "");
+  var cds = cdList(1);
+  if(cds.length) foot(cds[0].name, cds[0].d === 0 ? "今日" : ("あと" + cds[0].d + "日"));
+  var r = nextRest(k, 1);
+  if(r) foot("つぎの休み", (r.d === 0 ? "今日" : ("あと" + r.d + "日")) + (r.run >= 2 ? ("・" + r.run + "連休") : ""));
+  if(d.items.length) foot("持ち物", d.items.join("・"));
+}
+/* ---- クラスと座席のボタン ---- */
+$("#clsName").addEventListener("input", function(){ cls().n = this.value.trim(); save(); });
+$("#rosPaste").addEventListener("click", function(){
+  var cur = cls().roster.map(function(p){ return p.no + (p.n ? " " + p.n : ""); }).join("\n");
+  askArea("名簿をまとめて入れる",
+    "1行に1人ずつ。「1 山田太郎」「1,山田太郎」のどちらでも読めます。番号だけ、名前だけでもかまいません（名前だけのときは上から順に番号をふります）。",
+    cur, function(v){
+      var rs = rosterParse(v);
+      cls().roster = rs;
+      cls().seat = cls().seat.map(function(z){ return rosterBy(z) ? z : null; });
+      save(); renderRoster(); renderSeatEdit(); renderIn(); renderHome();
+    });
+});
+$("#rosAdd").addEventListener("click", function(){
+  var c = cls();
+  var next = c.roster.reduce(function(m, p){ return Math.max(m, p.no); }, 0) + 1;
+  askText(next + "番の名前", "山田太郎（名前なしでもよい）", function(v){
+    c.roster.push({no:next, n:v}); save(); renderRoster(); renderSeatEdit();
+  });
+});
+$("#rosClr").addEventListener("click", function(){
+  openSheet("名簿を消す", function(bx){
+    bx.appendChild(el("p","note","名簿と座席の中身がなくなります。これまでにとった出欠の記録は残りますが、名前は出なくなります。"));
+    var r = el("div"); r.style.cssText = "display:flex; gap:8px; margin-top:16px";
+    var ok = el("button","btn primary","消す"); ok.style.flex = "1";
+    ok.addEventListener("click", function(){
+      cls().roster = []; cls().seat = []; save(); closeSheet();
+      renderRoster(); renderSeatEdit(); renderIn(); renderHome();
+    });
+    var no = el("button","btn","やめる"); no.addEventListener("click", closeSheet);
+    r.appendChild(ok); r.appendChild(no); bx.appendChild(r);
+  });
+});
+$("#pgBack").addEventListener("click", function(){ go("home"); });
+$("#pgPrint").addEventListener("click", function(){ window.print(); });
+$("#pgTabs").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-t]"); if(!b) return;
+  pgTab = b.dataset.t; renderSeatPg(); window.scrollTo(0,0);
+});
+$("#pgDate").addEventListener("change", function(){
+  if(this.value){ pgKey = this.value; renderSeatPg(); }
+});
+$("#setSeatOpen").addEventListener("click", function(){ seatOpen("edit"); });
+$("#seatSide").addEventListener("click", function(){
+  cls().swap = !cls().swap; save(); renderSeatPg();
+});
+$("#seatShape").addEventListener("input", function(){
+  var a = shapeParse(this.value);
+  if(!a.length) return;
+  shapeSet(a); save(); renderSeatEdit(); renderIn();
+  $("#seatTot").textContent = "ぜんぶで" + seatTotal() + "席";
+});
+$("#seatShape").addEventListener("blur", function(){ this.value = shapeText(); });
+function autoSeat(way){ seatAuto(way); seatPick = null; save(); renderSeatEdit(); renderIn(); renderHome(); }
+$("#seatAutoR").addEventListener("click", function(){ autoSeat("right"); });
+$("#seatAutoL").addEventListener("click", function(){ autoSeat("left"); });
+$("#seatAutoW").addEventListener("click", function(){ autoSeat("row"); });
+$("#seatClr").addEventListener("click", function(){
+  cls().seat = []; seatPick = null; save(); renderSeatEdit();
+});
+$("#hAttSeat").addEventListener("click", function(){
+  seatOpen("att", keyOf(addDays(new Date(), off)));
+});
+$("#kOpen").addEventListener("click", kioskOpen);
+$("#kOpen2").addEventListener("click", kioskOpen);
+$("#kFaceBtn").addEventListener("click", function(){
+  var b = $("#kPick"); b.hidden = !b.hidden;
+  if(!b.hidden) renderKPick();
+});
+$("#kClose").addEventListener("click", kioskClose);
+document.addEventListener("keydown", function(e){ if(kOn && e.key === "Escape") kioskClose(); });
+
+/* ============ 全画面 ============ */
+/* ブラウザの枠を消して画面いっぱいに出す。
+   iPhone・iPadのSafariはこの仕組みを持っていないので、
+   そこでは「ホーム画面に追加」を案内する。 */
+var fsEl = document.documentElement;
+function fsCan(){
+  return !!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen || fsEl.msRequestFullscreen);
+}
+function fsNow(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+/* ホーム画面から開いたときは、もともと枠がない */
+function fsStandalone(){
+  return !!(window.navigator.standalone ||
+            (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches));
+}
+function fsEnter(){
+  var f = fsEl.requestFullscreen || fsEl.webkitRequestFullscreen || fsEl.msRequestFullscreen;
+  if(f) try{ f.call(fsEl); }catch(e){}
+}
+function fsExit(){
+  var f = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if(f) try{ f.call(document); }catch(e){}
+}
+function fsToggle(){ if(fsNow()) fsExit(); else fsEnter(); }
+function renderFs(){
+  var on = fsNow();
+  document.documentElement.classList.toggle("fs", on);
+  var b = $("#fsBtn");
+  if(b){
+    b.style.display = (fsCan() && !fsStandalone()) ? "" : "none";
+    b.setAttribute("aria-label", on ? "全画面をやめる" : "全画面にする");
+    b.title = on ? "全画面をやめる" : "全画面";
+    var i = b.querySelector(".fs-in"), o = b.querySelector(".fs-out");
+    if(i) i.style.display = on ? "none" : "";
+    if(o) o.style.display = on ? "" : "none";
+  }
+  var t = $("#fsToggle"), m = $("#fsMsg");
+  if(t){
+    t.textContent = on ? "全画面をやめる" : "全画面にする";
+    t.style.display = fsCan() ? "" : "none";
+  }
+  if(m){
+    m.textContent = fsStandalone()
+      ? "ホーム画面から開いているので、すでに枠はありません。"
+      : fsCan()
+      ? (on ? "Escキー、または同じボタンでもどせます。" : "")
+      : "この端末では、ブラウザの全画面が使えません。共有メニューの「ホーム画面に追加」から開くと、枠のない状態で使えます。";
+  }
+}
+$("#fsBtn").addEventListener("click", fsToggle);
+$("#fsToggle").addEventListener("click", fsToggle);
+["fullscreenchange","webkitfullscreenchange","msfullscreenchange"].forEach(function(e){
+  document.addEventListener(e, renderFs);
+});
+renderFs();
 
 /* ============ ホーム画面に追加できるように ============ */
 (function(){
