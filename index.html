@@ -1146,6 +1146,11 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <div id="hAttWho"></div>
     </div>
 
+    <div class="sect" id="hTobanS" style="display:none">
+      <p class="lab">日直・旗当番</p>
+      <dl class="facts" id="hToban"></dl>
+    </div>
+
     <div class="sect" id="hPrepS" style="display:none">
       <p class="lab">今日の予習<span class="r muted" id="hPrepN"></span></p>
       <div id="hPrep"></div>
@@ -1448,6 +1453,25 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <div class="in">
         <p class="note" style="margin:0 0 14px">名簿・座席のならび・出欠・出席率は、ひとつの画面にまとめてあります。</p>
         <button class="btn sm" id="setSeatOpen">出欠・座席表をひらく</button>
+      </div>
+    </details>
+<details class="acc">
+      <summary>日直・旗当番</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 14px">「クラスと座席」の名簿を、出席番号の順番でまわします。土日と、行事・予定に休みの言葉が入っている日は数えません。</p>
+        <p class="note" id="tobanRosMsg" style="margin:0 0 14px"></p>
+
+        <p class="lab">日直</p>
+        <div class="frow"><span>基準日</span><input type="date" id="tobanNK"></div>
+        <div class="frow"><span>その日の出席番号</span><input type="number" id="tobanNNo" inputmode="numeric" min="1"></div>
+        <div class="frow" style="margin-bottom:14px"><span>1回の人数</span><input type="number" id="tobanNCnt" inputmode="numeric" min="1"></div>
+
+        <p class="lab" style="margin-top:18px">旗当番</p>
+        <div class="frow"><span>基準日</span><input type="date" id="tobanHK"></div>
+        <div class="frow"><span>その日の出席番号</span><input type="number" id="tobanHNo" inputmode="numeric" min="1"></div>
+        <div class="frow"><span>1回の人数</span><input type="number" id="tobanHCnt" inputmode="numeric" min="1"></div>
+
+        <p class="note" style="margin-top:14px">「基準日」に「その日の出席番号」の人が担当だった、という実際にあった1日を入れてください。そこからの順番で、他の日を計算します。</p>
       </div>
     </details>
 <details class="acc">
@@ -2448,6 +2472,7 @@ function renderHome(){
   var pend = S.todos.filter(function(t){ return !t.k && (!t.d || t.d <= k); }).sort(sortTodos);
   $("#hTodoS").style.display = (pend.length && showOn("todo")) ? "" : "none";
   renderHomeAtt(k);
+  renderHomeToban(k);
   layoutHome();
   var tl = $("#hTodo"); tl.innerHTML = "";
   pend.slice(0,8).forEach(function(t){ tl.appendChild(todoRow(t, null)); });
@@ -2672,7 +2697,7 @@ function SHOW_LIST(){
   return [
     ["clock","時計"], ["wx","天気・警報"], ["cd","もうすぐ"],
     ["train","電車"], ["route","登校ルート"],
-    ["rest","つぎの休み"], ["att","出欠"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
+    ["rest","つぎの休み"], ["att","出欠"], ["toban","日直・旗当番"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
     ["memo","連絡・写真"], ["note","授業のノート"]
   ];
 }
@@ -3223,6 +3248,75 @@ function renderHomeAtt(k){
   }
 }
 
+/* ============ 日直・旗当番 ============ */
+/* 名簿（出席番号順）を、学校がある日だけ数えて順番にまわす。
+   「基準日にこの出席番号の人が担当だった」という実際の1日から、他の日を逆算する。 */
+function tobanDef(){ return {n:{k:"",no:null,c:1}, h:{k:"",no:null,c:1}}; }
+function tobanCfg(){
+  if(!S.toban) S.toban = tobanDef();
+  if(!S.toban.n) S.toban.n = tobanDef().n;
+  if(!S.toban.h) S.toban.h = tobanDef().h;
+  return S.toban;
+}
+function schoolDayDelta(baseK, k){
+  if(baseK === k) return 0;
+  var a = parseKey(baseK), b = parseKey(k), sign = 1;
+  if(b < a){ sign = -1; var tmp = a; a = b; b = tmp; }
+  var cnt = 0, d = addDays(a,1);
+  while(d <= b){ if(schoolDay(keyOf(d))) cnt++; d = addDays(d,1); }
+  return sign * cnt;
+}
+function tobanPick(cfg, k){
+  var rs = cls().roster.slice().sort(function(a,b){ return a.no - b.no; });
+  if(!rs.length || !cfg.k || cfg.no == null) return null;
+  var baseIdx = -1;
+  for(var i=0;i<rs.length;i++){ if(rs[i].no === cfg.no){ baseIdx = i; break; } }
+  if(baseIdx < 0) return null;
+  var L = rs.length, cnt = Math.max(1, Math.min(L, cfg.c || 1));
+  var t = schoolDayDelta(cfg.k, k);
+  var start = ((baseIdx + t*cnt) % L + L) % L;
+  var out = [];
+  for(var j=0;j<cnt;j++) out.push(rs[(start+j) % L]);
+  return out;
+}
+function tobanTxt(list){
+  if(!list) return "";
+  return list.map(function(p){ return p.n ? p.n : (p.no + "番"); }).join("、");
+}
+function renderHomeToban(k){
+  var sect = $("#hTobanS"); if(!sect) return;
+  var rs = cls().roster, cfg = tobanCfg();
+  var hasAny = (cfg.n.k && cfg.n.no != null) || (cfg.h.k && cfg.h.no != null);
+  if(!rs.length || !hasAny || !showOn("toban")){ sect.style.display = "none"; return; }
+  sect.style.display = "";
+  var dl = $("#hToban"); dl.innerHTML = "";
+  function row(nm, cf){
+    if(!(cf.k && cf.no != null)) return;
+    var d = el("div");
+    d.appendChild(el("dt",null,nm));
+    d.appendChild(el("dd",null, tobanTxt(tobanPick(cf, k)) || "—"));
+    dl.appendChild(d);
+  }
+  row("日直", cfg.n); row("旗当番", cfg.h);
+}
+function renderToban(){
+  var cfg = tobanCfg(), rs = cls().roster;
+  $("#tobanRosMsg").textContent = rs.length ? ("名簿は" + rs.length + "人います。") : "まだ名簿がありません。上の「クラスと座席」で、さきに名簿を入れてください。";
+  $("#tobanNK").value = cfg.n.k || "";
+  $("#tobanNNo").value = cfg.n.no != null ? cfg.n.no : "";
+  $("#tobanNCnt").value = cfg.n.c || 1;
+  $("#tobanHK").value = cfg.h.k || "";
+  $("#tobanHNo").value = cfg.h.no != null ? cfg.h.no : "";
+  $("#tobanHCnt").value = cfg.h.c || 1;
+}
+function tobanTouch(){ save(); renderHomeToban(keyOf(addDays(new Date(), off))); }
+$("#tobanNK").addEventListener("change", function(){ tobanCfg().n.k = this.value; tobanTouch(); });
+$("#tobanNNo").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().n.no = isFinite(v)?v:null; tobanTouch(); });
+$("#tobanNCnt").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().n.c = (isFinite(v)&&v>0)?v:1; tobanTouch(); });
+$("#tobanHK").addEventListener("change", function(){ tobanCfg().h.k = this.value; tobanTouch(); });
+$("#tobanHNo").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().h.no = isFinite(v)?v:null; tobanTouch(); });
+$("#tobanHCnt").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().h.c = (isFinite(v)&&v>0)?v:1; tobanTouch(); });
+
 /* ============ GKテストの記録 ============ */
 /* 朝の活動が「GKテスト」の曜日だけ、記入画面に合否の欄を出す。
    不合格の回は、夏休みの「不合格者GKタイム」に関わるので残しておく値がある。 */
@@ -3729,7 +3823,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow(); renderFs(); renderKPick();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow(); renderFs(); renderKPick(); renderToban();
   $("#trWalk").value = walkMin();
   $("#hyRide").value = hyRide();
   $("#hyTrans").value = hyTrans();
