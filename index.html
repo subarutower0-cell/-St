@@ -922,6 +922,20 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 .toast.on{opacity:1; transform:translate(-50%,0)}
 
+/* 下にスクロールすると出てくる「上に戻る」ボタン */
+.toTop{
+  position:fixed; right:16px; bottom:calc(88px + env(safe-area-inset-bottom));
+  width:46px; height:46px; border-radius:50%; z-index:45;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--glass2); -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+  box-shadow:var(--shadow-hi), inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--rim2);
+  opacity:0; pointer-events:none; transform:translateY(10px) scale(.9);
+  transition:opacity .22s, transform .26s var(--ease);
+}
+.toTop.on{opacity:1; pointer-events:auto; transform:translateY(0) scale(1)}
+.toTop:active{transform:scale(.92)}
+.toTop svg{width:22px; height:22px; stroke:var(--label); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
 /* ===== 録音タブ ===== */
 .nav{grid-template-columns:repeat(6,1fr)}
 .nav button{font-size:calc(10px * var(--fs))}
@@ -1866,6 +1880,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </button>
   </nav>
 </div>
+
+<button class="toTop" id="toTop" aria-label="上に戻る" type="button">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
 
 <div class="bg" id="bg"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
@@ -7358,6 +7376,20 @@ function renderHy(mtDep){
     "名古屋 " + pad(Math.floor(t/60)) + ":" + pad(t%60) + "着 → 乗り換え" + hyTrans() + "分 → 名鉄 " + mtDep + "発に接続" +
     (isHoliday(k) ? "（土日・休日ダイヤ）" : "")));
 }
+
+/* ============ 上に戻るボタン ============ */
+(function(){
+  var btn = $("#toTop");
+  if(!btn) return;
+  var onScroll = function(){
+    btn.classList.toggle("on", window.scrollY > 400);
+  };
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+  btn.addEventListener("click", function(){
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+})();
 
 /* ============ boot ============ */
 readLocal();
