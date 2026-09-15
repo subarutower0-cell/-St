@@ -10,7 +10,7 @@
 <title>終学活ノート</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
 <style>
 :root{
   /* user-adjustable */
@@ -24,20 +24,25 @@
   --glass:rgba(var(--gr), var(--ga));
   --glass2:rgba(var(--gr), calc(var(--ga) + .18));
   --glass3:rgba(var(--gr), calc(var(--ga) - .16));
-  --rim:rgba(255,255,255,.85); --rim2:rgba(255,255,255,.42);
-  --sheen:rgba(255,255,255,.36);
-  --segsel:rgba(255,255,255,.94);
-  --label:#0B1220; --label2:rgba(30,41,59,.66); --label3:rgba(30,41,59,.40);
-  --sep:rgba(30,41,59,.13);
+  --rim:rgba(255,255,255,.92); --rim2:rgba(255,255,255,.46);
+  --sheen:rgba(255,255,255,.30);
+  --segsel:rgba(255,255,255,.96);
+  --label:#080D16; --label2:rgba(24,34,52,.68); --label3:rgba(24,34,52,.42);
+  --sep:rgba(24,34,52,.11); --sep2:rgba(24,34,52,.20);
+  --hair:rgba(24,34,52,.08);
   --accent:var(--accent-l); --accent-on:#FFFFFF;
   --accent-soft:rgba(10,108,255,.13);
   --accent-soft:color-mix(in srgb, var(--accent) 14%, transparent);
   --red:#DC2F27; --green:#12915A; --orange:#C06A00;
-  --shadow:0 1px 1px rgba(9,20,40,.05), 0 10px 30px rgba(9,20,40,.08);
-  --blur:blur(var(--blurpx)) saturate(180%);
+  /* 影は2段。ふだんのカードは薄く、主役のカードだけ持ち上げる */
+  --shadow:0 1px 1px rgba(9,20,40,.04), 0 6px 18px rgba(9,20,40,.055);
+  --shadow-hi:0 1px 1px rgba(9,20,40,.05), 0 2px 6px rgba(9,20,40,.05), 0 16px 42px rgba(9,20,40,.12);
+  --blur:blur(var(--blurpx)) saturate(178%);
   --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Hiragino Sans','Hiragino Kaku Gothic ProN','Inter Tight','Noto Sans JP','Yu Gothic',sans-serif;
-  --disp:var(--sans); --mono:var(--sans);
-  --r:20px; --rc:13px;
+  /* 数字と大きな見出しだけ、この書体で。日本語は端末のものをそのまま使う */
+  --disp:'Archivo','SF Pro Display',-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;
+  --mono:var(--disp);
+  --r:22px; --rc:14px;
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 @media (prefers-color-scheme: dark){
@@ -49,9 +54,11 @@
     --segsel:rgba(120,126,145,.46);
     --label:#F4F6FA; --label2:rgba(226,232,240,.66); --label3:rgba(226,232,240,.40);
     --sep:rgba(255,255,255,.11);
+    --sep2:rgba(255,255,255,.19); --hair:rgba(255,255,255,.07);
     --accent:var(--accent-d); --accent-on:#04101F;
     --red:#FF7A6E; --green:#3ADB90; --orange:#FFB25C;
-    --shadow:0 1px 1px rgba(0,0,0,.4), 0 12px 34px rgba(0,0,0,.45);
+    --shadow:0 1px 1px rgba(0,0,0,.36), 0 8px 22px rgba(0,0,0,.36);
+    --shadow-hi:0 1px 1px rgba(0,0,0,.4), 0 3px 8px rgba(0,0,0,.34), 0 20px 48px rgba(0,0,0,.5);
   }
 }
 :root[data-theme="dark"]{
@@ -62,9 +69,11 @@
   --segsel:rgba(120,126,145,.46);
   --label:#F4F6FA; --label2:rgba(226,232,240,.66); --label3:rgba(226,232,240,.40);
   --sep:rgba(255,255,255,.11);
+  --sep2:rgba(255,255,255,.19); --hair:rgba(255,255,255,.07);
   --accent:var(--accent-d); --accent-on:#04101F;
   --red:#FF7A6E; --green:#3ADB90; --orange:#FFB25C;
-  --shadow:0 1px 1px rgba(0,0,0,.4), 0 12px 34px rgba(0,0,0,.45);
+  --shadow:0 1px 1px rgba(0,0,0,.36), 0 8px 22px rgba(0,0,0,.36);
+  --shadow-hi:0 1px 1px rgba(0,0,0,.4), 0 3px 8px rgba(0,0,0,.34), 0 20px 48px rgba(0,0,0,.5);
 }
 
 *{box-sizing:border-box}
@@ -86,10 +95,14 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 /* ambient light */
 .aurora{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; opacity:var(--auroraop)}
 .aurora span{position:absolute; border-radius:50%; filter:blur(70px); will-change:transform}
-.aurora span:nth-child(1){width:70vw; height:70vw; left:-22vw; top:-16vw; background:var(--tint1); opacity:.55; animation:dr1 52s ease-in-out infinite}
-.aurora span:nth-child(2){width:62vw; height:62vw; right:-20vw; top:15vh; background:var(--tint2); opacity:.45; animation:dr2 64s ease-in-out infinite}
-.aurora span:nth-child(3){width:74vw; height:74vw; left:-14vw; bottom:-18vh; background:var(--tint3); opacity:.42; animation:dr3 58s ease-in-out infinite}
-.aurora span:nth-child(4){width:44vw; height:44vw; right:-10vw; bottom:6vh; background:var(--tint4); opacity:.34; animation:dr4 46s ease-in-out infinite}
+.aurora span{filter:blur(96px)}
+.aurora span:nth-child(1){width:78vw; height:78vw; left:-26vw; top:-22vw; background:var(--tint1); opacity:.50; animation:dr1 72s ease-in-out infinite}
+.aurora span:nth-child(2){width:66vw; height:66vw; right:-24vw; top:12vh; background:var(--tint2); opacity:.38; animation:dr2 88s ease-in-out infinite}
+.aurora span:nth-child(3){width:82vw; height:82vw; left:-20vw; bottom:-24vh; background:var(--tint3); opacity:.36; animation:dr3 80s ease-in-out infinite}
+.aurora span:nth-child(4){width:48vw; height:48vw; right:-14vw; bottom:2vh; background:var(--tint4); opacity:.30; animation:dr4 64s ease-in-out infinite}
+/* 中央だけ静める。ここに文字が乗るので、色がまわると読みにくい */
+.aurora::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(108% 66% at 50% 30%, rgba(var(--gr),.20) 0%, rgba(var(--gr),.05) 44%, transparent 72%)}
 @keyframes dr1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(7vw,5vh,0) scale(1.14)}}
 @keyframes dr2{0%,100%{transform:translate3d(0,0,0) scale(1.06)}50%{transform:translate3d(-6vw,7vh,0) scale(.94)}}
 @keyframes dr3{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(5vw,-6vh,0) scale(1.1)}}
@@ -104,6 +117,10 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
   -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
   box-shadow:var(--shadow), inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--rim2);
 }
+/* 主役（時計・カウント・天気・電車・シート・タブバー）だけ、一段持ち上げる */
+.clock,.cd,.wx,.train,.route,.sheet,.nav{
+  box-shadow:var(--shadow-hi), inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--rim2);
+}
 @supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
   .sect,.acc,.callout,.pick button,.sheet,.nav{background:var(--glass2)}
 }
@@ -111,7 +128,10 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
 .sect,.acc{position:relative; overflow:hidden}
 .sect::after,.acc::after{
   content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
-  background:linear-gradient(140deg, var(--sheen), transparent 46%);
+  background:linear-gradient(150deg, color-mix(in srgb, var(--sheen) 46%, transparent), transparent 40%);
+}
+.clock::after,.cd::after,.wx::after,.train::after,.route::after{
+  background:linear-gradient(142deg, var(--sheen), transparent 52%);
 }
 .sect > *,.acc > *{position:relative; z-index:1}
 
@@ -126,7 +146,7 @@ button{cursor:pointer; background:none; border:none; padding:0; text-align:left}
   -webkit-mask-image:linear-gradient(#000 68%, transparent); mask-image:linear-gradient(#000 68%, transparent);
 }
 .brand{flex:1 1 auto; min-width:0}
-.brand h1{font-size:calc(15px * var(--fs)); font-weight:600; margin:0; letter-spacing:-.01em; color:var(--label2);
+.brand h1{font-size:calc(15.5px * var(--fs)); font-weight:700; margin:0; letter-spacing:.01em; color:var(--label2);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.4}
 .brick,.studs{display:none}
 .sync{font-size:calc(12px * var(--fs)); color:var(--label3); display:inline-flex; align-items:center; gap:6px;
@@ -361,6 +381,111 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .bellrow .r2{margin-top:8px}
 .bellrow input,.bellrow select{flex:1 1 auto; min-width:0}
 .bellrow .rm{flex:0 0 auto; color:var(--label3); font-size:calc(13px * var(--fs)); padding:0 4px}
+
+/* ===== 数字と見出しの詰め =====
+   このアプリでいちばん見るのは数字（時刻・のこり・あと何日）。
+   そこだけ表示用の書体にして、字間を詰め、幅をそろえる。 */
+.clock .cnow,.clock .cleft em,.cd .cdr em,.wxr em,.mtbest .left,.mtbest b,
+.train .tr em,.calbar .m,.cal .c .n,.dateline .d,.tt li .tmm,#mtList li .d,
+.risk .rn,.prev > div i,.env code{
+  font-family:var(--disp); font-variant-numeric:tabular-nums lining-nums;
+}
+.clock .cnow{letter-spacing:-.045em; font-weight:700}
+.clock .cnow small{letter-spacing:-.02em; font-family:var(--disp)}
+.clock .cleft em{letter-spacing:-.03em}
+.cd .cdr em{letter-spacing:-.035em}
+.dateline .d{letter-spacing:-.038em}
+.calbar .m{letter-spacing:-.032em}
+.mtbest .left,.mtbest b,.train .tr em{letter-spacing:-.025em}
+
+/* 小さな見出しは、字間をあけて芯を強く */
+.cd .cdk,.mtbest .k,.clock .cleft span,.train .tr span,.risk .rsub,.glab{
+  text-transform:none; letter-spacing:.1em; font-weight:700;
+}
+.lab{letter-spacing:.02em; color:var(--label2)}
+.lab .r{letter-spacing:0}
+.dateline .rel{letter-spacing:.06em; font-weight:700; text-transform:none}
+
+/* 区切り線は細く。線が太いと、枚数が多いぶん画面が騒がしくなる */
+.tt li,.trow,.todo li,.bellrow,.trrow,.nrow,.tplrow,.cdlist li,.prep{border-color:var(--hair)}
+.tt li,.trow{border-bottom:1px solid var(--hair)}
+
+/* 押したときの返事をはっきりさせる */
+.btn:active{transform:scale(.965); opacity:.86}
+.chip:active{transform:scale(.94)}
+.tt li.nowline{box-shadow:inset 0 0 0 1px var(--sep)}
+.segs button[aria-pressed="true"]{box-shadow:inset 0 1px 0 var(--rim), 0 2px 5px rgba(9,20,40,.07), 0 8px 18px rgba(9,20,40,.10)}
+.cal .c.today{box-shadow:inset 0 1px 0 var(--rim), inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent)}
+.cal .c.today .n{box-shadow:0 2px 8px var(--accent-soft), 0 1px 2px rgba(9,20,40,.18)}
+
+/* ===== タブレット・PC =====
+   スマホ向けの1列をそのまま引き伸ばすと、両側が余って中央が細長くなる。
+   幅があるときはカードを2〜3列に流し、さらに広ければタブバーを左の柱に置きかえる。 */
+@media (min-width:760px){
+  .app{max-width:880px; padding-inline:24px}
+  .cal .c{min-height:78px; padding:7px 5px; gap:4px}
+  .cal .c .e,.cal .c .tg{font-size:calc(10.5px * var(--fs)); max-height:32px}
+  .sheet{border-radius:26px; margin-bottom:22px; max-height:82vh; max-width:620px}
+  .bg{align-items:center}
+  .pick{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+}
+
+/* カードを2列に。上下に通したいものだけ全幅で割りこませる */
+@media (min-width:800px){
+  #v-home,#v-in,#v-set,#v-todo{column-count:2; column-gap:20px}
+  #v-home > *,#v-in > *,#v-todo > *{break-inside:avoid}
+  #v-home > .sect,#v-in > .sect,#v-todo > .sect{margin-top:0; margin-bottom:20px}
+  #v-set > .gset{break-inside:avoid; margin:0 0 4px}
+  .gset > .glab{margin:14px 8px 6px}
+  .gset:first-child > .glab{margin-top:0}
+  .gset > .acc{margin-top:10px}
+  #v-home > .segs,#v-home > .dateline,#v-home > #firstRun,#v-home > .actions{column-span:all}
+  #v-home > .segs{margin-bottom:18px; max-width:470px}
+  #v-home > .dateline{margin-top:6px}
+  #v-cal{max-width:860px}
+  #v-cal > .actions{max-width:420px}
+  #v-cal > .note{max-width:62ch}
+  #v-rec{max-width:820px}
+}
+
+/* タブバー → 左の柱 */
+@media (min-width:1000px){
+  body{padding-left:252px}
+  .app{max-width:1140px; padding-inline:26px;
+       padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+  .mast{height:62px}
+  .brand h1{font-size:calc(17px * var(--fs)); color:var(--label)}
+  .nav{
+    position:fixed; left:22px; top:50%; bottom:auto; transform:translateY(-50%);
+    width:208px; max-width:none; display:flex; flex-direction:column; gap:3px;
+    padding:13px 11px; border-radius:24px;
+  }
+  .nav button{
+    flex-direction:row; justify-content:flex-start; align-items:center; gap:13px;
+    text-align:left; padding:12px 13px; border-radius:14px;
+    font-size:calc(14.5px * var(--fs)); font-weight:500;
+    transition:color .18s, background .18s;
+  }
+  .nav button svg{width:22px; height:22px; flex:0 0 auto}
+  .nav button:hover{color:var(--label2); background:var(--glass3)}
+  .nav button[aria-current="page"]{background:var(--glass3); box-shadow:inset 0 0 0 1px var(--rim2)}
+  .nav button[aria-current="page"] svg{transform:none}
+  .cal{gap:5px}
+  .cal .c{min-height:104px; padding:9px 7px; gap:5px}
+  .cal .c .n{width:28px; height:28px; font-size:calc(14.5px * var(--fs))}
+  .cal .c .e,.cal .c .tg{font-size:calc(11px * var(--fs)); max-height:46px}
+  .cal .h{font-size:calc(12.5px * var(--fs)); padding-bottom:10px}
+}
+@media (min-width:1480px){
+  .app{max-width:1440px}
+  #v-home,#v-set{column-count:3}
+}
+/* 指ではなくマウスのとき、押せるところをわかりやすく */
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{filter:brightness(1.04)}
+  .chip:hover,.trow:hover,.tplrow:hover{background:var(--glass3)}
+  .cal .c:hover{box-shadow:inset 0 1px 0 var(--rim), inset 0 0 0 1.5px var(--accent)}
+}
 
 /* ===== 天気・警報 ===== */
 .wxtop{display:flex; align-items:center; gap:14px}
@@ -731,6 +856,18 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <ul class="cdlist" id="cdMore"></ul>
     </div>
 
+    <div class="sect cd" id="hRest" style="display:none">
+      <div class="cdtop">
+        <div class="cdl">
+          <span class="cdk">つぎの休み</span>
+          <b id="restName">—</b>
+          <span class="cdd" id="restDate"></span>
+        </div>
+        <div class="cdr"><em id="restNum">0</em><i id="restUnit">日</i></div>
+      </div>
+      <ul class="cdlist" id="restMore"></ul>
+    </div>
+
     <div class="dateline">
       <div>
         <p class="rel" id="hRel">今日</p>
@@ -925,7 +1062,8 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
   <section class="view" id="v-set">
     <div style="height:6px"></div>
 
-    <p class="glab">時間割</p>
+    <div class="gset">
+<p class="glab">時間割</p>
 <details class="acc">
       <summary>通常時程</summary>
       <div class="in">
@@ -999,8 +1137,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <button class="btn sm" id="disAdd" style="margin-top:14px">候補を追加</button>
       </div>
     </details>
+    </div>
 
-    <p class="glab">教科と持ち物</p>
+    <div class="gset">
+<p class="glab">教科と持ち物</p>
 <details class="acc">
       <summary>教科</summary>
       <div class="in">
@@ -1030,8 +1170,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <div id="siList"></div>
       </div>
     </details>
+    </div>
 
-    <p class="glab">学校のこと</p>
+    <div class="gset">
+<p class="glab">学校のこと</p>
 <details class="acc">
       <summary>学校の年間行事</summary>
       <div class="in">
@@ -1081,8 +1223,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" style="margin:0">診断されたら、その時点で学校に連絡します。休む期間は、インフルエンザが「発症した後5日を過ぎ、かつ熱が下がった後2日を過ぎるまで」、新型コロナが「発症した後5日を過ぎ、かつ症状が軽くなった後1日を過ぎるまで」。治癒証明書ではなく、保護者が書く「罹患証明書」を、原則として登校した日に出します。用紙は学校ホームページの「在校生・保護者の方へ → 各種届出表」からダウンロードできます。裏に調剤説明書のコピーなど、かかったことがわかる書類をつけてください。ほかの感染症は、原則として治癒証明書が必要です。</p>
       </div>
     </details>
+    </div>
 
-    <p class="glab">通学</p>
+    <div class="gset">
+<p class="glab">通学</p>
 <details class="acc">
       <summary>登校ルート</summary>
       <div class="in">
@@ -1125,8 +1269,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" style="margin-top:14px">運行情報は「文字起こしサーバー」を通して各社の公式ページを読んでいます。サーバーを設定していないと、時刻のカウントだけになります。</p>
       </div>
     </details>
+    </div>
 
-    <p class="glab">アプリのこと</p>
+    <div class="gset">
+<p class="glab">アプリのこと</p>
     <details class="acc">
       <summary>今日の画面に出すもの</summary>
       <div class="in">
@@ -1203,8 +1349,10 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <button class="btn sm mark" id="dWipe" style="margin-top:14px">ぜんぶ消してはじめから</button>
       </div>
     </details>
+    </div>
 
-    <p class="glab">はじめの設定</p>
+    <div class="gset">
+<p class="glab">はじめの設定</p>
 <details class="acc">
       <summary>3年A組の時間割</summary>
       <div class="in">
@@ -1238,6 +1386,7 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         <p class="note" id="sttMsg" style="margin-top:12px"></p>
       </div>
     </details>
+    </div>
 
   </section>
 
@@ -1869,6 +2018,7 @@ function renderHome(){
     tt.appendChild(li);
   }
   renderPrep();
+  renderRest();
   var f = $("#hFacts"); f.innerHTML = "";
   var g = el("div"); g.appendChild(el("dt",null,"下校")); g.appendChild(el("dd",null, d.dis || "—")); f.appendChild(g);
 
@@ -2113,7 +2263,7 @@ function SHOW_LIST(){
   return [
     ["clock","時計"], ["wx","天気・警報"], ["cd","もうすぐ"],
     ["train","電車"], ["route","登校ルート"],
-    ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
+    ["rest","つぎの休み"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
     ["memo","連絡・写真"], ["note","授業のノート"]
   ];
 }
@@ -2590,11 +2740,11 @@ function renderCal(){
         if(r.ev) bars.appendChild(el("i","bar b3"));
         if(tp) bars.appendChild(el("i","bar b4"));
         c.appendChild(bars);
-        if(tp) c.appendChild(el("div","tg", tp.n.slice(0,7)));
+        if(tp) c.appendChild(el("div","tg", tp.n.slice(0,10)));
         /* テンプレート名と同じ文字が下にもう一度出ないようにする */
         var evT = r.ev || "";
         if(tp && evT.indexOf(tp.n) === 0) evT = evT.slice(tp.n.length).replace(/^[／\/・\s]+/, "");
-        if(evT) c.appendChild(el("div","e", evT.slice(0, tp ? 6 : 8)));
+        if(evT) c.appendChild(el("div","e", evT.slice(0, tp ? 14 : 22)));
       }
       c.addEventListener("click", function(){
         if(asgTpl){
@@ -4055,6 +4205,107 @@ function cdList(limit){
   }
   return out;
 }
+/* ============ つぎの休み ============ */
+/* 学校がある日かどうかは schoolDay が知っている（日曜・家庭学習日・休暇・祝日）。
+   そこから、次に休める日と、その休みが何日続くかを数える。 */
+function restName(k){
+  var ev = (S.days[k] && S.days[k].ev) || "";
+  var hit = ev.split("／").map(function(x){ return x.trim(); }).filter(function(x){
+    return HOLI_RE.test(x) || OFF_RE.test(x);
+  })[0];
+  if(hit) return hit;
+  var w = parseKey(k).getDay();
+  return w === 0 ? "日曜日" : w === 6 ? "土曜日" : "休み";
+}
+function isShukujitsu(k){
+  return HOLI_RE.test((S.days[k] && S.days[k].ev) || "");
+}
+/* 続いた休みは、その中の祝日の名前で呼ぶ（「日曜日 4連休」より「敬老の日 4連休」） */
+function runName(k, run){
+  for(var i = 0; i < run; i++){
+    var d = keyOf(addDays(parseKey(k), i));
+    if(isShukujitsu(d)) return restName(d);
+  }
+  return restName(k);
+}
+/* 次に祝日が来る日そのもの（続いた休みの途中でもよい） */
+function nextHoliday(from){
+  var k = from;
+  for(var i = 0; i < 400; i++){
+    if(isShukujitsu(k)) return {k:k, d:Math.round((parseKey(k) - parseKey(from)) / 86400000)};
+    k = keyOf(addDays(parseKey(k), 1));
+  }
+  return null;
+}
+/* その日から何日続けて休みか */
+function restRun(k){
+  var n = 0, d = k;
+  while(n < 40 && !schoolDay(d)){ n++; d = keyOf(addDays(parseKey(d), 1)); }
+  return n;
+}
+/* from の日から先で、minRun 日以上つづく最初の休み */
+function nextRest(from, minRun, need){
+  var k = from;
+  for(var i = 0; i < 400; i++){
+    if(!schoolDay(k)){
+      var run = restRun(k);
+      if(run >= (minRun || 1) && (!need || need(k)))
+        return {k:k, run:run, d:Math.round((parseKey(k) - parseKey(from)) / 86400000)};
+      k = keyOf(addDays(parseKey(k), Math.max(1, run)));
+      continue;
+    }
+    k = keyOf(addDays(parseKey(k), 1));
+  }
+  return null;
+}
+function mdw(k){
+  var x = parseKey(k);
+  return (x.getMonth()+1) + "月" + x.getDate() + "日(" + DOW[x.getDay()] + ")";
+}
+/* 「9月21日(月)〜23日(水)」のように、続く休みをひとつづきで書く */
+function restSpan(k, run){
+  if(run < 2) return mdw(k);
+  var e = keyOf(addDays(parseKey(k), run - 1)), a = parseKey(k), b = parseKey(e);
+  var tail = (a.getMonth() === b.getMonth() ? "" : (b.getMonth()+1) + "月")
+           + b.getDate() + "日(" + DOW[b.getDay()] + ")";
+  return mdw(k) + "〜" + tail;
+}
+function renderRest(){
+  var box = $("#hRest"); if(!box) return;
+  if(!showOn("rest")){ box.style.display = "none"; return; }
+  var today = keyOf(new Date());
+  var r = nextRest(today, 1);
+  if(!r){ box.style.display = "none"; return; }
+  box.style.display = "";
+
+  var run = r.run;
+  $("#restName").textContent = runName(r.k, run) + (run >= 2 ? ("　" + run + "連休") : "");
+  $("#restDate").textContent = restSpan(r.k, run);
+  $("#restNum").textContent = r.d === 0 ? "今日" : String(r.d);
+  $("#restUnit").textContent = r.d === 0 ? "" : "日";
+  box.classList.toggle("soon", r.d <= 1);
+
+  var ul = $("#restMore"); ul.innerHTML = "";
+  function row(label, x){
+    if(!x) return;
+    var away = Math.round((parseKey(x.k) - parseKey(today)) / 86400000);
+    var li = el("li");
+    li.appendChild(el("span", null,
+      label + "　" + runName(x.k, x.run || 1) + (x.run >= 2 ? ("（" + x.run + "連休）") : "") + "　" + mdw(x.k)));
+    li.appendChild(el("b", null, "あと" + away + "日"));
+    ul.appendChild(li);
+  }
+  var after = keyOf(addDays(parseKey(r.k), run));     /* いちばん近い休みが明けた日 */
+  var seen = {};
+  var sh = nextHoliday(today);
+  if(sh && sh.k >= after){ row("つぎの祝日", {k:sh.k, d:sh.d, run:restRun(sh.k)}); seen[sh.k] = 1; }
+  var three = nextRest(after, 3);
+  if(three && !seen[three.k] && run < 3){ row("つぎの連休", three); seen[three.k] = 1; }
+  else if(three && !seen[three.k]){ row("そのつぎの連休", three); seen[three.k] = 1; }
+  var longr = nextRest(today, 6);
+  if(longr && !seen[longr.k] && longr.k !== r.k) row("つぎの長い休み", longr);
+}
+
 function renderCd(){
   var box = $("#hCd"), list = cdList(4);
   if(!list.length || !showOn("cd")){ box.style.display = "none"; return; }
@@ -4303,12 +4554,14 @@ function calcRisk(w){
   return {close:pct(close), early:pct(early), why:why};
 }
 
+/* 祝日の名前（国民の休日・振替休日も「休日」で拾う） */
+var HOLI_RE = /(の日|休日|敬老|秋分|春分|元日|成人|建国|昭和|憲法|みどり|勤労感謝|天皇誕生日|ホリデー)/;
+/* 学校が休みになる、そのほかの書き方 */
+var OFF_RE  = /(家庭学習日|休暇)/;
 function schoolDay(k){
-  var dt = parseKey(k);
-  if(dt.getDay() === 0) return false;
+  if(parseKey(k).getDay() === 0) return false;
   var ev = (S.days[k] && S.days[k].ev) || "";
-  if(/家庭学習日|休暇|振替休日|の日|敬老|秋分|春分|元日|成人|建国|昭和|憲法|みどり|こどもの日|海の日|山の日|勤労感謝|天皇誕生日|文化の日|ホリデー/.test(ev)) return false;
-  return true;
+  return !(HOLI_RE.test(ev) || OFF_RE.test(ev));
 }
 
 function drawRisk(mw, aw, mornKey, aftKey){
