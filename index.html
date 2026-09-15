@@ -468,6 +468,9 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .seats button.s1 i,.seats button.s2 i,.seats button.s3 i,.seats button.s4 i{color:currentColor; opacity:.72}
 .seats button.pickon{box-shadow:inset 0 0 0 2px var(--accent)}
 .seats .gap{display:block; aspect-ratio:1/.94}            /* そこに席がない場所 */
+.seats button.add{background:none; color:var(--label3); box-shadow:none;
+  border:1.5px dashed var(--sep2); border-radius:12px}
+.seats button.add b{font-size:calc(15px * var(--fs)); font-weight:600}
 .seatdir{margin:10px 0 0; text-align:center; font-size:calc(11.5px * var(--fs));
   color:var(--label3); letter-spacing:.04em}
 /* 出欠のまとめ */
@@ -479,6 +482,13 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 .attsum span b{font-family:var(--disp); font-weight:700; color:var(--label); margin-left:7px;
   font-variant-numeric:tabular-nums; font-size:calc(16px * var(--fs))}
 .attsum span.warn b{color:var(--red)}
+/* 会場のひとこと表 */
+.hall{display:flex; flex-direction:column; margin:0 0 6px}
+.hall li{display:flex; gap:12px; padding:9px 0; border-top:1px solid var(--hair);
+  font-size:calc(14px * var(--fs)); line-height:1.5}
+.hall li:first-child{border-top:none}
+.hall li i{font-style:normal; flex:0 0 auto; min-width:5.2em; color:var(--label3); font-weight:600}
+.hall li span{flex:1 1 auto; min-width:0}
 /* 名簿 */
 .rost{display:flex; flex-direction:column}
 .rost li{display:flex; align-items:center; gap:11px; padding:9px 0; border-top:1px solid var(--hair)}
@@ -522,6 +532,10 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
   .seats b,.seats i,.seats em{color:#000 !important}
   .room .sides,.backline,.colno span,.seatdir{color:#000 !important}
   #pgWhoS{break-inside:avoid}
+  /* 図が大きすぎると2枚目にこぼれるので、幅を決めてまん中に置く */
+  #pgRoom{max-width:150mm; margin-inline:auto}
+  .seats{gap:5px}
+  .sect{margin:0 0 7mm !important}
 }
 
 /* ===== 時計モード =====
@@ -922,20 +936,6 @@ input[type=range]::-moz-range-thumb{width:24px; height:24px; border:none; border
 }
 .toast.on{opacity:1; transform:translate(-50%,0)}
 
-/* 下にスクロールすると出てくる「上に戻る」ボタン */
-.toTop{
-  position:fixed; right:16px; bottom:calc(88px + env(safe-area-inset-bottom));
-  width:46px; height:46px; border-radius:50%; z-index:45;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--glass2); -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
-  box-shadow:var(--shadow-hi), inset 0 1px 0 var(--rim), inset 0 0 0 1px var(--rim2);
-  opacity:0; pointer-events:none; transform:translateY(10px) scale(.9);
-  transition:opacity .22s, transform .26s var(--ease);
-}
-.toTop.on{opacity:1; pointer-events:auto; transform:translateY(0) scale(1)}
-.toTop:active{transform:scale(.92)}
-.toTop svg{width:22px; height:22px; stroke:var(--label); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-
 /* ===== 録音タブ ===== */
 .nav{grid-template-columns:repeat(6,1fr)}
 .nav button{font-size:calc(10px * var(--fs))}
@@ -1144,11 +1144,6 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
       <p class="lab">出欠<span class="r"><button class="btn sm" id="hAttSeat">座席表</button></span></p>
       <div class="attsum" id="hAttSum"></div>
       <div id="hAttWho"></div>
-    </div>
-
-    <div class="sect" id="hTobanS" style="display:none">
-      <p class="lab">日直・旗当番</p>
-      <dl class="facts" id="hToban"></dl>
     </div>
 
     <div class="sect" id="hPrepS" style="display:none">
@@ -1449,29 +1444,19 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     <div class="gset">
 <p class="glab">学校のこと</p>
 <details class="acc">
+      <summary>感謝祭の会場</summary>
+      <div class="in">
+        <p class="note" style="margin:0 0 16px">会場は<b>産業振興センター</b>です。もらった平面図から、当日わかっていると助かるところだけ書き出してあります。くわしい図は学校からの紙を見てください。</p>
+        <div id="hallList"></div>
+        <p class="lab" style="margin-top:22px">建物のつくり</p>
+        <p class="note" style="margin:0">1階がエントランスロビーとあいおいホール、2階がロビーと展示コーナー（あいおいホールの吹抜けを見おろす形）。3〜6階は会議室、7階が小ホールです。エレベーターは本館側にあります。非常口と非常階段は各階の図に赤と黄で示されています。</p>
+      </div>
+    </details>
+<details class="acc">
       <summary>クラスと座席</summary>
       <div class="in">
         <p class="note" style="margin:0 0 14px">名簿・座席のならび・出欠・出席率は、ひとつの画面にまとめてあります。</p>
         <button class="btn sm" id="setSeatOpen">出欠・座席表をひらく</button>
-      </div>
-    </details>
-<details class="acc">
-      <summary>日直・旗当番</summary>
-      <div class="in">
-        <p class="note" style="margin:0 0 14px">「クラスと座席」の名簿を、出席番号の順番でまわします。土日と、行事・予定に休みの言葉が入っている日は数えません。</p>
-        <p class="note" id="tobanRosMsg" style="margin:0 0 14px"></p>
-
-        <p class="lab">日直</p>
-        <div class="frow"><span>基準日</span><input type="date" id="tobanNK"></div>
-        <div class="frow"><span>その日の出席番号</span><input type="number" id="tobanNNo" inputmode="numeric" min="1"></div>
-        <div class="frow" style="margin-bottom:14px"><span>1回の人数</span><input type="number" id="tobanNCnt" inputmode="numeric" min="1"></div>
-
-        <p class="lab" style="margin-top:18px">旗当番</p>
-        <div class="frow"><span>基準日</span><input type="date" id="tobanHK"></div>
-        <div class="frow"><span>その日の出席番号</span><input type="number" id="tobanHNo" inputmode="numeric" min="1"></div>
-        <div class="frow"><span>1回の人数</span><input type="number" id="tobanHCnt" inputmode="numeric" min="1"></div>
-
-        <p class="note" style="margin-top:14px">「基準日」に「その日の出席番号」の人が担当だった、という実際にあった1日を入れてください。そこからの順番で、他の日を計算します。</p>
       </div>
     </details>
 <details class="acc">
@@ -1853,7 +1838,8 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
         </div>
       </div>
       <div class="sect">
-        <p class="lab">席を入れかえる</p>
+        <p class="lab">席をなおす</p>
+        <div class="chips" id="seatMode" style="margin:0 0 12px"></div>
         <p class="note" id="seatMsg" style="margin:0 0 14px">マスを2つおすと、その席が入れかわります。</p>
         <div id="seatEdit"></div>
       </div>
@@ -1904,10 +1890,6 @@ canvas.wave{display:block; width:100%; height:44px; margin-top:6px}
     </button>
   </nav>
 </div>
-
-<button class="toTop" id="toTop" aria-label="上に戻る" type="button">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-</button>
 
 <div class="bg" id="bg"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
@@ -2015,6 +1997,11 @@ function readLocal(){
   if(!S.show) S.show = SHOW_DEF();
   if(!S.grade) S.grade = 3;
   if(!S.cls) S.cls = CLS_DEF();
+  /* まだ名簿を入れていないなら、もらった座席表を入れておく（自分で入れた人はさわらない） */
+  if(!S.mig7){
+    if(!S.cls.roster || !S.cls.roster.length) S.cls = CLS_A();
+    S.mig7 = true;
+  }
   if(!S.show.att) S.show.att = 1;
   if(!S.study) S.study = {};
   if(!S.mig4){
@@ -2472,7 +2459,6 @@ function renderHome(){
   var pend = S.todos.filter(function(t){ return !t.k && (!t.d || t.d <= k); }).sort(sortTodos);
   $("#hTodoS").style.display = (pend.length && showOn("todo")) ? "" : "none";
   renderHomeAtt(k);
-  renderHomeToban(k);
   layoutHome();
   var tl = $("#hTodo"); tl.innerHTML = "";
   pend.slice(0,8).forEach(function(t){ tl.appendChild(todoRow(t, null)); });
@@ -2697,7 +2683,7 @@ function SHOW_LIST(){
   return [
     ["clock","時計"], ["wx","天気・警報"], ["cd","もうすぐ"],
     ["train","電車"], ["route","登校ルート"],
-    ["rest","つぎの休み"], ["att","出欠"], ["toban","日直・旗当番"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
+    ["rest","つぎの休み"], ["att","出欠"], ["prep","今日の予習"], ["todo","課題"], ["ev","行事・予定"],
     ["memo","連絡・写真"], ["note","授業のノート"]
   ];
 }
@@ -2727,27 +2713,83 @@ function renderShow(){
    出欠は「ふつうは出席」なので、出席でない人だけを書きとめる。
    誰も休んでいない日と、まだ取っていない日は別のものなので、attOn で分けておく。 */
 /* colsN は「右の列から」数えた、列ごとの人数。教室の形がそのまま入る */
-function CLS_DEF(){ return {n:"", roster:[], colsN:[3,5,6,6,5,4], seat:[]}; }
+/* 席のあるなしは has（1マスずつ）で持つ。
+   人数のちがう列が、前からではなく1つ後ろから始まることがあるため、
+   「列ごとの人数」だけでは本物の教室の形を表せない。 */
+/* 3年A組の教室座席表（もらった紙のとおり）。
+   画面は「生徒の席から見た向き」なので、紙（教卓が下）とは前後・左右がひっくり返る。 */
+function CLS_A(){
+  return {
+    n: "3年A組",
+    roster: [
+      {no:1,n:"浅岡 和義"},{no:2,n:"安藤 百花"},{no:3,n:"伊藤 三瑛"},{no:4,n:"岩下 哲也"},
+      {no:5,n:"上原 小和"},{no:6,n:"大西 倫太郎"},{no:7,n:"岡田 悠希"},{no:8,n:"神谷 浩之介"},
+      {no:9,n:"纐纈 めい"},{no:10,n:"小松﨑 亜季"},{no:11,n:"古村 洋翔"},{no:12,n:"小山 由奈"},
+      {no:13,n:"謝 婷萱"},{no:14,n:"鈴木 蓮都"},{no:15,n:"高須 琉惟"},{no:16,n:"田村 昴流"},
+      {no:17,n:"千葉 耀人"},{no:18,n:"土屋 晴輝"},{no:19,n:"ディフ桑原 もも"},{no:20,n:"内藤 紬"},
+      {no:21,n:"長尾 盾信"},{no:22,n:"長澤 吏玖"},{no:23,n:"濱田 龍聖"},{no:24,n:"平山 凱斗"},
+      {no:25,n:"松尾 俊太朗"},{no:26,n:"松永 壮右"},{no:27,n:"矢橋 一将"},{no:28,n:"湯浅 椋太"},
+      {no:29,n:"若狭 朱香"}
+    ],
+    cols:6, rows:6, swap:false,
+    /* 上が黒板・右が自分の右。あいているところは席そのものが無い */
+    has:[ 0,1,1,1,1,0,
+          1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          1,1,1,1,1,1,
+          1,1,1,1,1,0,
+          0,0,1,1,0,0 ],
+    seat:[ null, 26,  6, 11,  9, null,
+             21, 20,  2, 12, 13,  28,
+              7, 27, 29,  5, 24,  10,
+              3,  4, 18,  8, 14,  17,
+             23, 22, 16, 15, 19, null,
+           null, null, 25,  1, null, null ]
+  };
+}
+function CLS_DEF(){ return CLS_A(); }
+/* 「右から数えた列ごとの人数」から、前づめの has を作る */
+function shapeHas(colsN, rows){
+  var cols = colsN.length, scr = colsN.slice().reverse(), a = [], x, y;
+  for(y=0; y<rows; y++) for(x=0; x<cols; x++) a.push(y < scr[x] ? 1 : 0);
+  return a;
+}
 function cls(){
   if(!S.cls) S.cls = CLS_DEF();
   var c = S.cls;
   if(!c.roster) c.roster = [];
   if(!c.seat) c.seat = [];
-  if(!c.colsN || !c.colsN.length){
-    /* 前の形（たて×よこがそろった四角）から移す */
-    var w = c.cols || 6, h = c.rows || 6, a = [];
-    for(var i=0;i<w;i++) a.push(h);
-    c.colsN = a;
+  if(!c.has || !c.has.length){
+    /* 前の持ちかた（列ごとの人数だけ）から移す */
+    var cn = (c.colsN && c.colsN.length) ? c.colsN : [3,5,6,6,5,4];
+    c.cols = cn.length;
+    c.rows = Math.max.apply(null, cn.concat([1]));
+    c.has = shapeHas(cn, c.rows);
   }
-  delete c.cols; delete c.rows;
+  if(!c.cols) c.cols = 6;
+  if(!c.rows) c.rows = 6;
+  delete c.colsN;
   return c;
 }
-/* 画面は左から右へならぶので、右から数えた colsN をひっくり返して使う */
-function colsScr(){ return cls().colsN.slice().reverse(); }
-function seatCols(){ return cls().colsN.length; }
-function seatRows(){ return Math.max.apply(null, cls().colsN.concat([1])); }
-function seatHas(x, y){ return y < (colsScr()[x] || 0); }      /* x は画面の左から */
-function seatTotal(){ return cls().colsN.reduce(function(a,b){ return a + b; }, 0); }
+function seatCols(){ return cls().cols; }
+function seatRows(){ return cls().rows; }
+function seatHas(x, y){                                    /* x は画面の左から */
+  var c = cls();
+  return !!c.has[y * c.cols + x];
+}
+function seatTotal(){
+  return cls().has.reduce(function(a,b){ return a + (b ? 1 : 0); }, 0);
+}
+/* 設定の欄に出す「右から数えた列ごとの人数」を、has から数える */
+function colsN(){
+  var c = cls(), out = [], x, y, n;
+  for(x = c.cols - 1; x >= 0; x--){                        /* 右の列から */
+    n = 0;
+    for(y = 0; y < c.rows; y++) if(c.has[y * c.cols + x]) n++;
+    out.push(n);
+  }
+  return out;
+}
 var ATT_CY = ["", "欠", "遅", "早", "停"];                       /* おすたびにこの順で変わる */
 var ATT_NM = {"欠":"欠席", "遅":"遅刻", "早":"早退", "停":"出席停止"};
 var ATT_CL = {"欠":"s1", "遅":"s2", "早":"s3", "停":"s4"};
@@ -2845,21 +2887,30 @@ function shapeParse(txt){
             .map(function(z){ return Math.max(0, Math.min(12, +z)); });
   return a.slice(0, 12);
 }
-function shapeText(){ return cls().colsN.join("-"); }
-/* 形を変えても、いま座っている人はできるだけそのまま残す */
+function shapeText(){ return colsN().join("-"); }
+/* 形を変えても、いま座っている人はできるだけそのまま残す。
+   人数だけを書きかえたときは、前づめにならび直す。 */
 function shapeSet(a){
   if(!a.length) return;
-  var c = cls(), oldS = seatGet(), oldC = seatCols(), oldR = seatRows();
-  c.colsN = a;
-  var cols = seatCols(), rows = seatRows(), s = [], x, y, v;
+  var c = cls(), oldS = seatGet(), oldC = c.cols, oldR = c.rows;
+  c.cols = a.length;
+  c.rows = Math.max.apply(null, a.concat([1]));
+  c.has = shapeHas(a, c.rows);
+  var s = [], x, y, v;
   /* 画面の右はしをそろえたいので、右から数えて同じ位置を引きつぐ */
-  for(y=0; y<rows; y++) for(x=0; x<cols; x++){
-    var ox = oldC - (cols - x);
+  for(y=0; y<c.rows; y++) for(x=0; x<c.cols; x++){
+    var ox = oldC - (c.cols - x);
     v = (ox >= 0 && ox < oldC && y < oldR) ? oldS[y*oldC + ox] : null;
     s.push(seatHas(x, y) ? v : null);
   }
   c.seat = s;
-  /* あふれた人は、席なしとして下に出る */
+  seatPick = null;    /* あふれた人は「席がない人」として下に出る */
+}
+/* 1マスだけ、席のあるなしを変える */
+function seatToggle(i){
+  var c = cls();
+  c.has[i] = c.has[i] ? 0 : 1;
+  if(!c.has[i]) c.seat[i] = null;      /* 席をなくしたら、その人は席なしにもどる */
   seatPick = null;
 }
 /* 席が用意されていない人。この人たちも出欠は取れないと困る */
@@ -2890,7 +2941,7 @@ function rosterParse(txt){
    mode "att"  タップで 出席→欠→遅→早→停 と変える
    mode "view" 見るだけ
    mode "edit" タップで席を入れかえる（2回タップで交換） */
-var seatPick = null;
+var seatPick = null, seatMode = "swap";
 function seatGrid(host, k, mode){
   var s = seatGet(), a = (mode === "edit") ? {} : attOf(k), cols = seatCols();
   host.innerHTML = "";
@@ -2913,7 +2964,18 @@ function seatGrid(host, k, mode){
   g.style.setProperty("--sc", cols);
   s.forEach(function(no, i){
     var x = i % cols, y = (i - x) / cols;
-    if(!seatHas(x, y)){ g.appendChild(el("span","gap")); return; }   /* そこに席はない */
+    if(!seatHas(x, y)){
+      if(mode === "edit" && seatMode === "has"){                      /* 席を足せる場所として出す */
+        var ad = el("button","add"); ad.type = "button";
+        ad.appendChild(el("b", null, "＋"));
+        ad.setAttribute("aria-label", "ここに席をつくる");
+        ad.addEventListener("click", function(){ seatToggle(i); save(); renderSeatEdit(); });
+        g.appendChild(ad);
+      }else{
+        g.appendChild(el("span","gap"));                              /* そこに席はない */
+      }
+      return;
+    }
     var b = el("button"); b.type = "button";
     if(no == null){
       b.className = "non";
@@ -2929,6 +2991,7 @@ function seatGrid(host, k, mode){
     if(mode === "view") b.disabled = true;
     else b.addEventListener("click", function(){
       if(mode === "edit"){
+        if(seatMode === "has"){ seatToggle(i); save(); renderSeatEdit(); return; }
         if(seatPick == null){ seatPick = i; }
         else if(seatPick === i){ seatPick = null; }
         else{
@@ -3007,6 +3070,47 @@ function renderInAtt(){
 var rateSpan = "month";
 function openRate(){ seatOpen("rate"); }
 
+/* ============ 感謝祭の会場 ============ */
+/* 産業振興センターの平面図から、当日わかっていると助かるところだけ */
+var HALLS = [
+  {n:"あいおいホール（展示場）", f:"1階（吹抜けで2階まで）",
+   rows:[
+     ["広さ", "39.5m × 24.0m"],
+     ["席数", "全758席（平席スタッキング420席＋階段席ロールバック338席）"],
+     ["階段席", "A〜M列。2階側にせり出す形で、後ろが高くなる"],
+     ["ステージ", "西側（図の左）。前にホワイエ、後ろにロールバック"],
+     ["机・いす", "机50脚（前板付10脚）／スタッキングチェアー460脚"],
+     ["そのほか", "ホワイトボード1台、パーティション（1200×2000）18枚・（900×2000）5枚"],
+     ["電源", "床ピット4か所（仮設電源盤）＋壁面コンセント3回路"]
+   ]},
+  {n:"小ホール", f:"本館7階",
+   rows:[
+     ["ステージ", "面積34.9㎡　幅6.5m（最長10.0m）／奥行4.0m／高さ0.45m"],
+     ["座席", "A〜L列。ステージを囲むように斜めにならぶ"],
+     ["机・いす", "折りたたみ机10脚／スタッキングチェアー40脚"],
+     ["音まわり", "ミキサー（入力12CH）、ワイヤレスマイク ハンド4本・タイピン2本、有線マイク8本"],
+     ["映すもの", "固定スクリーン（電動）4200×4000"],
+     ["そのほか", "グランドピアノ（有料・スタンウェイB-211）、指揮台、金屏風、平台10台"]
+   ]}
+];
+function renderHalls(){
+  var box = $("#hallList"); if(!box) return;
+  box.innerHTML = "";
+  HALLS.forEach(function(h){
+    var p = el("p","lab", h.n);
+    p.appendChild(el("span","r muted", h.f));
+    box.appendChild(p);
+    var ul = el("ul","hall");
+    h.rows.forEach(function(r){
+      var li = el("li");
+      li.appendChild(el("i", null, r[0]));
+      li.appendChild(el("span", null, r[1]));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  });
+}
+
 /* ---- 今日の画面を、柱に振り分ける ----
    カードは背の高さがバラバラなので、そのまま2列にすると
    短いカードの下に大きなすき間ができる。
@@ -3016,34 +3120,76 @@ function homeColN(){
   var w = window.innerWidth;
   return w >= 1480 ? 3 : (w >= 800 ? 2 : 1);
 }
-function fillCols(wrap, cards, n){
-  if(!wrap) return;
-  wrap.className = "hcols" + (n > 1 ? " split" : "");
-  while(wrap.firstChild) wrap.removeChild(wrap.firstChild);
-  if(n === 1){ cards.forEach(function(c){ wrap.appendChild(c); }); return; }
-  var cols = [], i;
-  for(i=0;i<n;i++) cols.push(wrap.appendChild(el("div","hcol")));
-  cards.forEach(function(c){
-    if(c.style.display === "none"){ cols[0].appendChild(c); return; }  /* 隠れている分は数えない */
+/* どの柱に何を入れるかを、先に紙の上で決める。
+   並べながら測ると、そのたびに画面を組み直すことになるため。 */
+function planCols(cards, n){
+  var h = cards.map(function(c){ return c.style.display === "none" ? 0 : c.offsetHeight; });
+  var want = [], sum = [], i, j;
+  for(i=0;i<n;i++){ want.push([]); sum.push(0); }
+  cards.forEach(function(c, idx){
     var b = 0;
-    for(var j=1;j<n;j++) if(cols[j].offsetHeight < cols[b].offsetHeight) b = j;
-    cols[b].appendChild(c);
+    for(j=1;j<n;j++) if(sum[j] < sum[b]) b = j;
+    want[b].push(c); sum[b] += h[idx] + (h[idx] ? 20 : 0);
   });
+  return want;
+}
+/* いまの並びと同じか */
+function sameCols(wrap, want, n){
+  var cur = $$(":scope > .hcol", wrap);
+  if(cur.length !== n) return false;
+  for(var i=0;i<n;i++){
+    var kid = $$(":scope > .sect", cur[i]);
+    if(kid.length !== want[i].length) return false;
+    for(var j=0;j<kid.length;j++) if(kid[j] !== want[i][j]) return false;
+  }
+  return true;
+}
+function fillCols(wrap, cards, n){
+  if(!wrap) return false;
+  if(n === 1){
+    var cur = $$(":scope > .sect", wrap);
+    if(cur.length === cards.length && cur.every(function(e,i){ return e === cards[i]; })
+       && wrap.children.length === cards.length) return false;
+    wrap.className = "hcols";
+    cards.forEach(function(c){ wrap.appendChild(c); });   /* appendChild は動かすだけ */
+    return true;
+  }
+  var want = planCols(cards, n);
+  if(sameCols(wrap, want, n)) return false;               /* 変わらないなら、さわらない */
+  wrap.className = "hcols split";
+  while(wrap.firstChild) wrap.removeChild(wrap.firstChild);
+  want.forEach(function(list){
+    var col = wrap.appendChild(el("div","hcol"));
+    list.forEach(function(c){ col.appendChild(c); });
+  });
+  return true;
 }
 function layoutHome(){
   var A = $("#hColsA"), B = $("#hColsB"); if(!A || !B) return;
   if(!hCardsA){ hCardsA = $$(":scope > .sect", A); hCardsB = $$(":scope > .sect", B); }
   var n = homeColN();
-  fillCols(A, hCardsA, n);
-  fillCols(B, hCardsB, n);
+  var y = window.pageYOffset;
+  var moved = fillCols(A, hCardsA, n);
+  moved = fillCols(B, hCardsB, n) || moved;
+  /* 組み直したときは、見ていた場所に戻す（放っておくと先頭に飛ぶ） */
+  if(moved && window.pageYOffset !== y) window.scrollTo(0, y);
 }
-/* 電車の時刻が後から届いたときなど、高さが変わったら組み直す */
+/* 電車の情報が届いたときなど、高さが変わったら組み直す */
 function relayoutSoon(){
   clearTimeout(hLayT);
   hLayT = setTimeout(function(){ if(view === "home") layoutHome(); }, 180);
 }
-window.addEventListener("resize", relayoutSoon);
-window.addEventListener("orientationchange", relayoutSoon);
+/* iPad や iPhone は、スクロールでアドレスバーが縮むだけでも resize が起きる。
+   たての変化で組み直すと、そのたびに上に飛ぶので、よこ幅が変わったときだけにする。 */
+var lastW = window.innerWidth;
+window.addEventListener("resize", function(){
+  if(window.innerWidth === lastW) return;
+  lastW = window.innerWidth;
+  relayoutSoon();
+});
+window.addEventListener("orientationchange", function(){
+  lastW = -1; relayoutSoon();
+});
 
 /* ---- 1ページにまとめたところ ---- */
 var pgTab = "att", pgKey = null;
@@ -3211,13 +3357,22 @@ function renderRoster(){
 function renderSeatEdit(){
   var host = $("#seatEdit"); if(!host) return;
   $("#seatSide").textContent = "左が" + sideL() + " ／ 右が" + sideR();
+  var mb = $("#seatMode"); mb.innerHTML = "";
+  [["swap","入れかえる"],["has","席のあるなし"]].forEach(function(o){
+    var c = el("button","chip",o[1]); c.type = "button";
+    c.setAttribute("aria-pressed", seatMode === o[0] ? "true" : "false");
+    c.addEventListener("click", function(){ seatMode = o[0]; seatPick = null; renderSeatEdit(); });
+    mb.appendChild(c);
+  });
   var sh = $("#seatShape");
   if(document.activeElement !== sh) sh.value = shapeText();
   $("#seatTot").textContent = "ぜんぶで" + seatTotal() + "席";
   var left = seatLeft();
-  $("#seatMsg").textContent = left.length
-    ? ("マスを2つおすと、その席が入れかわります。席がない人が" + left.length + "人います（" + left.map(function(p){ return p.no + "番"; }).join("、") + "）。")
+  var msg = (seatMode === "has")
+    ? "マスをおすと、そこの席をなくしたり、つくったりできます。列ごとに人数がちがう教室や、前が1つあいている列も、このとおりに作れます。"
     : "マスを2つおすと、その席が入れかわります。";
+  if(left.length) msg += "席がない人が" + left.length + "人います（" + left.map(function(p){ return p.no + "番"; }).join("、") + "）。";
+  $("#seatMsg").textContent = msg;
   seatGrid(host, keyOf(new Date()), "edit");
 }
 
@@ -3247,75 +3402,6 @@ function renderHomeAtt(k){
       box.appendChild(el("p","note","全員そろっています。"));
   }
 }
-
-/* ============ 日直・旗当番 ============ */
-/* 名簿（出席番号順）を、学校がある日だけ数えて順番にまわす。
-   「基準日にこの出席番号の人が担当だった」という実際の1日から、他の日を逆算する。 */
-function tobanDef(){ return {n:{k:"",no:null,c:1}, h:{k:"",no:null,c:1}}; }
-function tobanCfg(){
-  if(!S.toban) S.toban = tobanDef();
-  if(!S.toban.n) S.toban.n = tobanDef().n;
-  if(!S.toban.h) S.toban.h = tobanDef().h;
-  return S.toban;
-}
-function schoolDayDelta(baseK, k){
-  if(baseK === k) return 0;
-  var a = parseKey(baseK), b = parseKey(k), sign = 1;
-  if(b < a){ sign = -1; var tmp = a; a = b; b = tmp; }
-  var cnt = 0, d = addDays(a,1);
-  while(d <= b){ if(schoolDay(keyOf(d))) cnt++; d = addDays(d,1); }
-  return sign * cnt;
-}
-function tobanPick(cfg, k){
-  var rs = cls().roster.slice().sort(function(a,b){ return a.no - b.no; });
-  if(!rs.length || !cfg.k || cfg.no == null) return null;
-  var baseIdx = -1;
-  for(var i=0;i<rs.length;i++){ if(rs[i].no === cfg.no){ baseIdx = i; break; } }
-  if(baseIdx < 0) return null;
-  var L = rs.length, cnt = Math.max(1, Math.min(L, cfg.c || 1));
-  var t = schoolDayDelta(cfg.k, k);
-  var start = ((baseIdx + t*cnt) % L + L) % L;
-  var out = [];
-  for(var j=0;j<cnt;j++) out.push(rs[(start+j) % L]);
-  return out;
-}
-function tobanTxt(list){
-  if(!list) return "";
-  return list.map(function(p){ return p.n ? p.n : (p.no + "番"); }).join("、");
-}
-function renderHomeToban(k){
-  var sect = $("#hTobanS"); if(!sect) return;
-  var rs = cls().roster, cfg = tobanCfg();
-  var hasAny = (cfg.n.k && cfg.n.no != null) || (cfg.h.k && cfg.h.no != null);
-  if(!rs.length || !hasAny || !showOn("toban")){ sect.style.display = "none"; return; }
-  sect.style.display = "";
-  var dl = $("#hToban"); dl.innerHTML = "";
-  function row(nm, cf){
-    if(!(cf.k && cf.no != null)) return;
-    var d = el("div");
-    d.appendChild(el("dt",null,nm));
-    d.appendChild(el("dd",null, tobanTxt(tobanPick(cf, k)) || "—"));
-    dl.appendChild(d);
-  }
-  row("日直", cfg.n); row("旗当番", cfg.h);
-}
-function renderToban(){
-  var cfg = tobanCfg(), rs = cls().roster;
-  $("#tobanRosMsg").textContent = rs.length ? ("名簿は" + rs.length + "人います。") : "まだ名簿がありません。上の「クラスと座席」で、さきに名簿を入れてください。";
-  $("#tobanNK").value = cfg.n.k || "";
-  $("#tobanNNo").value = cfg.n.no != null ? cfg.n.no : "";
-  $("#tobanNCnt").value = cfg.n.c || 1;
-  $("#tobanHK").value = cfg.h.k || "";
-  $("#tobanHNo").value = cfg.h.no != null ? cfg.h.no : "";
-  $("#tobanHCnt").value = cfg.h.c || 1;
-}
-function tobanTouch(){ save(); renderHomeToban(keyOf(addDays(new Date(), off))); }
-$("#tobanNK").addEventListener("change", function(){ tobanCfg().n.k = this.value; tobanTouch(); });
-$("#tobanNNo").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().n.no = isFinite(v)?v:null; tobanTouch(); });
-$("#tobanNCnt").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().n.c = (isFinite(v)&&v>0)?v:1; tobanTouch(); });
-$("#tobanHK").addEventListener("change", function(){ tobanCfg().h.k = this.value; tobanTouch(); });
-$("#tobanHNo").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().h.no = isFinite(v)?v:null; tobanTouch(); });
-$("#tobanHCnt").addEventListener("input", function(){ var v=parseInt(this.value,10); tobanCfg().h.c = (isFinite(v)&&v>0)?v:1; tobanTouch(); });
 
 /* ============ GKテストの記録 ============ */
 /* 朝の活動が「GKテスト」の曜日だけ、記入画面に合否の欄を出す。
@@ -3823,7 +3909,7 @@ $("#calN").addEventListener("click", function(){ cur=new Date(cur.getFullYear(),
 /* ============ SETTINGS ============ */
 var wk = "mon";
 function renderSet(){
-  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow(); renderFs(); renderKPick(); renderToban();
+  renderStt(); renderBell(); renderTrEdit(); renderRtEdit(); renderTplList(); renderEvYear(); renderStorm(); renderSubItems(); renderIcs(); renderShow(); renderFs(); renderKPick(); renderHalls();
   $("#trWalk").value = walkMin();
   $("#hyRide").value = hyRide();
   $("#hyTrans").value = hyTrans();
@@ -7120,7 +7206,7 @@ function trFetch(){
   var c = S.stt || {};
   if(!c.url) return;
   svFetch({"x-train":"1"}).then(function(r){ return r.json(); }).then(function(d){
-    if(d && d.ok){ trInfo = d; renderTrain(); }
+    if(d && d.ok){ trInfo = d; renderTrain(); relayoutSoon(); }
   }).catch(function(){});
 }
 function trStateFor(t){
@@ -7190,7 +7276,6 @@ function renderTrain(){
     n.textContent = "運行情報を取りにいっています…";
   }
   $("#trStatus").textContent = "";
-  relayoutSoon();
 }
 
 /* ============ 登校ルート ============ */
@@ -7470,20 +7555,6 @@ function renderHy(mtDep){
     "名古屋 " + pad(Math.floor(t/60)) + ":" + pad(t%60) + "着 → 乗り換え" + hyTrans() + "分 → 名鉄 " + mtDep + "発に接続" +
     (isHoliday(k) ? "（土日・休日ダイヤ）" : "")));
 }
-
-/* ============ 上に戻るボタン ============ */
-(function(){
-  var btn = $("#toTop");
-  if(!btn) return;
-  var onScroll = function(){
-    btn.classList.toggle("on", window.scrollY > 400);
-  };
-  window.addEventListener("scroll", onScroll, {passive:true});
-  onScroll();
-  btn.addEventListener("click", function(){
-    window.scrollTo({top:0, behavior:"smooth"});
-  });
-})();
 
 /* ============ boot ============ */
 readLocal();
